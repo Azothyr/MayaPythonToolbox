@@ -2524,7 +2524,7 @@ def CreatePolygonToolOptions(*args, **keywords): pass
 def HypershadeUpdatePSDNetworks(*args, **keywords): pass
 def hardwareRenderPanel(*args, **kwargs): pass
 def dR_moveTweakTool(*args, **keywords): pass
-def scale(*args, **kwargs): pass
+def scale(*args: object, **kwargs: object) -> object: pass
 def LatticeUVToolOptions(*args, **keywords): pass
 def minimizeApp(*args, **kwargs): pass
 def createRenderLayer(*args, **kwargs): pass
