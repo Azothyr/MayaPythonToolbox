@@ -2737,7 +2737,7 @@ def polyMoveUV(*args, **kwargs): pass
 def CreaseProxyEdgeTool(*args, **keywords): pass
 def xgmSplinePreset(*args, **keywords): pass
 def listSets(*args, **kwargs): pass
-def ls(*args, **kwargs): pass
+def ls(*args: object, **kwargs: object) -> object: pass
 def InsertEdgeLoopToolOptions(*args, **keywords): pass
 def ikHandleDisplayScale(*args, **kwargs): pass
 def SymmetrizeUVBrushSizeOn(*args, **keywords): pass
