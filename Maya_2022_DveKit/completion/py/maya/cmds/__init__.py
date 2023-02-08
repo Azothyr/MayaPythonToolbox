@@ -44,7 +44,7 @@ def ToggleMeshFaces(*args, **keywords): pass
 def UnpublishNode(*args, **keywords): pass
 def HideFollicles(*args, **keywords): pass
 def AlignCameraToPolygon(*args, **keywords): pass
-def button(*args, **kwargs): pass
+def button(*args: object, **kwargs: object) -> object: pass
 def NURBSSmoothnessFine(*args, **keywords): pass
 def notifyPostRedo(*args, **keywords): pass
 def arnoldCopyAsAdmin(*args, **keywords): pass
@@ -108,7 +108,12 @@ def SelectNone(*args, **keywords): pass
 def SetCurrentUVSet(*args, **keywords): pass
 def ReducePolygonOptions(*args, **keywords): pass
 def FBXExportConvertUnitString(*args, **keywords): pass
-def checkBox(*args, **kwargs): pass
+def checkBox(*args: object, **kwargs: object) -> object:
+    """
+
+    :rtype: object
+    """
+    pass
 def KeyframeTangentMarkingMenuPopDown(*args, **keywords): pass
 def cMuscleAbout(*args, **keywords): pass
 def OffsetCurveOptions(*args, **keywords): pass
@@ -2771,7 +2776,7 @@ def OffsetSurfaces(*args, **keywords): pass
 def CreateNSoftBody(*args, **keywords): pass
 def bufferCurve(*args, **kwargs): pass
 def xgmBindPatches(*args, **keywords): pass
-def setAttr(*args, **kwargs): pass
+def setAttr(*args: object, **kwargs: object) -> object: pass
 def CreateVolumeSphere(*args, **keywords): pass
 def menu(*args, **kwargs): pass
 def TogglePaintOnPaintableObjects(*args, **keywords): pass

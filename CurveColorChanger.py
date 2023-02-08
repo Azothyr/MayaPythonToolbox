@@ -1,16 +1,16 @@
 import maya.cmds as cmds
 
 
-def ColorChanger(color):
+def color_changer(color):
     if color < 1 or color >= 32:
         cmds.error("INVALID INPUT: Color Value must be between 1 and 31")
     else:
-        objSelected = cmds.ls(selection=True)
-        shape = cmds.listRelatives(objSelected, shapes=True)
+        selection = cmds.ls(selection=True)
+        shape = cmds.listRelatives(selection, shapes=True)
 
-        for object in objSelected:
-            cmds.setAttr(object + '.overrideEnabled', 1)
-            cmds.setAttr(object + '.overrideColor', color)
+        for i in selection:
+            cmds.setAttr(i + '.overrideEnabled', 1)
+            cmds.setAttr(i + '.overrideColor', color)
 
 
-ColorChanger(0)
+color_changer(0)

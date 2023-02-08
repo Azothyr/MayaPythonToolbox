@@ -4,14 +4,14 @@ rename_to = str(input("Desired name scheme: "))
 
 
 def sequential_renamer(txt):
-    objs = cmds.ls(sl=True)
+    objects = cmds.ls(sl=True)
     count = txt.count('#')
     scheme_parts = txt.partition(count * "#")
     objects_changed = 0
 
-    for i in range(len(objs)):
-        new_name = scheme_parts[0] + str(i + 1).zfill(count) + schemeParts[2]
-        cmds.rename(objs[i], new_name)
+    for i in range(len(objects)):
+        new_name = scheme_parts[0] + str(i + 1).zfill(count) + scheme_parts[2]
+        cmds.rename(objects[i], new_name)
         objects_changed += 1
 
     print("Number of Objects renamed: " + str(objects_changed))
