@@ -6,7 +6,7 @@ def create_joints():
     Creates a joint at each selection(s) transform.
     Returns: [joints]
     """
-    selections = cmds.ls(select=True)
+    selections = cmds.ls(sl=True)
     new_joints = []
 
     for selection in selections:
