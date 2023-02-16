@@ -90,26 +90,7 @@ def pass_values(select_list, scheme_input, center_bool, parent_bool, freeze_bool
     print(creation_order)
 
 
-def tool_manager(selections, naming_scheme, center_bool, parent_bool, freeze_bool, creation_order):
-    def create_joints():
-        """
-        Creates a joint at each selection(s) transform.
-        Returns: [joints]
-        """
-        new_joints = []
-
-        if not center_bool:
-            for selection in selections:
-                position = cmds.xform(selection, query=True, translation=True, worldSpace=True)
-                cmds.select(clear=True)
-
-                jnt = cmds.joint()
-                new_joints.append(jnt)
-                cmds.xform(jnt, worldSpace=True, translation=position)
-
-            cmds.select(new_joints, replace=True)
-
-            return new_joints
+# def tool_pass_manager(selections, naming_scheme, center_bool, parent_bool, freeze_bool, creation_order):
 
 
 create_ui()
