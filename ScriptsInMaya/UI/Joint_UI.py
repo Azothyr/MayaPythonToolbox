@@ -101,6 +101,12 @@ def create_ui():
             cmds.textScrollList('position_list', edit=True, removeIndexedItem=index)
             center_location.pop(index - 1)
             cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
+            cmds.textScrollList('position_list', edit=True, removeAll=True)
+            for i, item in enumerate(center_location):
+                cmds.textScrollList('position_list', edit=True,
+                                    append=f'{i+1}: {str(item)}')
+            cmds.textScrollList('position_list', edit=True, deselectAll=True)
+
 
     def clear_center_list(*args):
         """
