@@ -11,6 +11,3 @@ def color_changer(color):
         for i in selection:
             cmds.setAttr(i + '.overrideEnabled', 1)
             cmds.setAttr(i + '.overrideColor', color)
-
-
-color_changer(0)

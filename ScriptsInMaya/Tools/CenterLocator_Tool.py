@@ -1,21 +1,17 @@
 import maya.cmds as cmds
 
-selections = cmds.ls(sl=True)
 
-
-def get_selection_center(obj_selection):
+def get_center(_input):
     """
-    Creates a locator at each selection(s) center of mass.
-    Returns: [center_location] (XYZ of the center as a tuple in a list)
+    finds the selection(s) center of mass.
+    Returns: (center x, center y, center z)
     """
-    center_location = []
+    bbox = cmds.exactWorldBoundingBox(_input)
 
-    for selection in obj_selection:
-        cluster = cmds.cluster(selection)
-        center = cmds.xform(cluster, query=True, rotatePivot=True, worldSpace=True)
-        cmds.delete(cluster)
-        center_location.append(center)
-    return center_location
+    center = (
+        (bbox[0] + bbox[3]) / 2,
+        (bbox[1] + bbox[4]) / 2,
+        (bbox[2] + bbox[5]) / 2
+    )
 
-
-get_selection_center(selections)
+    return center

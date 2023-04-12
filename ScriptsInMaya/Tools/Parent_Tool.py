@@ -1,18 +1,15 @@
 import maya.cmds as cmds
-# selection = cmds.ls(sl=True)
 
 
-def parent_selected(obj_selection):
+def parent_selected(data):
     """
     Takes order of selected object and parents them (Last object is parent of all children,
     first is the lowest step)
     Returns: top of hierarchy selected
     """
-    for selection in range(len(obj_selection)):
+    for value in range(len(data)):
         cmds.select(clear=True)
-        cmds.select(obj_selection[selection])
-        if (len(obj_selection) - 1) > selection:
-            cmds.select(obj_selection[selection + 1], add=True)
+        cmds.select(data[value])
+        if (len(data) - 1) > value:
+            cmds.select(data[value + 1], add=True)
             cmds.parent()
-
-# parent_selected(selection)

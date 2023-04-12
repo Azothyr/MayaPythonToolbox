@@ -1,22 +1,23 @@
 import maya.cmds as cmds
 
-rename_to = str(input("Desired name scheme: "))
-selections = cmds.ls(sl=True)
+selection = cmds.ls(sl=True)
 
 
-def get_selection_center(obj_selection):
+def get_center(_input):
     """
-    Creates a locator at each selection(s) center of mass.
-    Returns: [center_location] (XYZ of the center as a tuple in a list)
+    finds the selection(s) center of mass.
+    Returns: (center x, center y, center z)
     """
-    center_location = []
+    print(_input)
+    bbox = cmds.exactWorldBoundingBox(_input)
 
-    for selection in obj_selection:
-        cluster = cmds.cluster(selection)
-        center = cmds.xform(cluster, query=True, rotatePivot=True, worldSpace=True)
-        cmds.delete(cluster)
-        center_location.append(center)
-    return center_location
+    center = (
+        (bbox[0] + bbox[3]) / 2,
+        (bbox[1] + bbox[4]) / 2,
+        (bbox[2] + bbox[5]) / 2
+    )
+
+    return center
 
 
 def create_joints_xyz(xyz_list):
@@ -37,12 +38,12 @@ def create_joints_xyz(xyz_list):
     return new_joints
 
 
-def parent_selected(obj_selection):
-    for selection in range(len(obj_selection)):
+def parent_selected(data):
+    for value in range(len(data)):
         cmds.select(clear=True)
-        cmds.select(obj_selection[selection])
-        if (len(obj_selection) - 1) > selection:
-            cmds.select(obj_selection[selection + 1], add=True)
+        cmds.select(data[value])
+        if (len(data) - 1) > value:
+            cmds.select(data[value + 1], add=True)
             cmds.parent()
 
 
@@ -77,12 +78,22 @@ def orient_joints(obj_selection):
                    zeroScaleOrient=True)
 
 
-def run_tool():
-    center = get_selection_center(selections)
-    joints = create_joints_xyz(center)
-    parent_selected(joints)
-    sequential_renamer(rename_to, joints)
+def run_tool(arg=None):
+    global location
+    if 'location' not in globals():
+        location = []
+    center = get_center(cmds.ls(sl=True))
+    if arg is None:
+        location.append(center)
+        return print(location)
+    elif arg == 'clear':
+        location.clear()
+        print('list cleared')
+    else:
+        rename_to = str(input("Desired name scheme: "))
+        joints = create_joints_xyz(location)
+        parent_selected(joints)
+        sequential_renamer(rename_to, joints)
 
 
 run_tool()
-finger_03_knuckle_##_jnt

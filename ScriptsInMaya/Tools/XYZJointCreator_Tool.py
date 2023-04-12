@@ -1,7 +1,5 @@
 import maya.cmds as cmds
 
-# selections = cmds.ls(sl=True)
-
 
 def create_joints_xyz(xyz_list):
     """
@@ -18,6 +16,3 @@ def create_joints_xyz(xyz_list):
         cmds.xform(jnt, worldSpace=True, translation=center_position)
     cmds.select(new_joints, replace=True)
     return new_joints
-
-
-# create_joints_xyz()
