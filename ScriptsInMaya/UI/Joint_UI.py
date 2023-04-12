@@ -1,6 +1,9 @@
 import maya.cmds as cmds
 from functools import partial
 
+if 'center_location' not in globals():
+    center_location = []
+
 
 def create_joints_xyz(xyz_list):
     """
@@ -103,8 +106,6 @@ def create_ui():
         Calls get_center function and adds the center to the list.
         """
         global center_location
-        if 'center_location' not in globals():
-            center_location = []
         is_joint = False
         sel = cmds.ls(sl=True)
         if not sel:
@@ -178,17 +179,17 @@ def create_ui():
         def update_input_enable():
             return cmds.checkBox(enabler, query=True, value=True)
 
-        cmds.rowColumnLayout(dependant, edit=True, enable=update_input_enable())
+        cmds.rowColumnLayout(dependant, edit=True,
+                             enable=update_input_enable(), noBackground=update_input_enable())
 
     def update_window_size(*args):
         cmds.dockControl(joint_ui_control, edit=True, height=400, width=400)
 
-
     joint_ui_window = 'joint_ui_window'
     joint_ui_control = 'joint_ui_control'
-    if cmds.window(joint_ui_window , exists=True):
-        cmds.deleteUI(joint_ui_window )
-    cmds.window(joint_ui_window ,
+    if cmds.window(joint_ui_window, exists=True):
+        cmds.deleteUI(joint_ui_window)
+    cmds.window(joint_ui_window,
                 title='Joint Creator',
                 widthHeight=(400, 300),
                 maximizeButton=False,
@@ -212,7 +213,7 @@ def create_ui():
     cmds.columnLayout('name_column_upper', adjustableColumn=True, parent='base_column')
     cmds.columnLayout('name_column_lower', adjustableColumn=True, parent='base_column')
     cmds.rowColumnLayout('name_columns', numberOfColumns=2,
-                         columnAttach=(1, 'left', 20),
+                         columnAttach=(1, 'both', 20),
                          columnWidth=[(1, 125), (2, 175)],
                          adjustableColumn=True,
                          enable=False, parent='name_column_lower')
@@ -220,6 +221,7 @@ def create_ui():
     cmds.columnLayout('parent_column_lower', adjustableColumn=True, parent='base_column')
     cmds.rowColumnLayout('parent_columns', numberOfColumns=3,
                          columnWidth=[(1, 80), (2, 80), (3, 80)],
+                         columnAlign=[1, 'center'],
                          columnSpacing=(30, 0),
                          adjustableColumn=True,
                          enable=False, parent='parent_column_lower')
@@ -250,7 +252,8 @@ def create_ui():
     cmds.text(label='Naming Scheme Input', parent='name_columns')
     name_input = cmds.textField('name_input_field', parent='name_columns')
     cmds.text(label='Optional Quick Selection', parent='name_columns')
-    naming_option = cmds.optionMenu("NamingOpMenu", changeCommand=update_name_field, parent='name_columns')
+    naming_option = cmds.optionMenu("NamingOpMenu", changeCommand=update_name_field,
+                                    backgroundColor=[0, 0, 0], parent='name_columns')
     cmds.menuItem(label='User Input', parent="NamingOpMenu")
     sequential_schemas = ['Finger', 'Arm', 'L_FT_Leg', 'R_FT_Leg', 'L_BK_Leg', 'R_BK_Leg', 'Leg', 'Head']
     single_schemas = ['ROOT_JNT', 'COG_Jnt']
