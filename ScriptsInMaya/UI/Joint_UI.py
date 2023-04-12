@@ -39,19 +39,26 @@ def sequential_renamer(txt, data):
     scheme_parts = txt.partition(count * "#")
     objects_changed = 0
 
+    new_names = []
     for i in range(len(data)):
         new_name = scheme_parts[0] + str(i + 1).zfill(count) + scheme_parts[2]
-        cmds.rename(data[i], new_name)
+        new_names.append(cmds.rename(data[i], new_name))
         objects_changed += 1
+    cmds.select(clear=True)
+    cmds.select(new_names, replace=True)
+    return new_names
 
-    print("Number of Objects renamed: " + str(objects_changed))
 
-
-def single_renamer(new_name, obj):
+def single_renamer(new_name, data):
     """
     Renames selected object
     """
-    name = cmds.rename(obj, new_name)
+    new_names = []
+    for i in range(len(data)):
+        new_names.append(cmds.rename(data[i], new_name))
+    cmds.select(clear=True)
+    cmds.select(new_names, replace=True)
+    return new_names
 
 
 def add_to_layer(layer_name, data):
@@ -136,14 +143,13 @@ def create_ui():
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
             index = selected_items[0]
-            if index < len(center_location):
-                center_location[index - 1], center_location[index] = center_location[index], center_location[index - 1]
+            if index < len(center_location) - 1:
+                center_location[index], center_location[index + 1] = center_location[index + 1], center_location[index]
                 cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
                 cmds.textScrollList('position_list', edit=True, removeAll=True)
                 for i, item in enumerate(center_location):
-                    cmds.textScrollList('position_list', edit=True,
-                                        append=f'{i + 1}: {str(item)}')
-                cmds.textScrollList('position_list', edit=True, selectIndexedItem=index + 1)
+                    cmds.textScrollList('position_list', edit=True, append=f'{i + 1}: {str(item)}')
+                cmds.textScrollList('position_list', edit=True, selectIndexedItem=index + 2)
 
     def remove_center_item(*args):
         global center_location
@@ -174,17 +180,28 @@ def create_ui():
 
         cmds.rowColumnLayout(dependant, edit=True, enable=update_input_enable())
 
-    ui_window = 'ui_window'
-    if cmds.window(ui_window, exists=True):
-        cmds.deleteUI(ui_window)
-    cmds.window(ui_window,
+    def update_window_size(*args):
+        cmds.dockControl(joint_ui_control, edit=True, height=400, width=400)
+
+
+    joint_ui_window = 'joint_ui_window'
+    joint_ui_control = 'joint_ui_control'
+    if cmds.window(joint_ui_window , exists=True):
+        cmds.deleteUI(joint_ui_window )
+    cmds.window(joint_ui_window ,
                 title='Joint Creator',
                 widthHeight=(400, 300),
                 maximizeButton=False,
+                minimizeButton=False,
+                backgroundColor=[.3, .5, .55],
                 resizeToFitChildren=True)
-    cmds.frameLayout('description_frame', label='Description')
-    cmds.text('...', parent='description_frame')
-    cmds.frameLayout('settings_frame', label='Settings')
+    if cmds.dockControl(joint_ui_control, exists=True):
+        cmds.deleteUI(joint_ui_control)
+    cmds.columnLayout('window_base', adjustableColumn=True)
+    cmds.frameLayout('description_frame', label='Description', collapsable=True, parent='window_base')
+    cmds.text('This tool allows you to Create, Name, parent Joints ',
+              parent='description_frame', font='smallPlainLabelFont', backgroundColor=[0, 0, 0])
+    cmds.frameLayout('settings_frame', label='Tool Settings', collapsable=True, parent='window_base')
     cmds.columnLayout('base_column', adjustableColumn=True, parent='settings_frame')
     cmds.columnLayout('list_column', adjustableColumn=True, parent='base_column')
     cmds.rowColumnLayout('list_button_columns', numberOfColumns=3,
@@ -201,20 +218,25 @@ def create_ui():
                          enable=False, parent='name_column_lower')
     cmds.columnLayout('parent_column_group', adjustableColumn=True, parent='base_column')
     cmds.columnLayout('parent_column_lower', adjustableColumn=True, parent='base_column')
-    cmds.rowColumnLayout('parent_columns', numberOfColumns=2,
-                         columnAttach=(1, 'left', 20),
-                         columnWidth=[(1, 125), (2, 175)],
+    cmds.rowColumnLayout('parent_columns', numberOfColumns=3,
+                         columnWidth=[(1, 80), (2, 80), (3, 80)],
+                         columnSpacing=(30, 0),
                          adjustableColumn=True,
                          enable=False, parent='parent_column_lower')
     cmds.columnLayout('lower_column', adjustableColumn=True, parent='base_column')
 
-    cmds.button(label='Add Joint Position', command=add_center_to_list, parent='list_button_columns')
-    cmds.button(label='Remove Entry', command=remove_center_item, parent='list_button_columns')
-    cmds.button(label='Clear', command=clear_center_list, parent='list_button_columns')
+    cmds.button(label='Add Joint Position', command=add_center_to_list,
+                backgroundColor=[0, 0, 0], parent='list_button_columns')
+    cmds.button(label='Remove Entry', command=remove_center_item,
+                backgroundColor=[0, 0, 0], parent='list_button_columns')
+    cmds.button(label='Clear', command=clear_center_list,
+                backgroundColor=[0, 0, 0], parent='list_button_columns')
     center_label = cmds.text(label='Joint Positions (0):', align='center', parent='list_column')
     cmds.textScrollList('position_list', numberOfRows=6, parent='list_column')
-    cmds.button(label='Move Up', command=move_center_item_up, parent='list_column')
-    cmds.button(label='Move Down', command=move_center_item_down, parent='list_column')
+    cmds.button(label='Move Up', command=move_center_item_up,
+                backgroundColor=[0, 0, 0], parent='list_column')
+    cmds.button(label='Move Down', command=move_center_item_down,
+                backgroundColor=[0, 0, 0], parent='list_column')
 
     def update_name_field(selection):
         if selection == "User Input":
@@ -230,35 +252,48 @@ def create_ui():
     cmds.text(label='Optional Quick Selection', parent='name_columns')
     naming_option = cmds.optionMenu("NamingOpMenu", changeCommand=update_name_field, parent='name_columns')
     cmds.menuItem(label='User Input', parent="NamingOpMenu")
-    sequential_schemas = ['Finger', 'Arm', 'L_FT_Leg', 'R_FT_Leg', 'R_BK_Leg', 'R_BK_Leg', 'Leg', 'Head']
+    sequential_schemas = ['Finger', 'Arm', 'L_FT_Leg', 'R_FT_Leg', 'L_BK_Leg', 'R_BK_Leg', 'Leg', 'Head']
     single_schemas = ['ROOT_JNT', 'COG_Jnt']
     for name in sequential_schemas:
         cmds.menuItem(label=f'{name}_##_Jnt', parent="NamingOpMenu")
     for name in single_schemas:
         cmds.menuItem(label=f'{name}', parent="NamingOpMenu")
 
+    def update_joint_list(*args):
+        cmds.optionMenu('parent_menu', edit=True, deleteAllItems=True)
+        cmds.menuItem(label='None', parent='parent_menu')
+        joints = cmds.ls(type='joint')
+        for joint in joints:
+            cmds.menuItem(label=joint, parent='parent_menu')
+
     checkbox_parent = cmds.checkBox('parent_bool', label='Parent Objects on Creation', value=False,
                                     changeCommand=partial(grey_field, 'parent_bool', 'parent_columns'),
                                     parent='parent_column_group')
     joints = cmds.ls(type='joint')
-    parent_option = cmds.optionMenu('parent_menu', label='Optional Parent Joint', parent='parent_columns')
+    parent_option: None = cmds.optionMenu('parent_menu', label='Optional Parent Joint', parent='parent_columns')
     cmds.menuItem(label='None', parent='parent_menu')
     for joint in joints:
-        cmds.menuItem(parent='parent_menu', label=joint)
+        cmds.menuItem(label=joint, parent='parent_menu')
+    cmds.button(label='Update List', command=update_joint_list,
+                backgroundColor=[.2, 1, .2], parent='parent_columns')
 
-    cmds.button(label='Execute', command=partial(pass_values,
-                                                 rename_bool,
-                                                 name_input,
-                                                 naming_option,
-                                                 single_schemas,
-                                                 checkbox_parent,
-                                                 parent_option), parent='lower_column')
+    def on_execute(*args):
+        partial(pass_values, rename_bool, name_input, naming_option, checkbox_parent, parent_option)()
+        update_joint_list()
 
-    cmds.showWindow(ui_window)
+    cmds.button(label='Execute', command=on_execute,
+                backgroundColor=[1, 0, 0], parent='lower_column')
+
+    cmds.dockControl(joint_ui_control,
+                     label='Joint Creator',
+                     dockStation='viewPanes',
+                     area='right',
+                     floatChangeCommand=update_window_size,
+                     content=joint_ui_window)
     clear_center_list()
 
 
-def pass_values(rename, naming_input, name_choice, non_sequence_names, parent_bool, parent_name, *args):
+def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *args):
     global center_location
     rename = cmds.checkBox(rename, query=True, value=True)
     naming_input = cmds.textField(naming_input, query=True, text=True)
@@ -267,29 +302,26 @@ def pass_values(rename, naming_input, name_choice, non_sequence_names, parent_bo
     parent_name = cmds.optionMenu(parent_name, query=True, value=True)
 
     joints = create_joints_xyz(center_location)
-    if parent_bool:
-        if parent_name != 'None':
-            joints.append(str(parent_name))
-        parent_selected(joints)
-
     add_to_layer('Jnt_Layer', joints)
+    orient_joints(joints)
 
     if rename:
         if name_choice == 'User Input':
             name_schema = naming_input
-        elif name_choice in non_sequence_names:
-            name_schema = name_choice
         else:
             name_schema = name_choice
-        if naming_input[0].isdigit() or naming_input.startswith('_'):
+        if name_schema[0].isdigit() or name_schema.startswith('_'):
             cmds.error('Naming Schema starts with an invalid character.')
             cmds.delete(cmds.ls(sl=True))
         if "#" in naming_input:
-            sequential_renamer(name_schema, joints)
+            joints = sequential_renamer(name_schema, joints)
         else:
-            single_renamer(name_schema, joints)
+            joints = single_renamer(name_schema, joints)
 
-
+    if parent_bool:
+        if parent_name != 'None':
+            joints.append(str(parent_name))
+        parent_selected(joints)
 
 
 create_ui()

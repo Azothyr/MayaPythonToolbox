@@ -20,6 +20,8 @@ def create_ui():
                 title='Joint Creator',
                 widthHeight=(400, 300),
                 maximizeButton=False,
+                minimizeButton=False,
+                backgroundColor=[.3, .5, .5],
                 resizeToFitChildren=True)
     cmds.columnLayout('first_column', adjustableColumn=True, rowSpacing=10)
     cmds.frameLayout(label='Description')
