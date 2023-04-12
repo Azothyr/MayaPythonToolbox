@@ -47,34 +47,33 @@ def parent_selected(data):
             cmds.parent()
 
 
-def sequential_renamer(txt, obj_selection):
+def sequential_renamer(txt, data):
     """
     Renames selected objects sequentially.
     Returns:
     """
-    obj_selection.reverse()
+    data.reverse()
     count = txt.count('#')
     scheme_parts = txt.partition(count * "#")
     objects_changed = 0
 
-    for i in range(len(obj_selection)):
+    for i in range(len(data)):
         new_name = scheme_parts[0] + str(i + 1).zfill(count) + scheme_parts[2]
-        cmds.rename(obj_selection[i], new_name)
+        cmds.rename(data[i], new_name)
         objects_changed += 1
 
     print("Number of Objects renamed: " + str(objects_changed))
 
 
-def orient_joints(obj_selection):
-    # obj_selection.reverse()
-    last_joint = len(obj_selection) - 1
+def orient_joints(data):
+    last_joint = len(data) - 1
 
-    for index in range(len(obj_selection)):
+    for index in range(len(data)):
         if index == last_joint:
-            parent_orientation = cmds.joint(obj_selection[index - 1], query=True, orientation=True)
-            cmds.joint(obj_selection[index], edit=True, orientation=parent_orientation)
+            parent_orientation = cmds.joint(data[index - 1], query=True, orientation=True)
+            cmds.joint(data[index], edit=True, orientation=parent_orientation)
             break
-        cmds.joint(obj_selection[index], edit=True, orientJoint='xyz', secondaryAxisOrient='yup', children=True,
+        cmds.joint(data[index], edit=True, orientJoint='xyz', secondaryAxisOrient='yup', children=True,
                    zeroScaleOrient=True)
 
 
