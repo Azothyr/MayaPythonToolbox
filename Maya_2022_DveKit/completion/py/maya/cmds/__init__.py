@@ -2742,7 +2742,12 @@ def polyMoveUV(*args, **kwargs): pass
 def CreaseProxyEdgeTool(*args, **keywords): pass
 def xgmSplinePreset(*args, **keywords): pass
 def listSets(*args, **kwargs): pass
-def ls(*args: object, **kwargs: object) -> object: pass
+def ls(*args: object, **kwargs: object) -> object:
+    """
+
+    :rtype: object
+    """
+    pass
 def InsertEdgeLoopToolOptions(*args, **keywords): pass
 def ikHandleDisplayScale(*args, **kwargs): pass
 def SymmetrizeUVBrushSizeOn(*args, **keywords): pass
@@ -5154,7 +5159,12 @@ def nameCommand(*args, **kwargs): pass
 def AddInBetweenTargetShapeOptions(*args, **keywords): pass
 def StitchTogether(*args, **keywords): pass
 def createPolyPlatonicSolidCtx(*args, **kwargs): pass
-def makeIdentity(*args, **kwargs): pass
+def makeIdentity(*args, **kwargs):
+    """
+
+    :rtype: object
+    """
+    pass
 def goal(*args, **kwargs): pass
 def FrameSelectedWithoutChildrenInAllViews(*args, **keywords): pass
 def ConvertSelectionToUVShellBorder(*args, **keywords): pass

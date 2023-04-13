@@ -1,3 +1,5 @@
+import maya.standalone
+maya.standalone.initialize()
 import maya.cmds as cmds
 from functools import partial
 
@@ -12,14 +14,20 @@ def create_joints_xyz(xyz_list):
     """
     new_joints = []
 
+    if not cmds.objExists('Jnt_layer'):
+        cmds.createDisplayLayer(name='Jnt_layer', number=1)
+
+    joint_orient_attrs = ['jointOrientX', 'jointOrientY', 'jointOrientZ', 'displayLocalAxis']
     for xyz in xyz_list:
         center_position = xyz
         cmds.select(clear=True)
         jnt = cmds.joint()
         new_joints.append(jnt)
+        for attr_name in joint_orient_attrs:
+            cmds.setAttr(f"{jnt}.{attr_name}", keyable=False, channelBox=True)
         cmds.xform(jnt, worldSpace=True, translation=center_position)
+        cmds.editDisplayLayerMembers('Jnt_layer', jnt)
     cmds.select(new_joints, replace=True)
-    new_joints.reverse()
     return new_joints
 
 
@@ -79,8 +87,16 @@ def orient_joints(data):
             parent_orientation = cmds.joint(data[index - 1], query=True, orientation=True)
             cmds.joint(data[index], edit=True, orientation=parent_orientation)
             break
-        cmds.joint(data[index], edit=True, orientJoint='xyz', secondaryAxisOrient='yup', children=True,
+        cmds.joint(data[index], edit=True, orientJoint='xyz', secondaryAxisOrient='zup', children=True,
                    zeroScaleOrient=True)
+
+
+def joint_axis_visibility_toggle(*args):
+    selection = cmds.ls(selection=True, type="joint")
+
+    for joint_name in selection:
+        display_local_axis = cmds.getAttr(joint_name + ".displayLocalAxis")
+        cmds.setAttr(joint_name + ".displayLocalAxis", not display_local_axis)
 
 
 def create_ui():
@@ -307,6 +323,7 @@ def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *ar
     joints = create_joints_xyz(center_location)
     add_to_layer('Jnt_Layer', joints)
     orient_joints(joints)
+    joint_axis_visibility_toggle(joints)
 
     if rename:
         if name_choice == 'User Input':
@@ -316,7 +333,7 @@ def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *ar
         if name_schema[0].isdigit() or name_schema.startswith('_'):
             cmds.error('Naming Schema starts with an invalid character.')
             cmds.delete(cmds.ls(sl=True))
-        if "#" in naming_input:
+        if "#" in name_schema:
             joints = sequential_renamer(name_schema, joints)
         else:
             joints = single_renamer(name_schema, joints)
