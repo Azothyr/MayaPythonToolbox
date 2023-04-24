@@ -1,5 +1,3 @@
-import maya.standalone
-maya.standalone.initialize()
 import maya.cmds as cmds
 from functools import partial
 
@@ -45,7 +43,6 @@ def sequential_renamer(txt, data):
     Renames selected objects sequentially.
     Returns:
     """
-    data.reverse()
     count = txt.count('#')
     scheme_parts = txt.partition(count * "#")
     objects_changed = 0
@@ -74,7 +71,7 @@ def single_renamer(new_name, data):
 
 def add_to_layer(layer_name, data):
     if not cmds.objExists(layer_name):
-        cmds.createDisplayLayer(name=layer_name)
+        cmds.createDisplayLayer(n=layer_name, num=1, nr=True)
 
     cmds.editDisplayLayerMembers(layer_name, data, noRecurse=True)
 
@@ -99,7 +96,7 @@ def joint_axis_visibility_toggle(*args):
         cmds.setAttr(joint_name + ".displayLocalAxis", not display_local_axis)
 
 
-def create_ui():
+def create_joint_ui():
     """
     Returns: Joint Creator UI
     """
@@ -269,10 +266,12 @@ def create_ui():
     name_input = cmds.textField('name_input_field', parent='name_columns')
     cmds.text(label='Optional Quick Selection', parent='name_columns')
     naming_option = cmds.optionMenu("NamingOpMenu", changeCommand=update_name_field,
-                                    backgroundColor=[0, 0, 0], parent='name_columns')
+                                    backgroundColor=[.5, .5, .5], parent='name_columns')
     cmds.menuItem(label='User Input', parent="NamingOpMenu")
-    sequential_schemas = ['Finger', 'Arm', 'L_FT_Leg', 'R_FT_Leg', 'L_BK_Leg', 'R_BK_Leg', 'Leg', 'Head']
-    single_schemas = ['ROOT_JNT', 'COG_Jnt']
+    sequential_schemas = ['Spine', 'Arm', 'L_Arm', 'R-Arm', 'Finger', 'L_Finger', 'R_Finger',
+                          'Leg', 'L_Leg', 'R_Leg', 'L_FT_Leg', 'R_FT_Leg', 'L_BK_Leg', 'R_BK_Leg',
+                          'L_Toe', 'R_Toe', 'Head']
+    single_schemas = ['ROOT_JNT', 'COG_Jnt', 'Hip_Jnt']
     for name in sequential_schemas:
         cmds.menuItem(label=f'{name}_##_Jnt', parent="NamingOpMenu")
     for name in single_schemas:
@@ -322,7 +321,6 @@ def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *ar
 
     joints = create_joints_xyz(center_location)
     add_to_layer('Jnt_Layer', joints)
-    orient_joints(joints)
     joint_axis_visibility_toggle(joints)
 
     if rename:
@@ -339,9 +337,7 @@ def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *ar
             joints = single_renamer(name_schema, joints)
 
     if parent_bool:
+        joints.reverse()
         if parent_name != 'None':
             joints.append(str(parent_name))
         parent_selected(joints)
-
-
-create_ui()

@@ -1,98 +1,51 @@
-import maya.cmds as cmds
 from functools import partial
+import maya.cmds as cmds
 
 
-def create_ui():
-    """
-    Creates a UI
-    Returns: Joint Creator UI
-    """
-    selections = cmds.ls(sl=True)
+def parent_scale_constrain(data):
+    # Check that there is an even number of objects selected
+    if len(data) % 2 != 0:
+        cmds.warning("Please select an even number of objects")
+        return
 
-    schema_list = ['finger_01_knuckle_##', 'finger_02_knuckle_##', 'finger_03_knuckle_##', 'finger_04_knuckle_##',
-                   'finger_05_knuckle_##', 'finger_06_knuckle_##', 'finger_07_knuckle_##', 'finger_08_knuckle_##',
-                   'finger_09_knuckle_##', 'finger_10_knuckle_##']
+    # Cut the selection list in half
+    half = int(len(data) / 2)
+    parent_objs = data[:half]
+    child_objs = data[half:]
 
-    ui_window = 'ui_window'
-    if cmds.window(ui_window, exists=True):
-        cmds.deleteUI(ui_window)
-    cmds.window(ui_window,
-                title='Joint Creator',
-                widthHeight=(400, 300),
-                maximizeButton=False,
-                minimizeButton=False,
-                backgroundColor=[.3, .5, .5],
-                resizeToFitChildren=True)
-    cmds.columnLayout('first_column', adjustableColumn=True, rowSpacing=10)
-    cmds.frameLayout(label='Description')
-    cmds.text('...')
-    cmds.frameLayout(label='Settings')
-    cmds.columnLayout(adjustableColumn=True)
-    cmds.checkBox('sequence_bool', label='Rename Selections', value=False,
-                  changeCommand=partial(sequencing_checkbox, 'sequence_bool', 'sequence_columns'))
-    cmds.rowColumnLayout('sequence_columns', numberOfColumns=2,
-                         columnAttach=(1, 'right', 0),
-                         columnWidth=[(1, 100), (2, 250)],
-                         adjustableColumn=True,
-                         enable=False)
-    cmds.text(label='Naming Scheme Input')
-    name_input = cmds.textField()
-    cmds.text(label='Optional Quick Selection')
-    cmds.optionMenu()
-    cmds.menuItem(label='User Input')
+    # Create parent and scale constraints for each pair of objects
+    for i in range(half):
+        parent_const = cmds.parentConstraint(parent_objs[i], child_objs[i], mo=True, sr=['x', 'y', 'z'],
+                                             n="{}_parentConstraint".format(child_objs[i]))
+        scale_const = cmds.scaleConstraint(parent_objs[i], child_objs[i], n="{}_scaleConstraint".format(child_objs[i]))
 
-    cmds.columnLayout(adjustableColumn=True, parent='first_column')
-    checkbox_center = cmds.checkBox(label='Create at Center of Mass', value=False)
-    checkbox_parent = cmds.checkBox(label='Parent Objects on Creation', value=False)
-    checkbox_freeze = cmds.checkBox(label='Freeze Transforms on Completion', value=False)
+        # Set override display on constraints
+        parent_const_attrs = cmds.listAttr(parent_const[0], k=True)
+        scale_const_attrs = cmds.listAttr(scale_const[0], k=True)
+        attrs = parent_const_attrs + scale_const_attrs
 
-    cmds.rowColumnLayout('creation_order_columns', enable=True, numberOfColumns=2,
-                         columnAttach=(1, 'right', 0),
-                         columnWidth=[(1, 100), (2, 250)],
-                         adjustableColumn=True)
-    cmds.text(label='Creation Order')
-    cmds.columnLayout('order_column', adjustableColumn=True, parent='creation_order_columns')
-    order_control = cmds.radioCollection()
-    rb1 = cmds.radioButton('first_to_last', label='First Object Selected to Last')
-    rb2 = cmds.radioButton('last_to_first', label='Last Object Selected to First')
+        for attr in attrs:
+            try:
+                cmds.setAttr("{}.{}".format(parent_const[0], attr), l=False)
+                cmds.setAttr("{}.{}".format(parent_const[0], attr), 2)
+            except:
+                pass
 
-    order_control = cmds.radioCollection(order_control, edit=True, select=rb1)
-
-    cmds.columnLayout(adjustableColumn=True, rowSpacing=10, parent='first_column')
-    cmds.button(label='Execute', command=partial(pass_values,
-                                                 selections,
-                                                 name_input,
-                                                 checkbox_center,
-                                                 checkbox_parent,
-                                                 checkbox_freeze,
-                                                 order_control))
-
-    cmds.showWindow(ui_window)
+            try:
+                cmds.setAttr("{}.{}".format(scale_const[0], attr), l=False)
+                cmds.setAttr("{}.{}".format(scale_const[0], attr), 2)
+            except:
+                pass
 
 
-def sequencing_checkbox(enabler, dependant, *args):
-    def update_input_enable():
-        return cmds.checkBox(enabler, query=True, value=True)
+def parent_scale_constrain_ui(parent_ui, tool):
+    parent_scale_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .1, .1], p=parent_ui)
 
-    cmds.rowColumnLayout(dependant, edit=True, enable=update_input_enable())
+    cmds.rowColumnLayout(f'{tool}_top_row', p=f'{tool}_base', adj=True, bgc=[.5, .5, .5])
+    cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
+    cmds.text(l="Parent, Scale constrain between every other selected objects", p=f'{tool}_top_row')
 
+    def on_execute(*args):
+        partial(parent_scale_constrain, cmds.ls(sl=True))()
 
-def pass_values(select_list, scheme_input, center_bool, parent_bool, freeze_bool, order_control, *args):
-    selections = select_list
-    scheme_input = cmds.textField(scheme_input, query=True, text=True)
-    center_bool = cmds.checkBox(center_bool, query=True, value=True)
-    parent_bool = cmds.checkBox(parent_bool, query=True, value=True)
-    # freeze_bool = cmds.checkBox(freeze_bool, query=True, value=True)
-    creation_order = cmds.radioCollection(order_control, query=True, select=True)
-    # tool_manager(selections, scheme_input, center_bool, parent_bool, freeze_bool, creation_order)
-    print(scheme_input)
-    print(center_bool)
-    print(parent_bool)
-    print(freeze_bool)
-    print(creation_order)
-
-
-# def tool_pass_manager(selections, naming_scheme, center_bool, parent_bool, freeze_bool, creation_order):
-
-
-create_ui()
+    cmds.button(f'{tool}_button', l="Parent and Scale", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
