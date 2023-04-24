@@ -403,14 +403,24 @@ def create_joint_ui(parent_ui, tool):
 
     joint_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .5, .55], p=parent_ui)
 
-    cmds.frameLayout('description_frame', label='Description', collapsable=True, parent=f'{tool}_base')
+    cmds.frameLayout('description_frame', label='Description', collapsable=True,
+                     collapse=True, parent=f'{tool}_base')
     cmds.text('This tool allows you to Create, Name, parent Joints ',
               parent='description_frame', font='smallPlainLabelFont', backgroundColor=[0, 0, 0])
     cmds.frameLayout('settings_frame', label='Tool Settings', collapsable=True, parent=f'{tool}_base')
     cmds.columnLayout('base_column', adjustableColumn=True, parent='settings_frame')
     cmds.columnLayout('list_column', adjustableColumn=True, parent='base_column')
-    cmds.rowColumnLayout('list_button_columns', numberOfColumns=3,
+    cmds.rowColumnLayout('list_upper_buttons_columns', numberOfColumns=3,
                          columnWidth=[(1, 125), (2, 125), (3, 125)],
+                         adjustableColumn=True,
+                         enable=True, parent='list_column')
+    cmds.columnLayout('list_visualized_column', adjustableColumn=True, parent='list_column')
+    cmds.rowColumnLayout('list_lower_buttons_columns', numberOfColumns=2,
+                         columnWidth=[(1, 125), (2, 125)],
+                         adjustableColumn=True,
+                         enable=True, parent='list_column')
+    cmds.rowColumnLayout('list_lower_column', numberOfColumns=2,
+                         columnWidth=[(1, 25), (2, 25)],
                          adjustableColumn=True,
                          enable=True, parent='list_column')
     cmds.columnLayout('name_column_group', adjustableColumn=True, parent='base_column')
@@ -432,17 +442,19 @@ def create_joint_ui(parent_ui, tool):
     cmds.columnLayout('lower_column', adjustableColumn=True, parent='base_column')
 
     cmds.button(label='Add Joint Position', command=add_center_to_list,
-                backgroundColor=[0, 0, 0], parent='list_button_columns')
+                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
     cmds.button(label='Remove Entry', command=remove_center_item,
-                backgroundColor=[0, 0, 0], parent='list_button_columns')
+                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
     cmds.button(label='Clear', command=clear_center_list,
-                backgroundColor=[0, 0, 0], parent='list_button_columns')
-    center_label = cmds.text(label='Joint Positions (0):', align='center', parent='list_column')
-    cmds.textScrollList('position_list', numberOfRows=6, parent='list_column')
+                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
+    center_label = cmds.text(label='Joint Positions (0):', align='center', parent='list_visualized_column')
+    cmds.textScrollList('position_list', numberOfRows=6, parent='list_visualized_column')
     cmds.button(label='Move Up', command=move_center_item_up,
-                backgroundColor=[0, 0, 0], parent='list_column')
+                backgroundColor=[0, 0, 0], parent='list_lower_buttons_columns')
     cmds.button(label='Move Down', command=move_center_item_down,
-                backgroundColor=[0, 0, 0], parent='list_column')
+                backgroundColor=[0, 0, 0], parent='list_lower_buttons_columns')
+    cmds.text(l='Joint Radius:', bgc=[.7, .7, .7], p='list_lower_column')
+    cmds.textField(tx='1', bgc=[.1, .1, .1], p='list_lower_column')
 
     def update_name_field(selection):
         if selection == "User Input":
@@ -454,7 +466,7 @@ def create_joint_ui(parent_ui, tool):
                                 changeCommand=partial(grey_field, 'name_bool', 'name_columns'),
                                 parent='name_column_upper')
     cmds.text(label='Naming Scheme Input', parent='name_columns')
-    name_input = cmds.textField('name_input_field', parent='name_columns')
+    name_input = cmds.textField('name_input_field', parent='name_columns', bgc=[.1, .1, .1])
     cmds.text(label='Optional Quick Selection', parent='name_columns')
     naming_option = cmds.optionMenu("NamingOpMenu", changeCommand=update_name_field,
                                     backgroundColor=[.5, .5, .5], parent='name_columns')
@@ -479,7 +491,8 @@ def create_joint_ui(parent_ui, tool):
                                     changeCommand=partial(grey_field, 'parent_bool', 'parent_columns'),
                                     parent='parent_column_group')
     selected_joints = cmds.ls(type='joint')
-    parent_option: None = cmds.optionMenu('parent_menu', label='Optional Parent Joint', parent='parent_columns')
+    parent_option: None = cmds.optionMenu('parent_menu', label='Optional Parent Joint',
+                                          bgc=[.5, .5, .5], parent='parent_columns')
     cmds.menuItem(label='None', parent='parent_menu')
     for joint in selected_joints:
         cmds.menuItem(label=joint, parent='parent_menu')
