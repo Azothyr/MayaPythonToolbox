@@ -1,37 +1,44 @@
 import maya.cmds as cmds
 
 
-def create_color_change_ui(*args):
-    color_menu_order = ["Black", "White", "Light Grey", "Mid Grey", "Grey", "Red", "Dark Red", "Light Pink", "Mid Pink",
-                        "Pink", "Light Yellow", "Yellow", "Dark Yellow", "Light Green", "Green", "Dark Green",
-                        "Light Neon Green", "Neon Green", "Dark Neon Green", "Neon Blue", "Light Navy Blue",
-                        "Navy Blue", "Light Blue", "Dark Blue", "Light Purple", "Dark Purple", "Light Brown", "Brown",
-                        "Orange Brown", "Golden Brown"]
+def create_color_change_ui(parent_ui, tool):
+    color_menu_order = ["Maya Default Blue", "Black", "White", "Light Grey", "Dark Grey", "Red", "Dark Red",
+                        "Light Pink", "Mid Pink", "Pink", "Light Yellow", "Yellow", "Dark Yellow", 'Light Orange',
+                        "Orange", "Light Green", "Green", "Dark Green", "Light Neon Green", "Neon Green",
+                        "Dark Neon Green", "Neon Blue", "Light Navy Blue", "Navy Blue", "Light Blue", 'Blue',
+                        "Dark Blue", "Light Purple", "Dark Purple", "Light Brown", "Brown", "Golden Brown"]
 
     def change_shape_color(*args):
+        color_options = ["Maya Default Blue", "Black", "Dark Grey", "Light Grey", "Dark Red", "Dark Blue", 'Blue',
+                         "Dark Green", "Dark Purple", "Pink", "Light Brown", "Brown", "Dark Orange", "Red",
+                         "Neon Green", "Navy Blue", "White", "Yellow", "Neon Blue", "Light Neon Green", "Light Pink",
+                         'Light Orange', "Light Yellow", "Green", "Golden Brown", "Dark Yellow", "Dark Neon Green",
+                         "Light Green", "Light Navy Blue", "Light Blue", "Light Purple", "Mid Pink"]
         selection = cmds.ls(sl=True)
-        color_options = ["Mid Grey", "Black", "Grey", "Light Grey", "Dark Red", "Dark Blue", "Dark Green",
-                               "Dark Purple", "Pink", "Light Brown", "Brown", "Orange Brown", "Red", "Neon Green",
-                               "Navy Blue", "White", "Yellow", "Neon Blue", "Light Neon Green", "Light Pink",
-                               "Light Yellow", "Green", "Golden Brown", "Dark Yellow", "Dark Neon Green",
-                               "Light Green", "Light Navy Blue", "Light Blue", "Light Purple", "Mid Pink"]
         if not selection:
-            cmds.warning("Please select a shape.")
-            return
+            return cmds.warning("Please select a shape.")
 
-        menu_index = cmds.optionMenu(color_option_menu, query=True, select=True)
-        color_name = color_options[menu_index]
+        menu_index = cmds.optionMenu(color_option_menu, q=True, sl=True) - 1
+        color_name = color_menu_order[menu_index]
 
         if color_name in color_options:
             color_index = int(color_options.index(color_name))
         else:
             print('color not found in list.')
-        
+
         for sel in selection:
-            shapes = cmds.listRelatives(sel, children=True, shapes=True)
-            for shape in shapes:
-                cmds.setAttr("%s.overrideEnabled" % shape, 1)
-                cmds.setAttr("%s.overrideColor" % shape, color_index)
+            if cmds.nodeType(sel) == "joint":
+                cmds.setAttr("%s.overrideEnabled" % sel, lock=False)
+                cmds.setAttr("%s.overrideColor" % sel, lock=False)
+                cmds.setAttr("%s.overrideEnabled" % sel, 1)
+                cmds.setAttr("%s.overrideColor" % sel, color_index)
+            else:
+                shapes = cmds.listRelatives(sel, children=True, shapes=True)
+                for shape in shapes:
+                    cmds.setAttr("%s.overrideEnabled" % shape, lock=False)
+                    cmds.setAttr("%s.overrideColor" % shape, lock=False)
+                    cmds.setAttr("%s.overrideEnabled" % shape, 1)
+                    cmds.setAttr("%s.overrideColor" % shape, color_index)
 
     color_ui_window = 'color_ui_window'
     if cmds.window(color_ui_window, exists=True):

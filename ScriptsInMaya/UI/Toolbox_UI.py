@@ -2,26 +2,31 @@ from functools import partial
 import maya.cmds as cmds
 
 
-def create_joints_xyz(xyz_list):
+def create_joints_xyz(xyz_list, radius_input=None):
     """
     Creates a joint at each XYZ value from a list.
     Returns: [joints]
     """
     new_joints = []
 
+    '''
     if not cmds.objExists('Jnt_layer'):
         cmds.createDisplayLayer(name='Jnt_layer', number=1)
+    '''
 
     joint_orient_attrs = ['jointOrientX', 'jointOrientY', 'jointOrientZ', 'displayLocalAxis']
     for xyz in xyz_list:
         center_position = xyz
         cmds.select(clear=True)
-        jnt = cmds.joint()
+        if radius_input != None:
+            jnt = cmds.joint(rad=radius_input)
+        else:
+            jnt = cmds.joint(rad=1)
         new_joints.append(jnt)
         for attr_name in joint_orient_attrs:
             cmds.setAttr(f"{jnt}.{attr_name}", keyable=False, channelBox=True)
         cmds.xform(jnt, worldSpace=True, translation=center_position)
-        cmds.editDisplayLayerMembers('Jnt_layer', jnt)
+        # cmds.editDisplayLayerMembers('Jnt_layer', jnt)
     cmds.select(new_joints, replace=True)
     return new_joints
 
@@ -195,18 +200,17 @@ def create_control_ui(parent_ui, tool):
                         "Dark Blue", "Light Purple", "Dark Purple", "Light Brown", "Brown", "Golden Brown"]
 
     def create_joint_control(*arg):
-        selected_joint = cmds.ls(sl=True)[0]
         color_options = ["Maya Default Blue", "Black", "Dark Grey", "Light Grey", "Dark Red", "Dark Blue", 'Blue',
                          "Dark Green", "Dark Purple", "Pink", "Light Brown", "Brown", "Dark Orange", "Red",
                          "Neon Green", "Navy Blue", "White", "Yellow", "Neon Blue", "Light Neon Green", "Light Pink",
                          'Light Orange', "Light Yellow", "Green", "Golden Brown", "Dark Yellow", "Dark Neon Green",
                          "Light Green", "Light Navy Blue", "Light Blue", "Light Purple", "Mid Pink"]
-
-        if cmds.objectType(selected_joint) != 'joint':
-            return cmds.warning("Please select a joint.")
-        joint_name = selected_joint
-        joint_position = cmds.xform(joint_name, q=True, ws=True, t=True)
-        joint_rotation = cmds.xform(joint_name, q=True, ws=True, ro=True)
+        selection = cmds.ls(sl=True)
+        selected_joints = []
+        for object in selection:
+            if cmds.objectType(object) != 'joint':
+                return cmds.warning(f"{object} is not a joint. Please select at least one joint.")
+            selected_joints.append(object)
 
         menu_index = cmds.optionMenu(color_option_menu, q=True, sl=True) - 1
         color_name = color_menu_order[menu_index]
@@ -216,35 +220,49 @@ def create_control_ui(parent_ui, tool):
         else:
             print('color not found in list.')
 
-        circle = cmds.circle(nr=[1, 0, 0], r=1)[0]
+        radius = cmds.textField(radius_input, q=True, text=True)
 
-        circle_rename = joint_name.replace("Jnt", "Ctrl")
-        circle = cmds.rename(circle, circle_rename)
+        joints_to_process = selected_joints if len(selected_joints) > 1 else cmds.ls(sl=True)[0:1]
+        for joint in joints_to_process:
+            joint_name = joint
+            joint_position = cmds.xform(joint_name, q=True, ws=True, t=True)
+            joint_rotation = cmds.xform(joint_name, q=True, ws=True, ro=True)
+            circle = cmds.circle(nr=[1, 0, 0], r=radius)[0]
 
-        cmds.setAttr("%s.overrideEnabled" % circle, 1)
-        cmds.setAttr("%s.overrideColor" % circle, color_index)
+            circle_rename = joint_name.replace("Jnt", "Ctrl")
+            circle = cmds.rename(circle, circle_rename)
 
-        null_group = cmds.group(em=True)
-        null_group_rename = joint_name.replace("Jnt", "Ctrl_Grp")
-        null_group = cmds.rename(null_group, null_group_rename)
+            cmds.setAttr("%s.overrideEnabled" % circle, 1)
+            cmds.setAttr("%s.overrideColor" % circle, color_index)
 
-        cmds.parent(circle, null_group)
+            null_group = cmds.group(em=True)
+            null_group_rename = joint_name.replace("Jnt", "Ctrl_Grp")
+            null_group = cmds.rename(null_group, null_group_rename)
 
-        cmds.xform(null_group, ws=True, t=joint_position)
-        cmds.xform(null_group, ws=True, ro=joint_rotation)
+            cmds.parent(circle, null_group)
+
+            cmds.xform(null_group, ws=True, t=joint_position)
+            cmds.xform(null_group, ws=True, ro=joint_rotation)
 
     control_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .35, .3], p=parent_ui)
 
     cmds.rowColumnLayout(f'{tool}_selection_row', p=f'{tool}_base', adj=True, nc=2,
                          cal=[(1, 'center'), (2, 'left')],
                          bgc=[.5, .5, .5])
-    cmds.columnLayout(f'{tool}_select_1', p=f'{tool}_selection_row')
-    cmds.columnLayout(f'{tool}_select_2', p=f'{tool}_selection_row')
+    cmds.rowColumnLayout(f'{tool}_radius_row', p=f'{tool}_base', adj=True, nc=2,
+                         cal=[(1, 'center'), (2, 'left')],
+                         bgc=[.3, .3, .3])
+    cmds.columnLayout(f'{tool}_select_col_1', p=f'{tool}_selection_row')
+    cmds.columnLayout(f'{tool}_select_col_2', p=f'{tool}_selection_row')
+    cmds.columnLayout(f'{tool}_radius_col_1', p=f'{tool}_radius_row')
+    cmds.columnLayout(f'{tool}_radius_col_2', p=f'{tool}_radius_row')
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
-    cmds.text(l="Select a color:", p=f'{tool}_select_1')
-    color_option_menu = cmds.optionMenu(p=f'{tool}_select_2', bgc=[.5, .2, .2])
+    cmds.text(l="Select a color:", p=f'{tool}_select_col_1')
+    color_option_menu = cmds.optionMenu(p=f'{tool}_select_col_2', bgc=[.5, .2, .2])
     for color in color_menu_order:
         cmds.menuItem(l=color, p=color_option_menu)
+    cmds.text(l='Control Scale:', bgc=[.7, .7, .7], p=f'{tool}_radius_col_1')
+    radius_input = cmds.textField('radius_input', tx='10', bgc=[.1, .1, .1], p=f'{tool}_radius_col_2')
 
     cmds.button(f'{tool}_button', l="Create Control", p=f'{tool}_bot_button', c=create_joint_control, bgc=[0, 0, 0])
     return control_tab
@@ -276,10 +294,18 @@ def create_color_change_ui(parent_ui, tool):
             print('color not found in list.')
 
         for sel in selection:
-            shapes = cmds.listRelatives(sel, c=True, s=True)
-            for shape in shapes:
-                cmds.setAttr("%s.overrideEnabled" % shape, 1)
-                cmds.setAttr("%s.overrideColor" % shape, color_index)
+            if cmds.nodeType(sel) == "joint":
+                cmds.setAttr("%s.overrideEnabled" % sel, lock=False)
+                cmds.setAttr("%s.overrideColor" % sel, lock=False)
+                cmds.setAttr("%s.overrideEnabled" % sel, 1)
+                cmds.setAttr("%s.overrideColor" % sel, color_index)
+            else:
+                shapes = cmds.listRelatives(sel, children=True, shapes=True)
+                for shape in shapes:
+                    cmds.setAttr("%s.overrideEnabled" % shape, lock=False)
+                    cmds.setAttr("%s.overrideColor" % shape, lock=False)
+                    cmds.setAttr("%s.overrideEnabled" % shape, 1)
+                    cmds.setAttr("%s.overrideColor" % shape, color_index)
 
     color_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.35, .3, .3], p=parent_ui)
 
@@ -454,7 +480,7 @@ def create_joint_ui(parent_ui, tool):
     cmds.button(label='Move Down', command=move_center_item_down,
                 backgroundColor=[0, 0, 0], parent='list_lower_buttons_columns')
     cmds.text(l='Joint Radius:', bgc=[.7, .7, .7], p='list_lower_column')
-    cmds.textField(tx='1', bgc=[.1, .1, .1], p='list_lower_column')
+    radius_input = cmds.textField('joint_radius', tx='1', bgc=[.1, .1, .1], p='list_lower_column')
 
     def update_name_field(selection):
         if selection == "User Input":
@@ -506,9 +532,10 @@ def create_joint_ui(parent_ui, tool):
         name_choice = cmds.optionMenu(naming_option, query=True, value=True)
         parent_bool = cmds.checkBox(parent_checkbox, query=True, value=True)
         parent_name = cmds.optionMenu(parent_option, query=True, value=True)
+        radius = float(cmds.textField(radius_input, query=True, text=True))
 
-        selected_joints = create_joints_xyz(center_location)
-        add_to_layer('Jnt_Layer', selected_joints)
+        selected_joints = create_joints_xyz(center_location, radius)
+        # add_to_layer('Jnt_Layer', selected_joints)
         joint_axis_visibility_toggle(selected_joints)
 
         if rename:
