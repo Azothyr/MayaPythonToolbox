@@ -163,6 +163,20 @@ def parent_scale_constrain(data):
             cmds.setAttr("{}.{}".format(scale_const[0], attr), 2)
 
 
+def axis_visibility_ui(parent_ui, tool):
+    axis_visibility_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.1, .1, .3], p=parent_ui)
+
+    cmds.rowColumnLayout(f'{tool}_top_row', p=f'{tool}_base', adj=True, bgc=[.5, .5, .5])
+    cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
+    cmds.text(l="Toggles the axis visibility of the selection (joints)", p=f'{tool}_top_row')
+
+    def on_execute(*args):
+        joint_axis_visibility_toggle()
+
+    cmds.button(f'{tool}_button', l="Toggle", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
+    return axis_visibility_tab
+
+
 def parent_scale_constrain_ui(parent_ui, tool):
     parent_scale_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .1, .1], p=parent_ui)
 
@@ -575,12 +589,14 @@ def create_toolbox_ui():
     joint_tab = create_joint_ui(tabs_ui, 'joint')
     control_tab = create_control_ui(tabs_ui, 'control')
     color_tab = create_color_change_ui(tabs_ui, 'color')
+    axis_visibility_tab = axis_visibility_ui(tabs_ui, 'axis_visibility')
     freeze_tab = freeze_del_history_ui(tabs_ui, 'freeze_history')
     add_to_layer_tab = add_to_layer_ui(tabs_ui, 'add_to_layer')
     parent_scale_tab = parent_scale_constrain_ui(tabs_ui, 'parent_scale')
     cmds.tabLayout(tabs_ui, e=True, tl=((joint_tab, "Joint Creator"),
                                         (control_tab, "Control Creator"),
                                         (color_tab, "Color Changer"),
+                                        (axis_visibility_tab, "Axis Vis Toggle"),
                                         (freeze_tab, "Freeze, Delete History"),
                                         (add_to_layer_tab, 'Add To Layer'),
                                         (parent_scale_tab, 'Parent Scale')))
