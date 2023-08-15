@@ -3,6 +3,69 @@ Get all .py files in the directory and subdirectories this script is run from
 Return: Writes Maya userSetup.py and places all custom scripts in Maya directory
 Set a sys env variable "pythonpath" with script folder path value.
 """
+import winreg as reg
+from textwrap import dedent
+import os
+import ctypes
+import sys
+
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+
+def set_pythonpath(path):
+    # Location of the environment variables in the registry
+    key_path = r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
+
+    with reg.OpenKey(reg.HKEY_LOCAL_MACHINE, key_path, 0, reg.KEY_SET_VALUE) as key:
+        # Check if PYTHONPATH already exists
+        try:
+            existing_pythonpath = reg.QueryValueEx(key, "PYTHONPATH")[0]
+            # If it does, append the new path to it
+            new_pythonpath = existing_pythonpath + ";" + path if path not in existing_pythonpath else existing_pythonpath
+        except FileNotFoundError:
+            # If it doesn't, set the new PYTHONPATH as the provided path
+            new_pythonpath = path
+
+        # Set the PYTHONPATH in the registry
+        reg.SetValueEx(key, "PYTHONPATH", 0, reg.REG_EXPAND_SZ, new_pythonpath)
+
+
+if __name__ == "__main__":
+    if is_admin():
+        # Code of your script here or just import your script
+        import
+    else:
+        # Re-run the program with admin rights
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    user_name = os.getlogin()
+    maya_version = os.environ.get("MAYA_VERSION")
+    if not maya_version:
+        maya_version = "2022"
+    maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\bin"
+    scripts_folder = f"C:\\Users\\{user_name}\\Documents\\maya\\{maya_version}\\scripts"
+
+    code = dedent(f"""    import maya.cmds as cmds
+        import os
+
+        # Set Maya command line to Pycharm listener
+        if not cmds.commandPort(":4434", query=True):
+            cmds.commandPort(name=":4434")
+
+        # Replace "path_to_scripts_folder" with the actual path to your folder containing scripts
+        scripts_folder = "{scripts_folder}"
+        """)
+    with open(scripts_folder, 'w') as f:
+        f.write(code)
+
+    # with open(os.path.join(os.path.expanduser("~"), 'Documents', 'maya', 'scripts', 'userSetup.py'), 'w') as f:
+    #    f.write(code)
+
+"""
 import os
 import sys
 import platform
@@ -10,19 +73,14 @@ import shutil
 import subprocess
 from textwrap import dedent
 
-# Get the computer's Maya and OS/Platform version
-maya_version = os.environ.get("MAYA_VERSION")
-if not maya_version:
-    maya_version = "2022"  # Set a default value if the environment variable isn't set
+# Get the computer's Maya and OS/Platform version  # Set a default value if the environment variable isn't set
 
 # Confirm this is run on a Windows machine, raise an exception if not
 if platform.system() == "Windows":
     platform_name = "win64"
-    user_name = os.getlogin()
     # defines where maya is installed
-    maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\bin"
     # Set the path to the scripts folder
-    scripts_folder = f"C:\\Users\\{user_name}\\Documents\\maya\\{maya_version}\\scripts"
+
     # Create a path to the scripts folder, if it already exists, don't raise an error and continue
     os.makedirs(scripts_folder, exist_ok=True)
     # Open command prompt window and echo
@@ -89,20 +147,9 @@ if platform.system() == "Windows":
         print(f"Insufficient permissions to add folder to '{scripts_folder}'.\nPlease run file as admin...")
 
     # lines of code formatted to be run as a .py in the Maya user setup script
-    code = dedent(f"""    import maya.cmds as cmds
-    import os
 
-    # Set Maya command line to Pycharm listener
-    if not cmds.commandPort(":4434", query=True):
-        cmds.commandPort(name=":4434")
-    
-    # Replace "path_to_scripts_folder" with the actual path to your folder containing scripts
-    scripts_folder = "{scripts_folder}"
-    """)
 
     # Write user setup script to Maya scripts location with the above code
-    with open(os.path.join(os.path.expanduser("~"), 'Documents', 'maya', 'scripts', 'userSetup.py'), 'w') as f:
-        f.write(code)
     # print(f"Successfully created userSetup.py in {user_setup_path}")
 
     # Keeps the command prompt open and lets the user know to exit
@@ -110,3 +157,4 @@ if platform.system() == "Windows":
 else:
     raise RuntimeError(f"Unsupported platform: {platform.system()}")
     # Replace "path_to_scripts_folder" with the actual path to your folder containing scripts
+"""
