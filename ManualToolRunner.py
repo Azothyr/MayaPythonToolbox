@@ -9,11 +9,6 @@ def create_joints_xyz(xyz_list, radius_input=None):
     """
     new_joints = []
 
-    '''
-    if not cmds.objExists('Jnt_layer'):
-        cmds.createDisplayLayer(name='Jnt_layer', number=1)
-    '''
-
     joint_orient_attrs = ['jointOrientX', 'jointOrientY', 'jointOrientZ', 'displayLocalAxis']
     for xyz in xyz_list:
         center_position = xyz

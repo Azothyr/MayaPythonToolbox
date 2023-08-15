@@ -1,4 +1,5 @@
 from functools import partial
+
 import maya.cmds as cmds
 
 
@@ -29,15 +30,6 @@ def create_joints_xyz(xyz_list, radius_input=None):
         # cmds.editDisplayLayerMembers('Jnt_layer', jnt)
     cmds.select(new_joints, replace=True)
     return new_joints
-
-
-def parent_selected(data):
-    for value in range(len(data)):
-        cmds.select(clear=True)
-        cmds.select(data[value])
-        if (len(data) - 1) > value:
-            cmds.select(data[value + 1], add=True)
-            cmds.parent()
 
 
 def sequential_renamer(txt, data):

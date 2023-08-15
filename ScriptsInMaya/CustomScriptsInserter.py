@@ -8,7 +8,7 @@ import sys
 import platform
 import shutil
 import subprocess
-import textwrap
+from textwrap import dedent
 
 # Get the computer's Maya and OS/Platform version
 maya_version = os.environ.get("MAYA_VERSION")
@@ -18,10 +18,11 @@ if not maya_version:
 # Confirm this is run on a Windows machine, raise an exception if not
 if platform.system() == "Windows":
     platform_name = "win64"
+    user_name = os.getlogin()
     # defines where maya is installed
-    maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\bin"
+    maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\bin"
     # Set the path to the scripts folder
-    scripts_folder = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\custom scripts"
+    scripts_folder = f"C:\\Users\\{user_name}\\Documents\\maya\\{maya_version}\\scripts"
     # Create a path to the scripts folder, if it already exists, don't raise an error and continue
     os.makedirs(scripts_folder, exist_ok=True)
     # Open command prompt window and echo
@@ -31,7 +32,8 @@ if platform.system() == "Windows":
     cwd = os.getcwd()
 
     # Set the path to the userSetup.py file
-    user_setup_path = os.path.join(os.path.expanduser("~"), "Documents", "maya", "scripts", "userSetup.py")
+    user_setup_path = os.path.join(os.path.expanduser("~"), "Documents", "maya", f"{maya_version}", "scripts",
+                                   "userSetup.py")
 
     # Get the current environment variables
     env = os.environ.copy()
@@ -61,24 +63,33 @@ if platform.system() == "Windows":
 
     # Set the updated environment variables
     os.environ.update(env)
+
     # Attempt to write to program files, print on permission error
     try:
         # Loops through all files and subdirectories in the cwd (current working directory)
         for root, dirs, files in os.walk(cwd):
-            # Loop through all files in the current subdirectory
             for file_name in files:
-                # Check if the file is a Python file
                 if file_name.endswith(".py"):
-                    # Get the full path of the file
-                    file_path = os.path.join(root, file_name)
-                    # Check if a file with the same name already exists in the destination directory
-                    shutil.copy2(file_path, scripts_folder)
+                    # Calculate relative path
+                    rel_path = os.path.relpath(root, cwd)
+                    # Join the relative path with the destination to make a full path
+                    dest_folder = os.path.join(scripts_folder, rel_path)
+
+                    # If the destination directory doesn't exist, create it
+                    os.makedirs(dest_folder, exist_ok=True)
+
+                    # Calculate source and destination file paths
+                    src_file_path = os.path.join(root, file_name)
+                    dest_file_path = os.path.join(dest_folder, file_name)
+
+                    # Copy the file from source to destination
+                    shutil.copy2(src_file_path, dest_file_path)
                     # print(f"{file_name} has been copied to the scripts folder.")
-    except:
-        print(f"insufficient permissions to add folder to '{scripts_folder}'.\n Please run file as admin...")
+    except PermissionError:
+        print(f"Insufficient permissions to add folder to '{scripts_folder}'.\nPlease run file as admin...")
 
     # lines of code formatted to be run as a .py in the Maya user setup script
-    code = textwrap.dedent(f"""    import maya.cmds as cmds
+    code = dedent(f"""    import maya.cmds as cmds
     import os
 
     # Set Maya command line to Pycharm listener
@@ -87,14 +98,6 @@ if platform.system() == "Windows":
     
     # Replace "path_to_scripts_folder" with the actual path to your folder containing scripts
     scripts_folder = "{scripts_folder}"
-    
-    # Iterate through all files in the scripts folder
-    for filename in os.listdir(scripts_folder):
-        # Only consider Python files
-        if filename.endswith(".py"):
-            # Import the script as a module
-            module_name = os.path.splitext(filename)[0]
-            module = __import__(module_name)
     """)
 
     # Write user setup script to Maya scripts location with the above code
