@@ -1,4 +1,9 @@
-"""
+r"""
+**MUST RUN ADMIN CMD AND SET THE SYS VARIABLES do not run it multiple times**
+code: setx PYTHONPATH "%PYTHONPATH%;C:\Users\.\Documents\maya\customscripts" /M
+setx PATH "%PATH%;C:\Users\.\Documents\maya\customscripts" /M
+(to check the path and python path in cmd you need to close the terminal and reopen it
+ then using echo %PATH% and echo %PYTHONPATH%)
 Get all .py files in the directory and subdirectories this script is run from
 Return: Writes Maya userSetup.py and places all custom scripts in Maya directory
 Set a sys env variable "pythonpath" with script folder path value.
@@ -6,25 +11,14 @@ Set a sys env variable "pythonpath" with script folder path value.
 import os
 import platform
 import shutil
-import sys
 from textwrap import dedent
 
 
-def pass_path(var):
-    var = os.environ[var].split(";")
-    print_list_content(var)
-
-
-def print_list_content(lyst):
-    for value in lyst:
-        print(value)
-
-
 if __name__ == "__main__":
-    maya_version = os.environ.get("MAYA_VERSION", "2022")
     if platform.system() == "Windows":
         platform_name = "win64"  # You don't use this variable in this code. Do you need it?
-        scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "customscripts")
+        scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "maya", "customscripts")
+        maya_version = os.environ.get("MAYA_VERSION", "2022")
         maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\bin"
         user_setup_path = os.path.join(os.path.expanduser("~"), "Documents", "maya", f"{maya_version}", "scripts",
                                        "userSetup.py")
@@ -38,7 +32,7 @@ if __name__ == "__main__":
                 cmds.commandPort(name=":4434")
 
             # Add custom scripts folder to sys.path
-            scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "customscripts")
+            scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "maya", "customscripts")
             if scripts_folder not in sys.path:
                 sys.path.append(scripts_folder)
             """)
