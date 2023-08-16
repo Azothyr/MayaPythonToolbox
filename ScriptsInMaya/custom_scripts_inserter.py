@@ -14,6 +14,15 @@ import shutil
 from textwrap import dedent
 
 
+def clear_directory(path):
+    """Remove all files and subdirectories from a directory."""
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            os.remove(os.path.join(root, name))
+        for name in dirs:
+            os.rmdir(os.path.join(root, name))
+
+
 if __name__ == "__main__":
     if platform.system() == "Windows":
         platform_name = "win64"  # You don't use this variable in this code. Do you need it?
@@ -39,11 +48,14 @@ if __name__ == "__main__":
 
         os.makedirs(scripts_folder, exist_ok=True)
 
+        clear_directory(scripts_folder)
+
         cwd = os.getcwd()
+        file_exceptions = ["custom_scripts_inserter.py", "manual_tool_runner.py"]
         try:
             for root, dirs, files in os.walk(cwd):
                 for file_name in files:
-                    if file_name.endswith(".py") and file_name != "custom_scripts_inserter.py":
+                    if file_name.endswith(".py") and file_name not in file_exceptions:
                         rel_path = os.path.relpath(root, cwd)
                         dest_folder = os.path.join(scripts_folder, rel_path)
                         os.makedirs(dest_folder, exist_ok=True)

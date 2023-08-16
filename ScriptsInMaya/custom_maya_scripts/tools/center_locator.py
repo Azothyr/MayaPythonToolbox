@@ -39,16 +39,11 @@ def get_obj_center(_input=None):
     finds the selection(s) center of mass.
     Returns: (center x, center y, center z)
     """
-    # if _input is None, get the selected objects from Maya
-    if _input is None:
-        _input = cmds.ls(selection=True)
-        if not _input:
-            raise ValueError("No objects selected in Maya!")
-
     # Check if _input is a list or a single object
     if isinstance(_input, list):
         return _get_selection_centers(_input)
     elif isinstance(_input, str):  # Maya object names are typically strings
         return _calculate_center(_input)
     else:
-        raise ValueError("input must be a selected object or a list of selected objects.")
+        cmds.warning("input must be a selected object or a list of selected objects.")
+        return

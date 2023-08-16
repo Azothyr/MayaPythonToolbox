@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 
 
-def joint_axis_visibility_toggle(*args):
+def toggle_visibility(*args):
     selection = cmds.ls(selection=True, type="joint")
 
     for joint_name in selection:

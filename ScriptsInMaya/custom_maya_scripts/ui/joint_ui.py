@@ -1,79 +1,10 @@
 import maya.cmds as cmds
 from functools import partial
-from customscript_tools import xyz_joint_creator
+from custom_maya_scripts.tools import (joint_creator, selection_renamer, parent_selection, center_locator,
+                                       joint_axis_vis_toggle)
 
 if 'center_location' not in globals():
     center_location = []
-
-
-
-
-
-def parent_selected(data):
-    for value in range(len(data)):
-        cmds.select(clear=True)
-        cmds.select(data[value])
-        if (len(data) - 1) > value:
-            cmds.select(data[value + 1], add=True)
-            cmds.parent()
-
-
-def sequential_renamer(txt, data):
-    """
-    Renames selected objects sequentially.
-    Returns:
-    """
-    count = txt.count('#')
-    scheme_parts = txt.partition(count * "#")
-    objects_changed = 0
-
-    new_names = []
-    for i in range(len(data)):
-        new_name = scheme_parts[0] + str(i + 1).zfill(count) + scheme_parts[2]
-        new_names.append(cmds.rename(data[i], new_name))
-        objects_changed += 1
-    cmds.select(clear=True)
-    cmds.select(new_names, replace=True)
-    return new_names
-
-
-def single_renamer(new_name, data):
-    """
-    Renames selected object
-    """
-    new_names = []
-    for i in range(len(data)):
-        new_names.append(cmds.rename(data[i], new_name))
-    cmds.select(clear=True)
-    cmds.select(new_names, replace=True)
-    return new_names
-
-
-def add_to_layer(layer_name, data):
-    if not cmds.objExists(layer_name):
-        cmds.createDisplayLayer(n=layer_name, num=1, nr=True)
-
-    cmds.editDisplayLayerMembers(layer_name, data, noRecurse=True)
-
-
-def orient_joints(data):
-    last_joint = len(data) - 1
-
-    for index in range(len(data)):
-        if index == last_joint:
-            parent_orientation = cmds.joint(data[index - 1], query=True, orientation=True)
-            cmds.joint(data[index], edit=True, orientation=parent_orientation)
-            break
-        cmds.joint(data[index], edit=True, orientJoint='xyz', secondaryAxisOrient='zup', children=True,
-                   zeroScaleOrient=True)
-
-
-def joint_axis_visibility_toggle(*args):
-    selection = cmds.ls(selection=True, type="joint")
-
-    for joint_name in selection:
-        display_local_axis = cmds.getAttr(joint_name + ".displayLocalAxis")
-        cmds.setAttr(joint_name + ".displayLocalAxis", not display_local_axis)
 
 
 def create_joint_ui():
@@ -81,43 +12,19 @@ def create_joint_ui():
     Returns: Joint Creator UI
     """
 
-    def get_center(_input):
-        """
-        finds the selection(s) center of mass.
-        Returns: (center x, center y, center z)
-        """
-        bbox = cmds.exactWorldBoundingBox(_input)
-        center = (
-            (bbox[0] + bbox[3]) / 2,
-            (bbox[1] + bbox[4]) / 2,
-            (bbox[2] + bbox[5]) / 2
-        )
-        return center
-
-    def add_center_to_list(*args):
+    def add_to_list(*args):
         """
         Calls get_center function and adds the center to the list.
         """
         global center_location
-        is_joint = False
         sel = cmds.ls(sl=True)
-        if not sel:
-            cmds.warning('No objects selected.')
-            return
-        for obj in sel:
-            if cmds.objectType(obj) == 'joint':
-                center = cmds.xform(sel, q=True, ws=True, t=True)
-                is_joint = True
-            else:
-                continue
-        if not is_joint:
-            center = get_center(sel)
+        center = center_locator.get_obj_center(sel)
         center_location.append(center)
         center_txt = str(center)
         cmds.textScrollList('position_list', edit=True, append=f'{len(center_location)}: {center_txt}')
         cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
 
-    def move_center_item_up(*args):
+    def move_item_up(*args):
         global center_location
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
@@ -132,7 +39,7 @@ def create_joint_ui():
                                         append=f'{i + 1}: {str(item)}')
                 cmds.textScrollList('position_list', edit=True, selectIndexedItem=index - 1)
 
-    def move_center_item_down(*args):
+    def move_item_down(*args):
         global center_location
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
@@ -145,7 +52,7 @@ def create_joint_ui():
                     cmds.textScrollList('position_list', edit=True, append=f'{i + 1}: {str(item)}')
                 cmds.textScrollList('position_list', edit=True, selectIndexedItem=index + 2)
 
-    def remove_center_item(*args):
+    def remove_item(*args):
         global center_location
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
@@ -159,7 +66,7 @@ def create_joint_ui():
                                     append=f'{i + 1}: {str(item)}')
             cmds.textScrollList('position_list', edit=True, deselectAll=True)
 
-    def clear_center_list(*args):
+    def clear_list(*args):
         """
         Clears the center list.
         """
@@ -220,17 +127,17 @@ def create_joint_ui():
                          enable=False, parent='parent_column_lower')
     cmds.columnLayout('lower_column', adjustableColumn=True, parent='base_column')
 
-    cmds.button(label='Add Joint Position', command=add_center_to_list,
+    cmds.button(label='Add Joint Position', command=add_to_list,
                 backgroundColor=[0, 0, 0], parent='list_button_columns')
-    cmds.button(label='Remove Entry', command=remove_center_item,
+    cmds.button(label='Remove Entry', command=remove_item,
                 backgroundColor=[0, 0, 0], parent='list_button_columns')
-    cmds.button(label='Clear', command=clear_center_list,
+    cmds.button(label='Clear', command=clear_list,
                 backgroundColor=[0, 0, 0], parent='list_button_columns')
     center_label = cmds.text(label='Joint Positions (0):', align='center', parent='list_column')
     cmds.textScrollList('position_list', numberOfRows=6, parent='list_column')
-    cmds.button(label='Move Up', command=move_center_item_up,
+    cmds.button(label='Move Up', command=move_item_up,
                 backgroundColor=[0, 0, 0], parent='list_column')
-    cmds.button(label='Move Down', command=move_center_item_down,
+    cmds.button(label='Move Down', command=move_item_down,
                 backgroundColor=[0, 0, 0], parent='list_column')
 
     def update_name_field(selection):
@@ -288,7 +195,7 @@ def create_joint_ui():
                      area='right',
                      floatChangeCommand=update_window_size,
                      content=joint_ui_window)
-    clear_center_list()
+    clear_list()
 
 
 def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *args):
@@ -299,9 +206,8 @@ def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *ar
     parent_bool = cmds.checkBox(parent_bool, query=True, value=True)
     parent_name = cmds.optionMenu(parent_name, query=True, value=True)
 
-    joints = create_joints_xyz(center_location)
-    add_to_layer('Jnt_Layer', joints)
-    joint_axis_visibility_toggle(joints)
+    joints = joint_creator.create_joints_xyz(center_location)
+    joint_axis_vis_toggle.toggle_visibility(joints)
 
     if rename:
         if name_choice == 'User Input':
@@ -311,13 +217,10 @@ def pass_values(rename, naming_input, name_choice, parent_bool, parent_name, *ar
         if name_schema[0].isdigit() or name_schema.startswith('_'):
             cmds.error('Naming Schema starts with an invalid character.')
             cmds.delete(cmds.ls(sl=True))
-        if "#" in name_schema:
-            joints = sequential_renamer(name_schema, joints)
-        else:
-            joints = single_renamer(name_schema, joints)
+        joints = selection_renamer.rename_selection(name_schema, joints)
 
     if parent_bool:
         joints.reverse()
         if parent_name != 'None':
             joints.append(str(parent_name))
-        parent_selected(joints)
+        parent_selection.parent_selected(joints)
