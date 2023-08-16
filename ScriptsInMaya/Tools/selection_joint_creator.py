@@ -1,9 +1,7 @@
-import maya.standalone
-maya.standalone.initialize()
 import maya.cmds as cmds
 
 
-def create_joints_select(data):
+def create_joints_select(lyst):
     """
     Creates a joint at each selection(s) transform.
     Returns: [joints]
@@ -13,7 +11,7 @@ def create_joints_select(data):
     if not cmds.objExists('Jnt_layer'):
         cmds.createDisplayLayer(name='Jnt_layer', number=1)
 
-    for value in data:
+    for value in lyst:
         position = cmds.xform(value, query=True, rotatePivot=True, worldSpace=True)
         cmds.select(clear=True)
         jnt = cmds.joint()

@@ -1,5 +1,3 @@
-import maya.standalone
-maya.standalone.initialize()
 import maya.cmds as cmds
 
 selections = cmds.ls(sl=True)

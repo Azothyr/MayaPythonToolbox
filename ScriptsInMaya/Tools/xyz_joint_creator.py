@@ -1,9 +1,7 @@
-import maya.standalone
-maya.standalone.initialize()
 import maya.cmds as cmds
 
 
-def create_joints_xyz(xyz_list):
+def create_joints_xyz(xyz_lyst):
     """
     Creates a joint at each XYZ value from a list.
     Returns: [joints]
@@ -14,7 +12,7 @@ def create_joints_xyz(xyz_list):
         cmds.createDisplayLayer(name='Jnt_layer', number=1)
 
     joint_orient_attrs = ['jointOrientX', 'jointOrientY', 'jointOrientZ', 'displayLocalAxis']
-    for xyz in xyz_list:
+    for xyz in xyz_lyst:
         center_position = xyz
         cmds.select(clear=True)
         jnt = cmds.joint()

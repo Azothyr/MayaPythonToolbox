@@ -16,7 +16,7 @@ def create_color_change_ui(parent_ui, tool):
                          "Light Green", "Light Navy Blue", "Light Blue", "Light Purple", "Mid Pink"]
         selection = cmds.ls(sl=True)
         if not selection:
-            return cmds.warning("Please select a shape.")
+            return cmds.warning("Please object a shape.")
 
         menu_index = cmds.optionMenu(color_option_menu, q=True, sl=True) - 1
         color_name = color_menu_order[menu_index]
@@ -26,14 +26,14 @@ def create_color_change_ui(parent_ui, tool):
         else:
             print('color not found in list.')
 
-        for sel in selection:
-            if cmds.nodeType(sel) == "joint":
-                cmds.setAttr("%s.overrideEnabled" % sel, lock=False)
-                cmds.setAttr("%s.overrideColor" % sel, lock=False)
-                cmds.setAttr("%s.overrideEnabled" % sel, 1)
-                cmds.setAttr("%s.overrideColor" % sel, color_index)
+        for obj in selection:
+            if cmds.nodeType(obj) == "joint":
+                cmds.setAttr("%s.overrideEnabled" % obj, lock=False)
+                cmds.setAttr("%s.overrideColor" % obj, lock=False)
+                cmds.setAttr("%s.overrideEnabled" % obj, 1)
+                cmds.setAttr("%s.overrideColor" % obj, color_index)
             else:
-                shapes = cmds.listRelatives(sel, children=True, shapes=True)
+                shapes = cmds.listRelatives(obj, children=True, shapes=True)
                 for shape in shapes:
                     cmds.setAttr("%s.overrideEnabled" % shape, lock=False)
                     cmds.setAttr("%s.overrideColor" % shape, lock=False)
@@ -53,7 +53,7 @@ def create_color_change_ui(parent_ui, tool):
 
     layout = cmds.columnLayout(adjustableColumn=True)
 
-    cmds.text(label="Select a color:")
+    cmds.text(label="object a color:")
     color_option_menu = cmds.optionMenu()
     for color in color_menu_order:
         cmds.menuItem(label=color)
@@ -63,4 +63,5 @@ def create_color_change_ui(parent_ui, tool):
     cmds.showWindow(color_ui_window)
 
 
-create_color_change_ui()
+if __name__ == "__main__":
+    create_color_change_ui()
