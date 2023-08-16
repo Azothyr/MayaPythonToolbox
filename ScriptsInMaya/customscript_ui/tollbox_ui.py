@@ -1,35 +1,6 @@
 from functools import partial
-
 import maya.cmds as cmds
-
-
-def create_joints_xyz(xyz_list, radius_input=None):
-    """
-    Creates a joint at each XYZ value from a list.
-    Returns: [joints]
-    """
-    new_joints = []
-
-    '''
-    if not cmds.objExists('Jnt_layer'):
-        cmds.createDisplayLayer(name='Jnt_layer', number=1)
-    '''
-
-    joint_orient_attrs = ['jointOrientX', 'jointOrientY', 'jointOrientZ', 'displayLocalAxis']
-    for xyz in xyz_list:
-        center_position = xyz
-        cmds.select(clear=True)
-        if radius_input != None:
-            jnt = cmds.joint(rad=radius_input)
-        else:
-            jnt = cmds.joint(rad=1)
-        new_joints.append(jnt)
-        for attr_name in joint_orient_attrs:
-            cmds.setAttr(f"{jnt}.{attr_name}", keyable=False, channelBox=True)
-        cmds.xform(jnt, worldSpace=True, translation=center_position)
-        # cmds.editDisplayLayerMembers('Jnt_layer', jnt)
-    cmds.select(new_joints, replace=True)
-    return new_joints
+from customscript_tools import xyz_joint_creator, center_locator as custom_tools
 
 
 def sequential_renamer(txt, data):
@@ -334,85 +305,60 @@ def create_joint_ui(parent_ui, tool):
     """
     Returns: Joint Creator UI
     """
-    global center_location
-    if 'center_location' not in globals():
-        center_location = []
-
-
-    def get_center(_input):
-        """
-        finds the selection(s) center of mass.
-        Returns: (center x, center y, center z)
-        """
-        bbox = cmds.exactWorldBoundingBox(_input)
-        center = (
-            (bbox[0] + bbox[3]) / 2,
-            (bbox[1] + bbox[4]) / 2,
-            (bbox[2] + bbox[5]) / 2
-        )
-        return center
+    global center_locations
+    if 'center_locations' not in globals():
+        center_locations = []
 
     def add_center_to_list(*args):
         """
-        Calls get_center function and adds the center to the list.
+        Calls center_locator module and adds the center to the list.
         """
-        global center_location
-        is_joint = False
-        sel = cmds.ls(sl=True)
-        if not sel:
-            cmds.warning('No objects selected.')
-            return
-        for obj in sel:
-            if cmds.objectType(obj) == 'joint':
-                center = cmds.xform(sel, q=True, ws=True, t=True)
-                is_joint = True
-            else:
-                continue
-        if not is_joint:
-            center = get_center(sel)
-        center_location.append(center)
-        center_txt = str(center)
-        cmds.textScrollList('position_list', edit=True, append=f'{len(center_location)}: {center_txt}')
-        cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
+        global center_locations
+        center = custom_tools.get_obj_center()
+        for xyz in center:
+            center_locations.append(xyz)
+            center_txt = str(xyz)
+            cmds.textScrollList('position_list', edit=True, append=f'{len(center_locations)}: {center_txt}')
+            cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
 
     def move_center_item_up(*args):
-        global center_location
+        global center_locations
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
             index = selected_items[0]
             if index > 1:
-                center_location[index - 2], center_location[index - 1] = center_location[index - 1], center_location[
+                center_locations[index - 2], center_locations[index - 1] = center_locations[index - 1], center_locations[
                     index - 2]
-                cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
+                cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
                 cmds.textScrollList('position_list', edit=True, removeAll=True)
-                for i, item in enumerate(center_location):
+                for i, item in enumerate(center_locations):
                     cmds.textScrollList('position_list', edit=True,
                                         append=f'{i + 1}: {str(item)}')
                 cmds.textScrollList('position_list', edit=True, selectIndexedItem=index - 1)
 
     def move_center_item_down(*args):
-        global center_location
+        global center_locations
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
             index = selected_items[0]
-            if index < len(center_location) - 1:
-                center_location[index], center_location[index + 1] = center_location[index + 1], center_location[index]
-                cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
+            if index < len(center_locations) - 1:
+                center_locations[index], center_locations[index + 1] = center_locations[index + 1], center_locations[index]
+                cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
                 cmds.textScrollList('position_list', edit=True, removeAll=True)
-                for i, item in enumerate(center_location):
+                for i, item in enumerate(center_locations):
                     cmds.textScrollList('position_list', edit=True, append=f'{i + 1}: {str(item)}')
                 cmds.textScrollList('position_list', edit=True, selectIndexedItem=index + 2)
 
     def remove_center_item(*args):
-        global center_location
+        global center_locations
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
             index = selected_items[0]
             cmds.textScrollList('position_list', edit=True, removeIndexedItem=index)
-            center_location.pop(index - 1)
-            cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
+            center_locations.pop(index - 1)
+            cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
             cmds.textScrollList('position_list', edit=True, removeAll=True)
-            for i, item in enumerate(center_location):
+            for i, item in enumerate(center_locations):
                 cmds.textScrollList('position_list', edit=True,
                                     append=f'{i + 1}: {str(item)}')
             cmds.textScrollList('position_list', edit=True, deselectAll=True)
@@ -421,10 +367,10 @@ def create_joint_ui(parent_ui, tool):
         """
         Clears the center list.
         """
-        global center_location
-        center_location.clear()
+        global center_locations
+        center_locations.clear()
         cmds.textScrollList('position_list', edit=True, removeAll=True)
-        cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_location)}):")
+        cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
 
     def grey_field(enabler, dependant, *args):
         def update_input_enable():
@@ -532,7 +478,7 @@ def create_joint_ui(parent_ui, tool):
                 backgroundColor=[.2, 1, .2], parent='parent_columns')
 
     def on_execute(*args):
-        global center_location
+        global center_locations
         rename = cmds.checkBox(rename_bool, query=True, value=True)
         naming_input = cmds.textField(name_input, query=True, text=True)
         name_choice = cmds.optionMenu(naming_option, query=True, value=True)
@@ -540,7 +486,7 @@ def create_joint_ui(parent_ui, tool):
         parent_name = cmds.optionMenu(parent_option, query=True, value=True)
         radius = float(cmds.textField(radius_input, query=True, text=True))
 
-        selected_joints = create_joints_xyz(center_location, radius)
+        selected_joints = create_joints_xyz(center_locations, radius)
         # add_to_layer('Jnt_Layer', selected_joints)
         joint_axis_visibility_toggle(selected_joints)
 
@@ -596,8 +542,5 @@ def create_toolbox_ui():
     return toolbox_ui_window
 
 
-def main():
+if __name__ == "__main__":
     cmds.showWindow(create_toolbox_ui())
-
-
-main()
