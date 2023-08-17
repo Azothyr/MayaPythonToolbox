@@ -24,8 +24,8 @@ def create_ui_window():
                                         (add_to_layer_tab, 'Add To Layer'),
                                         (constrain_tab, 'Constrain')))
 
-    return toolbox_ui_window
+    cmds.showWindow(toolbox_ui_window)
 
 
 if __name__ == "__main__":
-    cmds.showWindow(create_ui_window())
+    create_ui_window()

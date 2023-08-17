@@ -9,7 +9,7 @@ def _single_renamer(new_name, obj):
     cmds.rename(obj, new_name)
     cmds.select(clear=True)
     cmds.select(new_name, replace=True)
-    return new_name
+    return list(new_name)
 
 
 def _sequential_renamer(txt, lyst):
@@ -35,9 +35,9 @@ def perform_rename(txt, selection=None):
         selection_check.is_selection(selection)
     except custom_exception.CustomException as err:
         print(err)
-        if "#" in txt:
-            new_names = _sequential_renamer(txt, selection)
-        else:
-            new_names = _single_renamer(txt, selection)
+    if "#" in txt:
+        new_names = _sequential_renamer(txt, selection)
+    else:
+        new_names = _single_renamer(txt, selection)
 
     return new_names

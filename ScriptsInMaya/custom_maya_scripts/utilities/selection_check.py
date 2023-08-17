@@ -2,8 +2,10 @@ import maya.cmds as cmds
 from custom_maya_scripts.utilities import custom_exception as util
 
 
-def is_selection(_selection=cmds.ls(selection=True)):
-    # if _selection is None, get the selected objects from Maya
+def is_selection(_selection=None):
+    if _selection is None:
+        _selection = cmds.ls(selection=True)
+
     if not _selection:
         raise util.CustomException("No objects selected in Maya!")
     return _selection
@@ -16,11 +18,12 @@ def _is_joint(obj):
     return True
 
 
-def filter_joints(objs=cmds.ls(selection=True)):
-    joints = []
-    for obj in objs:
-        if _is_joint(obj):
-            joints.append(obj)
-    if joints is None:
-        raise cmds.warning("No joints selected")
+def filter_joints(objs=None):
+    if objs is None:
+        objs = cmds.ls(selection=True)
+
+    joints = [obj for obj in objs if _is_joint(obj)]
+
+    if not joints:
+        cmds.warning("No joints selected")
     return joints

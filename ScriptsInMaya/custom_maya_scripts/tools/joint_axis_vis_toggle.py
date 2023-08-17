@@ -2,7 +2,7 @@ import maya.cmds as cmds
 from custom_maya_scripts.utilities import selection_check
 
 
-def toggle_visibility():
+def toggle_visibility(*args):
     selection = selection_check.filter_joints()
 
     for joint_name in selection:

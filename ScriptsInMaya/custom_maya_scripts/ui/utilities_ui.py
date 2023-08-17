@@ -1,7 +1,6 @@
 import maya.cmds as cmds
-from functools import partial
-from custom_maya_scripts.tools import color_changer, layer_control, joint_axis_vis_toggle, constrain_commands
-from custom_maya_scripts.utilities import selection_check, obj_history
+from custom_maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_commands
+from custom_maya_scripts.utilities import obj_history
 
 
 def layer_cmds_ui(parent_ui, tool):
@@ -16,7 +15,7 @@ def layer_cmds_ui(parent_ui, tool):
 
     def on_execute(*args):
         add_to = cmds.textField(layer_name_input, query=True, text=True)
-        partial(layer_control.add_to_layer, add_to, cmds.ls(sl=True))()
+        layer_control.add_to_layer(add_to, cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Add To Layer", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return layer_cmds_tab
@@ -44,7 +43,7 @@ def constrain_ui(parent_ui, tool):
     cmds.text(l="Parent, Scale constrain between every other selected objects", p=f'{tool}_top_row')
 
     def on_execute(*args):
-        partial(constrain_commands.parent_scale_constrain, cmds.ls(sl=True))()
+        constrain_commands.parent_scale_constrain(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Parent and Scale", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return parent_scale_tab
@@ -58,7 +57,7 @@ def freeze_del_history_ui(parent_ui, tool):
     cmds.text(l="Freeze the transformations and delete history of selected objects", p=f'{tool}_top_row')
 
     def on_execute(*args):
-        partial(obj_history.perform_freeze_delete, cmds.ls(sl=True))()
+        obj_history.perform_freeze_delete(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Freeze and Delete History", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return freeze_tab
@@ -104,8 +103,8 @@ def create_ui_window():
                         (freeze_del_history_ui_elem, 'top', 5, constrain_ui_elem),
                     ])
 
-    return utility_ui_window
+    cmds.showWindow(utility_ui_window)
 
 
 if __name__ == "__main__":
-    cmds.showWindow(create_ui_window())
+    create_ui_window()

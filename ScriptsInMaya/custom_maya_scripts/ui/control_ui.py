@@ -27,7 +27,7 @@ def _ui_setup(parent_ui, tool):
     cmds.text(l='Control Scale:', bgc=[.7, .7, .7], p=f'{tool}_radius_col_1')
     radius_input = cmds.textField('radius_input', tx='10', bgc=[.1, .1, .1], p=f'{tool}_radius_col_2')
 
-    def on_execute():
+    def on_execute(*args):
         radius = cmds.textField(radius_input, q=True, text=True)
         selected_color = cmds.optionMenu(color_option_menu, query=True, value=True)
 
@@ -55,10 +55,11 @@ def create_ui_window():
     tabs_ui = cmds.tabLayout('tabs_ui', innerMarginWidth=5, innerMarginHeight=5)
 
     control_tab = _ui_setup(tabs_ui, 'control')
-    cmds.tabLayout(tabs_ui, e=True, tl=(control_tab, "Control Creator"))
+    cmds.tabLayout(tabs_ui, e=True, tl=[(control_tab, "Control Creator")])
 
-    return control_ui_window
+    cmds.showWindow(control_ui_window)
 
 
 if __name__ == "__main__":
-    cmds.showWindow(create_ui_window())
+    create_ui_window()
+

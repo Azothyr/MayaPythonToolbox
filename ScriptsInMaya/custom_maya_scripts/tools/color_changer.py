@@ -15,7 +15,7 @@ def _pass_color_info():
 def get_color_order():
     order = []
     for color in _pass_color_info():
-        order.append(color)
+        order.append(color[0])
     return order
 
 

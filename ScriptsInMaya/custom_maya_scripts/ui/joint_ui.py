@@ -20,7 +20,7 @@ def _ui_setup(parent_ui, tool):
         Calls center_locator module and adds the center to the list.
         """
         global center_locations
-        center = center_locator.get_obj_center()
+        center = center_locator.get_obj_center(cmds.ls(sl=True))
         for xyz in center:
             center_locations.append(xyz)
             center_txt = str(xyz)
@@ -229,8 +229,9 @@ def create_ui_window():
     joint_tab = _ui_setup(tabs_ui, 'joint')
     cmds.tabLayout(tabs_ui, e=True, tl=(joint_tab, "Joint Creator"))
 
-    return joint_ui_window
+    cmds.showWindow(joint_ui_window)
 
 
 if __name__ == "__main__":
-    cmds.showWindow(create_ui_window())
+    create_ui_window()
+

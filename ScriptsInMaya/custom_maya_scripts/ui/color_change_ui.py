@@ -18,10 +18,10 @@ def _ui_setup(parent_ui, tool):
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True)
     cmds.text(l="Select a color:", p=f'{tool}_select_1')
     color_option_menu = cmds.optionMenu(p=f'{tool}_select_2', bgc=[.5, .2, .2])
-    for color, index in color_options:
+    for color in color_options:
         cmds.menuItem(l=color, p=color_option_menu)
     
-    def on_execute():
+    def on_execute(*args):
         selected_color = cmds.optionMenu(color_option_menu, query=True, value=True)
         objects = selection_check.is_selection()
 
@@ -48,8 +48,8 @@ def create_ui_window():
     color_tab = _ui_setup(tabs_ui, 'color')
     cmds.tabLayout(tabs_ui, e=True, tl=(color_tab, "color Creator"))
 
-    return color_ui_window
+    cmds.showWindow(color_ui_window)
 
 
 if __name__ == "__main__":
-    cmds.showWindow(create_ui_window())
+    create_ui_window()
