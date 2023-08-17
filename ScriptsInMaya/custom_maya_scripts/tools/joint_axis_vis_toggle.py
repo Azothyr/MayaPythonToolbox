@@ -1,8 +1,9 @@
 import maya.cmds as cmds
+from custom_maya_scripts.utilities import selection_check
 
 
-def toggle_visibility(*args):
-    selection = cmds.ls(selection=True, type="joint")
+def toggle_visibility():
+    selection = selection_check.filter_joints()
 
     for joint_name in selection:
         display_local_axis = cmds.getAttr(joint_name + ".displayLocalAxis")

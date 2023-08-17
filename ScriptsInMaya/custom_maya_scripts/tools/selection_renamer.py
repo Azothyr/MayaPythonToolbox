@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from customscript_util import selection_checkas util, custom_exception as util
+from custom_maya_scripts.utilities import selection_check, custom_exception
 
 
 def _single_renamer(new_name, obj):
@@ -30,10 +30,14 @@ def _sequential_renamer(txt, lyst):
     return new_names
 
 
-def rename_selection(name_schema, selection=None):
+def perform_rename(txt, selection=None):
     try:
-        util.check_selection(selection)
-    except util.CustomException as err:
+        selection_check.is_selection(selection)
+    except custom_exception.CustomException as err:
         print(err)
-        if "#" in name_schema:
+        if "#" in txt:
+            new_names = _sequential_renamer(txt, selection)
+        else:
+            new_names = _single_renamer(txt, selection)
 
+    return new_names

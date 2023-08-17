@@ -1,46 +1,46 @@
 import maya.cmds as cmds
+from custom_maya_scripts.tools import color_changer, control_creator
 
 
-def create_control_ui():
-    def create_joint_control(*arg):
-        selected_joint = cmds.ls(selection=True)[0]
+def _ui_setup(parent_ui, tool):
+    """
+    Returns: Control Creator UI
+    """
+    control_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .35, .3], p=parent_ui)
 
-        joint_name = selected_joint
-        joint_position = cmds.xform(selected_joint, query=True, worldSpace=True, translation=True)
-        joint_rotation = cmds.xform(selected_joint, query=True, worldSpace=True, rotation=True)
+    color_options = color_changer.get_color_order()
+    cmds.rowColumnLayout(f'{tool}_selection_row', p=f'{tool}_base', adj=True, nc=2,
+                         cal=[(1, 'center'), (2, 'left')],
+                         bgc=[.5, .5, .5])
+    cmds.rowColumnLayout(f'{tool}_radius_row', p=f'{tool}_base', adj=True, nc=2,
+                         cal=[(1, 'center'), (2, 'left')],
+                         bgc=[.3, .3, .3])
+    cmds.columnLayout(f'{tool}_select_col_1', p=f'{tool}_selection_row')
+    cmds.columnLayout(f'{tool}_select_col_2', p=f'{tool}_selection_row')
+    cmds.columnLayout(f'{tool}_radius_col_1', p=f'{tool}_radius_row')
+    cmds.columnLayout(f'{tool}_radius_col_2', p=f'{tool}_radius_row')
+    cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
+    cmds.text(l="Select a color:", p=f'{tool}_select_col_1')
+    color_option_menu = cmds.optionMenu(p=f'{tool}_select_col_2', bgc=[.5, .2, .2])
+    for color in color_options:
+        cmds.menuItem(l=color, p=color_option_menu)
+    cmds.text(l='Control Scale:', bgc=[.7, .7, .7], p=f'{tool}_radius_col_1')
+    radius_input = cmds.textField('radius_input', tx='10', bgc=[.1, .1, .1], p=f'{tool}_radius_col_2')
 
-        circle = cmds.circle(normal=[1, 0, 0], radius=1)[0]
+    def on_execute():
+        radius = cmds.textField(radius_input, q=True, text=True)
+        selected_color = cmds.optionMenu(color_option_menu, query=True, value=True)
 
-        circle_name = joint_name.replace("Jnt", "Ctrl")
-        cmds.rename(circle, circle_name)
+        controls = control_creator.create_at_joint(radius)
+        color_changer.change_color(selected_color, controls)
 
-        null_group = cmds.group(empty=True)
-        null_group_name = joint_name.replace("Jnt", "Ctrl_Grp")
-        null_group = cmds.rename(null_group, null_group_name)
+    cmds.button(f'{tool}_button', l="Create Control", p=f'{tool}_bot_button',
+                c=on_execute,
+                bgc=[0, 0, 0])
+    return control_tab
 
-        cmds.xform(null_group, worldSpace=True, translation=joint_position)
-        cmds.xform(null_group, worldSpace=True, rotation=joint_rotation)
 
-        cmds.parent(circle_name, null_group_name)
-
-        selected_color_option = cmds.optionMenu(color_option_menu, query=True, value=True)
-        color_map = {
-            "Red": [1, 0, 0],
-            "Green": [0, 1, 0],
-            "Blue": [0, 0, 1],
-            "Yellow": [1, 1, 0],
-            "Orange": [1, 0.5, 0],
-            "Purple": [0.5, 0, 1],
-            "Pink": [1, 0, 1],
-            "Turquoise": [0, 1, 1],
-            "White": [1, 1, 1],
-            "Black": [0, 0, 0]
-        }
-        cmds.setAttr(circle_name + ".overrideEnabled", 1)
-        cmds.setAttr(circle_name + ".overrideColor",
-                     color_map[selected_color_option][0] * 5 + color_map[selected_color_option][1] * 5 * 256 +
-                     color_map[selected_color_option][2] * 5 * 256 * 256)
-
+def create_ui_window():
     control_ui_window = 'control_ui_window'
     if cmds.window(control_ui_window, exists=True):
         cmds.deleteUI(control_ui_window)
@@ -48,18 +48,17 @@ def create_control_ui():
                 title="Control Creator",
                 widthHeight=(200, 100),
                 maximizeButton=False,
-                minimizeButton=False,
+                minimizeButton=True,
                 backgroundColor=[.35, .3, .3],
-                resizeToFitChildren=True)
+                resizeToFitChildren=True,
+                nde=True)
+    tabs_ui = cmds.tabLayout('tabs_ui', innerMarginWidth=5, innerMarginHeight=5)
 
-    layout = cmds.columnLayout(adjustableColumn=True)
+    control_tab = _ui_setup(tabs_ui, 'control')
+    cmds.tabLayout(tabs_ui, e=True, tl=(control_tab, "Control Creator"))
 
-    color_options = ["Red", "Green", "Blue", "Yellow", "Orange", "Purple", "Pink", "Turquoise", "White", "Black"]
-    cmds.text(label="Select a color:")
-    color_option_menu = cmds.optionMenu()
-    for color in color_options:
-        cmds.menuItem(label=color)
+    return control_ui_window
 
-    cmds.button(label="Create Joint Control", command=create_joint_control)
 
-    cmds.showWindow(control_ui_window)
+if __name__ == "__main__":
+    cmds.showWindow(create_ui_window())
