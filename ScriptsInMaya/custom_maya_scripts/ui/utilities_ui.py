@@ -5,15 +5,15 @@ from custom_maya_scripts.utilities import obj_history
 
 def layer_cmds_ui(parent_ui, tool):
     layer_cmds_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.2, .2, .35], p=parent_ui)
-    cmds.rowColumnLayout(f'{tool}_selection_row', p=f'{tool}_base', adj=True, nc=2, cal=[(1, 'center'), (2, 'left')],
-                         bgc=[.5, .5, .5])
+    cmds.rowColumnLayout(f'{tool}_selection_row', p=f'{tool}_base', adj=True,
+                         nc=2, cal=[(1, 'center'), (2, 'left')], bgc=[.5, .5, .5])
     cmds.columnLayout(f'{tool}_select_1', p=f'{tool}_selection_row')
     cmds.columnLayout(f'{tool}_select_2', p=f'{tool}_selection_row')
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
     cmds.text(l="Add selected objects to layer: ", p=f'{tool}_select_1')
     layer_name_input = cmds.textField('layer_input_field', p=f'{tool}_select_2')
 
-    def on_execute(*args):
+    def on_execute(*_):
         add_to = cmds.textField(layer_name_input, query=True, text=True)
         layer_control.add_to_layer(add_to, cmds.ls(sl=True))
 
@@ -28,7 +28,7 @@ def axis_visibility_ui(parent_ui, tool):
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
     cmds.text(l="Toggles the axis visibility of the selection (joints)", p=f'{tool}_top_row')
 
-    def on_execute(*args):
+    def on_execute(*_):
         joint_axis_vis_toggle.toggle_visibility()
 
     cmds.button(f'{tool}_button', l="Toggle", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
@@ -42,7 +42,7 @@ def constrain_ui(parent_ui, tool):
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
     cmds.text(l="Parent, Scale constrain between every other selected objects", p=f'{tool}_top_row')
 
-    def on_execute(*args):
+    def on_execute(*_):
         constrain_commands.parent_scale_constrain(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Parent and Scale", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
@@ -56,7 +56,7 @@ def freeze_del_history_ui(parent_ui, tool):
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
     cmds.text(l="Freeze the transformations and delete history of selected objects", p=f'{tool}_top_row')
 
-    def on_execute(*args):
+    def on_execute(*_):
         obj_history.perform_freeze_delete(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Freeze and Delete History", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
@@ -106,5 +106,9 @@ def create_ui_window():
     cmds.showWindow(utility_ui_window)
 
 
-if __name__ == "__main__":
+def main():
     create_ui_window()
+
+
+if __name__ == "__main__":
+    main()

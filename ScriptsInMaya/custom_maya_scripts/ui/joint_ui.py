@@ -15,7 +15,7 @@ def _ui_setup(parent_ui, tool):
     if 'center_locations' not in globals():
         center_locations = []
 
-    def add_center_to_list(*args):
+    def add_center_to_list(*_):
         """
         Calls center_locator module and adds the center to the list.
         """
@@ -27,14 +27,14 @@ def _ui_setup(parent_ui, tool):
             cmds.textScrollList('position_list', edit=True, append=f'{len(center_locations)}: {center_txt}')
             cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
 
-    def move_center_item_up(*args):
+    def move_center_item_up(*_):
         global center_locations
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
             index = selected_items[0]
             if index > 1:
-                center_locations[index - 2], center_locations[index - 1] = center_locations[index - 1], center_locations[
-                    index - 2]
+                center_locations[index - 2], center_locations[index - 1] = (center_locations[index - 1],
+                                                                            center_locations[index - 2])
                 cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
                 cmds.textScrollList('position_list', edit=True, removeAll=True)
                 for i, item in enumerate(center_locations):
@@ -42,20 +42,21 @@ def _ui_setup(parent_ui, tool):
                                         append=f'{i + 1}: {str(item)}')
                 cmds.textScrollList('position_list', edit=True, selectIndexedItem=index - 1)
 
-    def move_center_item_down(*args):
+    def move_center_item_down(*_):
         global center_locations
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
             index = selected_items[0]
             if index < len(center_locations) - 1:
-                center_locations[index], center_locations[index + 1] = center_locations[index + 1], center_locations[index]
+                center_locations[index], center_locations[index + 1] = (center_locations[index + 1],
+                                                                        center_locations[index])
                 cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
                 cmds.textScrollList('position_list', edit=True, removeAll=True)
                 for i, item in enumerate(center_locations):
                     cmds.textScrollList('position_list', edit=True, append=f'{i + 1}: {str(item)}')
                 cmds.textScrollList('position_list', edit=True, selectIndexedItem=index + 2)
 
-    def remove_center_item(*args):
+    def remove_center_item(*_):
         global center_locations
         selected_items = cmds.textScrollList('position_list', query=True, selectIndexedItem=True)
         if selected_items:
@@ -69,7 +70,7 @@ def _ui_setup(parent_ui, tool):
                                     append=f'{i + 1}: {str(item)}')
             cmds.textScrollList('position_list', edit=True, deselectAll=True)
 
-    def clear_center_list(*args):
+    def clear_center_list(*_):
         """
         Clears the center list.
         """
@@ -78,7 +79,7 @@ def _ui_setup(parent_ui, tool):
         cmds.textScrollList('position_list', edit=True, removeAll=True)
         cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
 
-    def grey_field(enabler, dependant, *args):
+    def grey_field(enabler, dependant, *_):
         def update_input_enable():
             return cmds.checkBox(enabler, query=True, value=True)
 
@@ -164,12 +165,12 @@ def _ui_setup(parent_ui, tool):
     for name in single_schemas:
         cmds.menuItem(label=f'{name}', parent="NamingOpMenu")
 
-    def update_joint_list(*args):
+    def update_joint_list(*_):
         cmds.optionMenu('parent_menu', edit=True, deleteAllItems=True)
         cmds.menuItem(label='None', parent='parent_menu')
         selected_joints = cmds.ls(type='joint')
-        for joint in selected_joints:
-            cmds.menuItem(label=joint, parent='parent_menu')
+        for _ in selected_joints:
+            cmds.menuItem(label=_, parent='parent_menu')
 
     parent_checkbox = cmds.checkBox('parent_bool', label='Parent Objects on Creation', value=False,
                                     changeCommand=partial(grey_field, 'parent_bool', 'parent_columns'),
@@ -183,7 +184,7 @@ def _ui_setup(parent_ui, tool):
     cmds.button(label='Update List', command=update_joint_list,
                 backgroundColor=[.2, 1, .2], parent='parent_columns')
 
-    def on_execute(*args):
+    def on_execute(*_):
         global center_locations
         rename = cmds.checkBox(rename_bool, query=True, value=True)
         naming_input = cmds.textField(name_input, query=True, text=True)
@@ -232,6 +233,9 @@ def create_ui_window():
     cmds.showWindow(joint_ui_window)
 
 
-if __name__ == "__main__":
+def main():
     create_ui_window()
 
+
+if __name__ == "__main__":
+    main()

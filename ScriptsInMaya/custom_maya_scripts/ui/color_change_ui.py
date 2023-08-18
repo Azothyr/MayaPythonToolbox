@@ -21,7 +21,7 @@ def _ui_setup(parent_ui, tool):
     for color in color_options:
         cmds.menuItem(l=color, p=color_option_menu)
     
-    def on_execute(*args):
+    def on_execute(*_):
         selected_color = cmds.optionMenu(color_option_menu, query=True, value=True)
         objects = selection_check.is_selection()
 
@@ -51,5 +51,9 @@ def create_ui_window():
     cmds.showWindow(color_ui_window)
 
 
-if __name__ == "__main__":
+def main():
     create_ui_window()
+
+
+if __name__ == "__main__":
+    main()

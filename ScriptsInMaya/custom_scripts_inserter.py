@@ -48,7 +48,7 @@ if __name__ == "__main__":
                 sys.path.append(scripts_folder)
             
             # Create Custom Tools tab at the top of the Maya main window for every scene
-            cmds.scriptJob(event=("SceneOpened", main_win_tab.create_custom_menu))
+            cmds.scriptJob(event=("SceneOpened", main_win_tab.create_tools_menu))
             """)
         os.makedirs(scripts_folder, exist_ok=True)
 

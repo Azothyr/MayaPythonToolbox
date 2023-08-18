@@ -27,5 +27,9 @@ def create_ui_window():
     cmds.showWindow(toolbox_ui_window)
 
 
-if __name__ == "__main__":
+def main():
     create_ui_window()
+
+
+if __name__ == "__main__":
+    main()
