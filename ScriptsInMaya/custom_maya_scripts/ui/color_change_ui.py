@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 from custom_maya_scripts.tools import color_changer
 from custom_maya_scripts.utilities import selection_check
+from custom_maya_scripts.components import color_library
 
 
 def _ui_setup(parent_ui, tool):
@@ -9,7 +10,8 @@ def _ui_setup(parent_ui, tool):
     """
     color_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.35, .3, .3], p=parent_ui)
 
-    color_options = color_changer.get_color_order()
+    color_lib = color_library.ColorIndex()
+    color_options = color_lib.get_color_order()
     cmds.rowColumnLayout(f'{tool}_selection_row', p=f'{tool}_base', adj=True, nc=2,
                          cal=[(1, 'center'), (2, 'left')],
                          bgc=[.5, .5, .5])

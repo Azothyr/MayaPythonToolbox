@@ -1,6 +1,5 @@
 import maya.cmds as cmds
-from custom_maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_commands
-from custom_maya_scripts.utilities import obj_history
+from custom_maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_commands, modify_history
 
 
 def layer_cmds_ui(parent_ui, tool):
@@ -57,7 +56,7 @@ def freeze_del_history_ui(parent_ui, tool):
     cmds.text(l="Freeze the transformations and delete history of selected objects", p=f'{tool}_top_row')
 
     def on_execute(*_):
-        obj_history.perform_freeze_delete(cmds.ls(sl=True))
+        modify_history.perform_freeze_delete(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Freeze and Delete History", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return freeze_tab
