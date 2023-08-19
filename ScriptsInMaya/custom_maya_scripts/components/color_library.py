@@ -49,7 +49,7 @@ class ColorIndex:
 
     def get_color_from_cvalue(self, _num: int):
         assert isinstance(_num, int), "Expected _num to be a integer"
-        return self.color_order[self.cvalue_order.index(_num)]
+        return self.color_order[self.cvalue_order.index(str(_num))]
 
     def get_cvalue_from_color(self, _color: str):
         assert isinstance(_color, str), "Expected _color to be a string"
