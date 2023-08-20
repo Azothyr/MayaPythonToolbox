@@ -220,7 +220,7 @@ def _ui_setup(parent_ui, tool):
     return _tab
 
 
-def create_ui_window():
+def create_ui_window(manual_run=False):
     joint_ui_window = "joint_ui_window"
     if cmds.window(joint_ui_window, ex=True):
         cmds.deleteUI(joint_ui_window)
@@ -234,7 +234,7 @@ def create_ui_window():
 
 
 def main():
-    create_ui_window()
+    create_ui_window(True)
 
 
 if __name__ == "__main__":

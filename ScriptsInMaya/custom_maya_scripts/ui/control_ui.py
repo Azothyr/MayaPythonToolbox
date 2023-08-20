@@ -40,7 +40,7 @@ def _ui_setup(parent_ui, tool):
     return control_tab
 
 
-def create_ui_window():
+def create_ui_window(manual_run=False):
     control_ui_window = 'control_ui_window'
     if cmds.window(control_ui_window, exists=True):
         cmds.deleteUI(control_ui_window)
@@ -55,13 +55,13 @@ def create_ui_window():
     tabs_ui = cmds.tabLayout('tabs_ui', innerMarginWidth=5, innerMarginHeight=5)
 
     control_tab = _ui_setup(tabs_ui, 'control')
-    cmds.tabLayout(tabs_ui, e=True, tl=[(control_tab, "Control Creator")])
+    cmds.tabLayout(tabs_ui, e=True, tl=[(control_tab, "control creator")])
 
     cmds.showWindow(control_ui_window)
 
 
 def main():
-    create_ui_window()
+    create_ui_window(True)
 
 
 if __name__ == "__main__":

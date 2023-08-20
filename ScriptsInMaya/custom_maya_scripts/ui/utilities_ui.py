@@ -62,7 +62,7 @@ def freeze_del_history_ui(parent_ui, tool):
     return freeze_tab
 
 
-def create_ui_window():
+def create_ui_window(manual_run=False):
     utility_ui_window = 'utility_ui_window'
     if cmds.window(utility_ui_window, exists=True):
         cmds.deleteUI(utility_ui_window)
@@ -106,7 +106,7 @@ def create_ui_window():
 
 
 def main():
-    create_ui_window()
+    create_ui_window(True)
 
 
 if __name__ == "__main__":

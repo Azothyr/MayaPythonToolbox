@@ -2,7 +2,7 @@ import maya.cmds as cmds
 from custom_maya_scripts.ui import joint_ui, control_ui, color_change_ui, utilities_ui
 
 
-def create_ui_window():
+def create_ui_window(manual_run=False):
     toolbox_ui_window = "toolbox_ui_window"
     if cmds.window(toolbox_ui_window, ex=True):
         cmds.deleteUI(toolbox_ui_window)
@@ -28,7 +28,7 @@ def create_ui_window():
 
 
 def main():
-    create_ui_window()
+    create_ui_window(True)
 
 
 if __name__ == "__main__":

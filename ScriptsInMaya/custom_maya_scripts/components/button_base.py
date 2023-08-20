@@ -1,65 +1,32 @@
 import maya.cmds as cmds
-import textwrap
 from custom_maya_scripts.info.button_arg_map import button_arg_map as arg_map
+from custom_maya_scripts.utilities import arg_map_utils as map_handler
+from custom_maya_scripts.utilities import ui_presence_checker as ui_check
 
 
 class ButtonBase:
-	def __init__(self, label, **kwargs):
+	def __init__(self, name, command=None, **kwargs):
 		self.widget = None
-		self.label = label
+		self.name = name
+		self.command = command
 		self.arg_mapping = arg_map
 
-		# Translate kwargs keys if they are in arg_mapping
-		for key in list(kwargs.keys()):
-			if key in self.arg_mapping:
-				name = self.arg_mapping[key]['name']
-				kwargs[name] = kwargs.pop(key)
-
 		# Set attributes
-		self.set_attributes(**kwargs)
-		self.create(**kwargs)
+		translated_kwargs = map_handler.translate_arg_map_keys(self.arg_mapping, kwargs)
+		self.set_attributes(**translated_kwargs)
+		self.create(**translated_kwargs)
 
 	def set_attributes(self, **kwargs):
-		for key, value in self.arg_mapping.items():
-			setattr(self, value['name'], kwargs.get(value['name']))
-			setattr(self, f"{value['name']}_description", value.get('description'))
-			setattr(self, f"{value['name']}_property", value.get('property'))
-			setattr(self, f"{value['name']}_type", value.get('type'))
+		map_handler.set_class_kwargs(self, self.arg_mapping, **kwargs)
 
 	def helper(self, attr):
-		formatted_meta = []
-		if str(attr).lower() == "all":
-			for k, v in self.arg_mapping.items():
-				formatted_meta.append(f"Name: {k} -> {v['name']} | Arg: {v['type']} | Use case: {v['property']}\n\tDescription: {textwrap.fill(v['description'], width=80)}\n")
-			return '\n'.join(formatted_meta)
-		elif str(attr).lower() == "args":
-			for k, v in self.arg_mapping.items():
-				formatted_meta.append(f"Name: {k} -> {v['name']}")
-
-			return '\n'.join(formatted_meta)
-		elif attr in self.arg_mapping:
-			sn = attr
-			ln = self.arg_mapping[attr]['name']
-			desc = self.arg_mapping[attr]['description']
-			typ = self.arg_mapping[attr]['type']
-			prop = self.arg_mapping[attr]['property']
-			return f"Name: {sn} -> {ln} | Arg: {typ} | Use case: {prop}\n\tDescription: {textwrap.fill(desc, width=80)}\n"
-		else:
-			for k, v in self.arg_mapping.items():
-				if attr == v['name']:
-					sn = k
-					ln = attr
-					desc = v['description']
-					typ = v['type']
-					prop = v['property']
-					return f"Name: {sn} -> {ln} | Arg: {typ} | Use case: {prop}\n\tDescription: {textwrap.fill(desc, width=80)}\n"
-		return f"Key {attr} was not found in Arg Map."
+		print(map_handler.retrieve_metadata(attr, self.arg_mapping))
 
 	def create(self, **kwargs):
-		self.widget = cmds.button(label=self.label, **kwargs)
+		self.widget = cmds.button(self.name, **kwargs)
 
 	def edit(self, **kwargs):
-		cmds.button(self.widget, e=True, **kwargs)
+		cmds.button(self.name, e=True, **kwargs)
 
 	def query(self, attribute):
-		return cmds.button(self.widget, q=True, **{attribute: True})
+		return cmds.button(self.name, q=True, **{attribute: True})
