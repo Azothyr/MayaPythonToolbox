@@ -43,7 +43,7 @@ if __name__ == "__main__":
                 cmds.commandPort(name=":4434")
 
             # Add custom scripts folder to sys.path
-            scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "maya", "customscripts")
+            scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "maya", "customscripts", "custom_maya_scripts")
             if scripts_folder not in sys.path:
                 sys.path.append(scripts_folder)
             
