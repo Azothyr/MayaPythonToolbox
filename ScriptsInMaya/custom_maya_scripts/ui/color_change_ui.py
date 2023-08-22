@@ -26,7 +26,6 @@ def _ui_setup(parent_ui, tool):
     def on_execute(*_):
         selected_color = color_option_menu.query('value')
         objects = selection_check.is_selection()
-
         color_changer.change_color(selected_color, objects)
 
     exec_button = button_base.ButtonBase(f'{tool}_button', l="Change Color",
@@ -34,7 +33,7 @@ def _ui_setup(parent_ui, tool):
     return color_tab
 
 
-def create_ui_window(manual_run=False):
+def create_ui_window(from_main=False):
     win = window_base.WindowBase("color creator",
                                  wh=[200, 100],
                                  maximizeButton=True,
@@ -48,7 +47,7 @@ def create_ui_window(manual_run=False):
 
     cmds.tabLayout(tabs_ui, e=True, tl=(color_tab, "color creator"))
 
-    win.initialize(manual_run)
+    win.initialize(from_main)
 
 
 def main():

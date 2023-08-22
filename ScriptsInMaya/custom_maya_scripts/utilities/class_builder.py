@@ -33,7 +33,10 @@ def _get_data_from_file(src):
 
 def _process_variables(text):
     prop_values = {
+        "createqueryeditmultiuse": "C Q E M",
         "createqueryedit": "C Q E",
+        "createquerymultiuse": "C Q M",
+        "createeditmultiuse": "C E M",
         "createquery": "C Q",
         "createedit": "C E",
         "queryedit": "Q E",
@@ -43,8 +46,6 @@ def _process_variables(text):
         "edit": "E",
         "multiuse": "M"
     }
-    for idx, txt in enumerate(text):
-        print(f'{idx}: {txt}')
 
     items = []
     for idx, line in enumerate(text[::2]):
@@ -133,7 +134,7 @@ def arg_map_handler(arg_map, cls):
 
 
 def class_handler(txt, cls):
-    class_name = cls[0].capitalize() + cls[1].capitalize()
+    class_name = cls[0][0].capitalize() + cls[0][1::] + cls[1].capitalize()
     lower_name = cls[0]
     content = [
         "import maya.cmds as cmds",
@@ -147,13 +148,13 @@ def class_handler(txt, cls):
         "\n\t\t# Set attributes",
         "\t\ttranslated_kwargs = map_handler.translate_arg_map_keys(self.arg_mapping, kwargs)",
         "\t\tself.set_attributes(**translated_kwargs)",
-        "\t\tself.create(**translated_kwargs)",
+        "\t\tself._create(**translated_kwargs)",
     ] + txt + [
         "\n\tdef set_attributes(self, **kwargs):",
         "\t\tmap_handler.set_class_kwargs(self, self.arg_mapping, **kwargs)",
         "\n\tdef helper(self, attr):",
         "\t\tprint(map_handler.retrieve_metadata(attr, self.arg_mapping))",
-        "\n\tdef create(self, **kwargs):",
+        "\n\tdef _create(self, **kwargs):",
         f"\t\tself.widget = cmds.{lower_name}(self.name, **kwargs)",
         "\n\tdef edit(self, **kwargs):",
         f"\t\tcmds.{lower_name}(self.name, e=True, **kwargs)",

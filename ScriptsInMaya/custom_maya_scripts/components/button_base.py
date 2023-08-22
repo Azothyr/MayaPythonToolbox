@@ -14,7 +14,7 @@ class ButtonBase:
 		# Set attributes
 		translated_kwargs = map_handler.translate_arg_map_keys(self.arg_mapping, kwargs)
 		self.set_attributes(**translated_kwargs)
-		self.create(**translated_kwargs)
+		self._create(**translated_kwargs)
 
 	def set_attributes(self, **kwargs):
 		map_handler.set_class_kwargs(self, self.arg_mapping, **kwargs)
@@ -22,7 +22,7 @@ class ButtonBase:
 	def helper(self, attr):
 		print(map_handler.retrieve_metadata(attr, self.arg_mapping))
 
-	def create(self, **kwargs):
+	def _create(self, **kwargs):
 		self.widget = cmds.button(self.name, **kwargs)
 
 	def edit(self, **kwargs):
