@@ -27,7 +27,7 @@ if __name__ == "__main__":
     if platform.system() == "Windows":
         platform_name = "win64"  # You don't use this variable in this code. Do you need it?
         scripts_folder = os.path.join(os.path.expanduser('~\\documents\\maya\\customscripts'))
-        maya_version = os.environ.get("MAYA_VERSION", "2022")
+        maya_version = os.environ.get("MAYA_VERSION", "2024")
         maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\bin"
         user_setup_path = os.path.join(os.path.expanduser(f"~\\Documents\\maya\\{maya_version}\\scripts\\userSetup.py"))
 

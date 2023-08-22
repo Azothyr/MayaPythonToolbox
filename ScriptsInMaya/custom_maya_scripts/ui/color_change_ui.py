@@ -28,7 +28,7 @@ def _ui_setup(parent_ui, tool):
         objects = selection_check.is_selection()
         color_changer.change_color(selected_color, objects)
 
-    exec_button = button_base.ButtonBase(f'{tool}_button', l="Change Color",
+    button_base.ButtonBase(f'{tool}_button', l="Change Color",
                                          p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return color_tab
 
