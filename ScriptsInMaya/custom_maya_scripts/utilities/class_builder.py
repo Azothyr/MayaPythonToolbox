@@ -1,4 +1,5 @@
 import os
+from custom_maya_scripts.utilities import arg_map_utils as map_handler
 
 
 def _get_data_from_file(src):
@@ -221,6 +222,7 @@ def main(output_file_path="", name=""):
     result = write_to_file(output_file_path, update_file_path, arg_map, class_map, class_name)
 
     print(result)
+    print(map_handler.refresh_arg_lib())
 
 
 if __name__ == "__main__":

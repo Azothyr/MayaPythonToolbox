@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 import os
 from custom_maya_scripts.utilities.arg_map_utils import refresh_arg_lib
+from custom_maya_scripts.utilities.arg_lib_reader import LibReader
 from custom_maya_scripts.components.window_base import WindowBase
 from custom_maya_scripts.components.button_base import ButtonBase
 from custom_maya_scripts.components.optionMenu_base import OptionMenuBase
@@ -8,7 +9,7 @@ from custom_maya_scripts.components.menuItem_base import MenuItemBase
 from custom_maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase
 from custom_maya_scripts.components.tabLayout_base import TabLayoutBase
 from custom_maya_scripts.components.text_base import TextBase
-from custom_maya_scripts.components.textfield_base import TextFieldBase
+from custom_maya_scripts.components.textField_base import TextFieldBase
 from custom_maya_scripts.components.tabLayout_base import TabLayoutBase
 
 
@@ -21,7 +22,7 @@ def run_arg_refresh():
     refresh_arg_lib()
 
 
-test_ = MenuItemBase("test class")
+test_ = LibReader()
 # test_.helper("nde")
 # test_.helper("label")
 # test_.helper("title")
