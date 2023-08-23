@@ -3,13 +3,13 @@ optionMenu_arg_map = {
 		"name": "alwaysCallChangeCommand",
 		"description": "Toggle whether to always call the change command, regardless of the change.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"ann": {
 		"name": "annotation",
 		"description": "Annotate the control with an extra string value.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bgc": {
 		"name": "backgroundColor",
@@ -18,13 +18,13 @@ optionMenu_arg_map = {
 		" the background is automatically enabled, unless enableBackground is also specified with"
 		" a false value.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bsp": {
 		"name": "beforeShowPopup",
 		"description": "Callback that is called just before we show the drop down menu.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"cc": {
 		"name": "changeCommand",
@@ -32,7 +32,7 @@ optionMenu_arg_map = {
 		" newly selected item's value substituted for #1. For Python, the callback should be a callable"
 		" object which accepts one argument, which is the newly selected item's value.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dt": {
 		"name": "defineTemplate",
@@ -40,20 +40,20 @@ optionMenu_arg_map = {
 		" the command template specified in the argument. They will be used as default arguments"
 		" in any subsequent invocations of the command when templateName is set as the current template.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"dai": {
 		"name": "deleteAllItems",
 		"description": "Delete all the items in this menu.",
 		"type": "boolean",
-		"property": "E"
+		"property": "Edit"
 	},
 	"dtg": {
 		"name": "docTag",
 		"description": "Add a documentation flag to the control. The documentation flag has a directory structure."
 		" (e.g., -dt render/multiLister/createNode/material)",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dgc": {
 		"name": "dragCallback",
@@ -74,7 +74,7 @@ optionMenu_arg_map = {
 		" is a string and the other values are integers eg the callback string could be \"print"
 		" '%dragControls %xd %yd %modifiersd'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dpc": {
 		"name": "dropCallback",
@@ -95,7 +95,7 @@ optionMenu_arg_map = {
 		" values are integers eg the callback string could be \"print '%dragControls %dropControls"
 		" %messagesr %xd %yd %typed'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"en": {
 		"name": "enable",
@@ -103,13 +103,13 @@ optionMenu_arg_map = {
 		" enabled. Specify false and the control will appear dimmed or greyed-out indicating it"
 		" is disabled.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ebg": {
 		"name": "enableBackground",
 		"description": "Enables the background color of the control.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ekf": {
 		"name": "enableKeyboardFocus",
@@ -119,33 +119,33 @@ optionMenu_arg_map = {
 		" fields can still be selected with the mouse but it cannot be copied (except in Linux when"
 		" \"Middle Click Paste\" is enabled).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ex": {
 		"name": "exists",
 		"description": "Returns whether the specified object exists or not. Other flags are ignored.",
 		"type": "boolean",
-		"property": "C"
+		"property": "Create"
 	},
 	"fpn": {
 		"name": "fullPathName",
 		"description": "Return the full path name of the widget, which includes all the parents.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"h": {
 		"name": "height",
 		"description": "The height of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"hlc": {
 		"name": "highlightColor",
 		"description": "The highlight color of the control. The arguments correspond to the red, green, and blue"
 		" color components. Each component ranges in value from 0.0 to 1.0.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"io": {
 		"name": "isObscured",
@@ -153,39 +153,39 @@ optionMenu_arg_map = {
 		" if its state is invisible, if it is blocked (entirely or partially) by some other control,"
 		" if it or a parent layout is unmanaged, or if the control's window is invisible or iconified.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"ill": {
 		"name": "itemListLong",
 		"description": "The long names of the menu items.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"ils": {
 		"name": "itemListShort",
 		"description": "The short names of the menu items.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"l": {
 		"name": "label",
 		"description": "The optional label text to the left of the popup menu.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"m": {
 		"name": "manage",
 		"description": "Manage state of the control. An unmanaged control is not visible, nor does it take up any"
 		" screen real estate. All controls are created managed by default.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"mvi": {
 		"name": "maxVisibleItems",
 		"description": "The maximum number of items that are visible in the popup menu. If the popup contains more"
 		" items than this, a scrollbar is added automatically.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"nbg": {
 		"name": "noBackground",
@@ -193,95 +193,95 @@ optionMenu_arg_map = {
 		" at all, false means the background should be drawn. The state of this flag is inherited"
 		" by children of this control.",
 		"type": "boolean",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ni": {
 		"name": "numberOfItems",
 		"description": "The number of menu items.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"npm": {
 		"name": "numberOfPopupMenus",
 		"description": "Return the number of popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"p": {
 		"name": "parent",
 		"description": "The parent layout for this control.",
 		"type": "string",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"pma": {
 		"name": "popupMenuArray",
 		"description": "Return the names of all the popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"pmc": {
 		"name": "postMenuCommand",
 		"description": "Specify a script to be executed when the popup menu is about to be shown.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"pmo": {
 		"name": "postMenuCommandOnce",
 		"description": "Indicate the -pmc/postMenuCommand should only be invoked once. Default value is false,"
 		" ie. the -pmc/postMenuCommand is invoked every time the popup menu is shown.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"po": {
 		"name": "preventOverride",
 		"description": "If true, this flag prevents overriding the control's attribute via the control's right"
 		" mouse button menu.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"sl": {
 		"name": "select",
 		"description": "The current menu item. The argument and return value is 1-based. Note that the current"
 		" menu item can only be set if it is enabled.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"sbm": {
 		"name": "statusBarMessage",
 		"description": "Extra string to display in the status bar when the mouse is over the control.",
 		"type": "string",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ut": {
 		"name": "useTemplate",
 		"description": "Forces the command to use a command template other than the current one.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"v": {
 		"name": "value",
 		"description": "The text of the current menu item.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"vis": {
 		"name": "visible",
 		"description": "The visible state of the control. A control is created visible by default. Note that a"
 		" control's actual appearance is also dependent on the visible state of its parent layout(s).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"vcc": {
 		"name": "visibleChangeCommand",
 		"description": "Command that gets executed when visible state of the control changes.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"w": {
 		"name": "width",
 		"description": "The width of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 }

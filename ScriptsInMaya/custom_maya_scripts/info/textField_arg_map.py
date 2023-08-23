@@ -4,13 +4,13 @@ textField_arg_map = {
 		"description": "Sets whether to always invoke the enter command when the return key is pressed by the user."
 		" By default, this option is false.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ann": {
 		"name": "annotation",
 		"description": "Annotate the control with an extra string value.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bgc": {
 		"name": "backgroundColor",
@@ -19,14 +19,14 @@ textField_arg_map = {
 		" the background is automatically enabled, unless enableBackground is also specified with"
 		" a false value.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"cc": {
 		"name": "changeCommand",
 		"description": "Command executed when the text changes. This command is not invoked when the value changes"
 		" via the -tx/text flag.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dt": {
 		"name": "defineTemplate",
@@ -34,21 +34,21 @@ textField_arg_map = {
 		" the command template specified in the argument. They will be used as default arguments"
 		" in any subsequent invocations of the command when templateName is set as the current template.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"db": {
 		"name": "disableButtons",
 		"description": "Sets the visibility state of search field buttons to true/false depending on the passed"
 		" value. In Query mode returns whether both buttons are visible or not.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dcb": {
 		"name": "disableClearButton",
 		"description": "Sets the visibility state of search field clear button to true/false depending on the passed"
 		" value. In Query mode returns whether clear button of search field is visible or not.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dhb": {
 		"name": "disableHistoryButton",
@@ -56,14 +56,14 @@ textField_arg_map = {
 		" passed value. In Query mode returns whether history button of search field is visible"
 		" or not.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dtg": {
 		"name": "docTag",
 		"description": "Add a documentation flag to the control. The documentation flag has a directory structure."
 		" (e.g., -dt render/multiLister/createNode/material)",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dgc": {
 		"name": "dragCallback",
@@ -84,14 +84,14 @@ textField_arg_map = {
 		" is a string and the other values are integers eg the callback string could be \"print"
 		" '%dragControls %xd %yd %modifiersd'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dif": {
 		"name": "drawInactiveFrame",
 		"description": "Sets whether the text field draws itself with a frame when it's inactive. By default, this"
 		" option is false.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dpc": {
 		"name": "dropCallback",
@@ -112,7 +112,7 @@ textField_arg_map = {
 		" values are integers eg the callback string could be \"print '%dragControls %dropControls"
 		" %messagesr %xd %yd %typed'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ed": {
 		"name": "editable",
@@ -121,7 +121,7 @@ textField_arg_map = {
 		" into. The text in the field can always be changed with the -tx/text flag regardless of"
 		" the state of the -ed/editable flag.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"en": {
 		"name": "enable",
@@ -129,13 +129,13 @@ textField_arg_map = {
 		" enabled. Specify false and the control will appear dimmed or greyed-out indicating it"
 		" is disabled.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ebg": {
 		"name": "enableBackground",
 		"description": "Enables the background color of the control.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ekf": {
 		"name": "enableKeyboardFocus",
@@ -145,26 +145,26 @@ textField_arg_map = {
 		" fields can still be selected with the mouse but it cannot be copied (except in Linux when"
 		" \"Middle Click Paste\" is enabled).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ec": {
 		"name": "enterCommand",
 		"description": "Command executed when the keypad 'Enter' key is pressed.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ex": {
 		"name": "exists",
 		"description": "Returns whether the specified object exists or not. Other flags are ignored.",
 		"type": "boolean",
-		"property": "C"
+		"property": "Create"
 	},
 	"fi": {
 		"name": "fileName",
 		"description": "Text in the field as a filename. This does conversions between internal and external (UI)"
 		" file representation.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"fn": {
 		"name": "font",
@@ -172,41 +172,41 @@ textField_arg_map = {
 		" \"plainLabelFont\", \"smallPlainLabelFont\", \"obliqueLabelFont\", \"smallObliqueLabelFont\","
 		" \"fixedWidthFont\" and \"smallFixedWidthFont\".",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"fpn": {
 		"name": "fullPathName",
 		"description": "Return the full path name of the widget, which includes all the parents.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"h": {
 		"name": "height",
 		"description": "The height of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"hlc": {
 		"name": "highlightColor",
 		"description": "The highlight color of the control. The arguments correspond to the red, green, and blue"
 		" color components. Each component ranges in value from 0.0 to 1.0.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"it": {
 		"name": "insertText",
 		"description": "Insert text into the field at the current insertion position (specified by the -ip/insertionPosition"
 		" flag).",
 		"type": "string",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ip": {
 		"name": "insertionPosition",
 		"description": "The insertion position for inserted text. This is a 1 based value where position 1 specifies"
 		" the beginning of the field. Position 0 may be used to specify the end of the field.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"io": {
 		"name": "isObscured",
@@ -214,14 +214,14 @@ textField_arg_map = {
 		" if its state is invisible, if it is blocked (entirely or partially) by some other control,"
 		" if it or a parent layout is unmanaged, or if the control's window is invisible or iconified.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"m": {
 		"name": "manage",
 		"description": "Manage state of the control. An unmanaged control is not visible, nor does it take up any"
 		" screen real estate. All controls are created managed by default.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"nbg": {
 		"name": "noBackground",
@@ -229,19 +229,19 @@ textField_arg_map = {
 		" at all, false means the background should be drawn. The state of this flag is inherited"
 		" by children of this control.",
 		"type": "boolean",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"npm": {
 		"name": "numberOfPopupMenus",
 		"description": "Return the number of popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"p": {
 		"name": "parent",
 		"description": "The parent layout for this control.",
 		"type": "string",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"pht": {
 		"name": "placeholderText",
@@ -249,75 +249,75 @@ textField_arg_map = {
 		" as the text field is empty and the widget doesn't have focus. By default, this property"
 		" contains an empty string.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"pma": {
 		"name": "popupMenuArray",
 		"description": "Return the names of all the popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"po": {
 		"name": "preventOverride",
 		"description": "If true, this flag prevents overriding the control's attribute via the control's right"
 		" mouse button menu.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"rfc": {
 		"name": "receiveFocusCommand",
 		"description": "Command executed when the field receives focus.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"sf": {
 		"name": "searchField",
 		"description": "Creates a search field instead of a text field.",
 		"type": "boolean",
-		"property": "C"
+		"property": "Create"
 	},
 	"sbm": {
 		"name": "statusBarMessage",
 		"description": "Extra string to display in the status bar when the mouse is over the control.",
 		"type": "string",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"tx": {
 		"name": "text",
 		"description": "The field text.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"tcc": {
 		"name": "textChangedCommand",
 		"description": "Command executed immediately when the field text changes.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ut": {
 		"name": "useTemplate",
 		"description": "Forces the command to use a command template other than the current one.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"vis": {
 		"name": "visible",
 		"description": "The visible state of the control. A control is created visible by default. Note that a"
 		" control's actual appearance is also dependent on the visible state of its parent layout(s).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"vcc": {
 		"name": "visibleChangeCommand",
 		"description": "Command that gets executed when visible state of the control changes.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"w": {
 		"name": "width",
 		"description": "The width of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 }

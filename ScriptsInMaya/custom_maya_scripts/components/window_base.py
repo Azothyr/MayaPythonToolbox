@@ -31,7 +31,7 @@ class WindowBase:
 	def query(self, attribute):
 		return cmds.window(self.name, q=True, **{attribute: True})
 
-	def initialize(self, use_name):
+	def initialize(self, use_name=False):
 		if use_name:
 			cmds.showWindow(self.name)
 		else:

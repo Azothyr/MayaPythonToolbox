@@ -41,10 +41,10 @@ def _ui_setup(parent_ui, tool):
 
 
 def create_ui_window(manual_run=False):
-    control_ui_window = 'control_ui_window'
-    if cmds.window(control_ui_window, exists=True):
-        cmds.deleteUI(control_ui_window)
-    cmds.window(control_ui_window,
+    win = 'control_ui_window'
+    if cmds.window(win, exists=True):
+        cmds.deleteUI(win)
+    cmds.window(win,
                 title="Control Creator",
                 widthHeight=(200, 100),
                 maximizeButton=False,
@@ -57,12 +57,8 @@ def create_ui_window(manual_run=False):
     control_tab = _ui_setup(tabs_ui, 'control')
     cmds.tabLayout(tabs_ui, e=True, tl=[(control_tab, "control creator")])
 
-    cmds.showWindow(control_ui_window)
-
-
-def main():
-    create_ui_window(True)
+    win.initialize()
 
 
 if __name__ == "__main__":
-    main()
+    create_ui_window()

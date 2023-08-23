@@ -33,18 +33,18 @@ def _get_data_from_file(src):
 
 def _process_variables(text):
     prop_values = {
-        "createqueryeditmultiuse": "C Q E M",
-        "createqueryedit": "C Q E",
-        "createquerymultiuse": "C Q M",
-        "createeditmultiuse": "C E M",
-        "createquery": "C Q",
-        "createedit": "C E",
-        "queryedit": "Q E",
-        "createmultiuse": "C M",
-        "create": "C",
-        "query": "Q",
-        "edit": "E",
-        "multiuse": "M"
+        "createqueryeditmultiuse": "Create|Query|Edit|Multi-use",
+        "createqueryedit": "Create|Query|Edit",
+        "createquerymultiuse": "Create|Query|Multi-use",
+        "createeditmultiuse": "Create|Edit|Multi-use",
+        "createquery": "Create|Query",
+        "createedit": "Create|Edit",
+        "queryedit": "Create|Edit",
+        "createmultiuse": "Create|Multi-use",
+        "create": "Create",
+        "query": "Query",
+        "edit": "Edit",
+        "multiuse": "Multi-use"
     }
 
     items = []

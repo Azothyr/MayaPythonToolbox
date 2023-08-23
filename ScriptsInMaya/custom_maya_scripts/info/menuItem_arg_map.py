@@ -5,45 +5,45 @@ menuItem_arg_map = {
 		" items this flag specifies whether the submenu will be able to support option box menu"
 		" items. Always returns true.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"ann": {
 		"name": "annotation",
 		"description": "Annotate the menu item with an extra string value.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bld": {
 		"name": "boldFont",
 		"description": "Specify if text should be bold. Only supported in menus which use the marking menu implementation."
 		" Default is false for Windows, and true for all other platforms.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"cb": {
 		"name": "checkBox",
 		"description": "Creates a check box menu item. Argument specifies the check box value.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"cl": {
 		"name": "collection",
 		"description": "To explicitly add a radio menu item to a radioMenuItemCollection.",
 		"type": "string",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"c": {
 		"name": "command",
 		"description": "Attaches a command/script that will be executed when the item is selected. Note this command"
 		" is not executed when the menu item is in an optionMenu control.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"da": {
 		"name": "data",
 		"description": "Attaches a piece of user-defined data to the menu item.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dt": {
 		"name": "defineTemplate",
@@ -51,39 +51,39 @@ menuItem_arg_map = {
 		" the command template specified in the argument. They will be used as default arguments"
 		" in any subsequent invocations of the command when templateName is set as the current template.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"d": {
 		"name": "divider",
 		"description": "Creates a divider menu item.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"dl": {
 		"name": "dividerLabel",
 		"description": "Adds a label to a divider menu item.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dtg": {
 		"name": "docTag",
 		"description": "Attaches a tag to the menu item.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ddc": {
 		"name": "dragDoubleClickCommand",
 		"description": "If the menu item is put on the shelf then this command will be invoked when the corresponding"
 		" shelf object is double clicked.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dmc": {
 		"name": "dragMenuCommand",
 		"description": "If the menu item is put on the shelf then this command will be invoked when the corresponding"
 		" shelf object is clicked.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ec": {
 		"name": "echoCommand",
@@ -91,14 +91,14 @@ menuItem_arg_map = {
 		" output areas when invoked. This flag is false by default and must be specified with the"
 		" c/command flag.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"en": {
 		"name": "enable",
 		"description": "Enable state for the menu item. A disabled menu item is dimmed and unresponsive. An enabled"
 		" menu item is selectable and has normal appearance.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ecr": {
 		"name": "enableCommandRepeat",
@@ -106,20 +106,20 @@ menuItem_arg_map = {
 		" the command may be repeated by executing the command repeatLast. This flag is true by"
 		" default for all items except for option box items.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ex": {
 		"name": "exists",
 		"description": "Returns whether the specified object exists or not. Other flags are ignored.",
 		"type": "boolean",
-		"property": "C"
+		"property": "Create"
 	},
 	"fi": {
 		"name": "familyImage",
 		"description": "Get the filename of the family icon associated with the menu. The family icon will be used"
 		" for the shelf unless an icon is specified with the image flag.",
 		"type": "string",
-		"property": "Q"
+		"property": "Query"
 	},
 	"i": {
 		"name": "image",
@@ -128,7 +128,7 @@ menuItem_arg_map = {
 		" to represent the menu item. This icon will be displayed on the shelf when the menu item"
 		" is placed there.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"iol": {
 		"name": "imageOverlayLabel",
@@ -137,7 +137,7 @@ menuItem_arg_map = {
 		" are using a Family icon due to the fact that an icon image had not been explicitly defined."
 		" The image overlay label will not be used if an icon image is defined for the menu item.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ia": {
 		"name": "insertAfter",
@@ -145,45 +145,45 @@ menuItem_arg_map = {
 		" is added at the end of the menu. Use the empty string \"\" to insert before the first"
 		" item of the menu.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"icb": {
 		"name": "isCheckBox",
 		"description": "Returns true if the item is a check box item.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"iob": {
 		"name": "isOptionBox",
 		"description": "Returns true if the item is an option box item.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"irb": {
 		"name": "isRadioButton",
 		"description": "Returns true if the item is a radio button item.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"itl": {
 		"name": "italicized",
 		"description": "Specify if text should be italicized. Only supported in menus which use the marking menu"
 		" implementation. Default is false.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"l": {
 		"name": "label",
 		"description": "The text that appears in the item.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ld": {
 		"name": "longDivider",
 		"description": "Indicate whether the divider is long or short. Has no effect if divider label is set. Default"
 		" is true.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"lt": {
 		"name": "ltVersion",
@@ -193,14 +193,14 @@ menuItem_arg_map = {
 		" should be given as a string of the version number (e.g. \"2013\", \"2014\"). Currently"
 		" only accepts major version numbers (e.g. 2013 Ext 1, or 2013.5 should be given as \"2014\").",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ob": {
 		"name": "optionBox",
 		"description": "Indicates that the menu item will be an option box item. This item will appear to the right"
 		" of the preceeding menu item.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"obi": {
 		"name": "optionBoxIcon",
@@ -208,26 +208,26 @@ menuItem_arg_map = {
 		" for in the folder specified by the XBMLANGPATH environment variable. The icon can be any"
 		" size, but will be resized to the standard 16x16 pixels when drawn.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"p": {
 		"name": "parent",
 		"description": "Specify the menu that the item will appear in.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"pmc": {
 		"name": "postMenuCommand",
 		"description": "Specify a script to be executed when the submenu is about to be shown.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"pmo": {
 		"name": "postMenuCommandOnce",
 		"description": "Indicate the pmc/postMenuCommand should only be invoked once. Default value is false, ie."
 		" the pmc/postMenuCommand is invoked everytime the sub menu is shown.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"rp": {
 		"name": "radialPosition",
@@ -235,13 +235,13 @@ menuItem_arg_map = {
 		" in the form of a cardinal direction, and may be \"N\", \"NW\", \"W\", \"SW\", \"S\", \"SE\","
 		" \"E\" or \"NE\".",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"rb": {
 		"name": "radioButton",
 		"description": "Creates a radio button menu item. Argument specifies the radio button value.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"rtc": {
 		"name": "runTimeCommand",
@@ -250,7 +250,7 @@ menuItem_arg_map = {
 		" fields have not been provided to this command: label, annotation, image, command. Note:"
 		" command will be set to the runTimeCommand itself.",
 		"type": "string",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"stp": {
 		"name": "sourceType",
@@ -259,7 +259,7 @@ menuItem_arg_map = {
 		" script. In query mode, will return the language of the specified command. Valid values"
 		" are \"mel\" and \"python\".",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"sm": {
 		"name": "subMenu",
@@ -267,20 +267,20 @@ menuItem_arg_map = {
 		" submenu until setParent -menu is called. Note that a submenu item creates a menu object"
 		" and consequently the menu command may be used on the submenu item.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"to": {
 		"name": "tearOff",
 		"description": "For the case where the menu item is a sub menu this flag will make the sub menu tear-off-able."
 		" Note that this flag has no effect on the other menu item types.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"ut": {
 		"name": "useTemplate",
 		"description": "Forces the command to use a command template other than the current one.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"ver": {
 		"name": "version",
@@ -288,13 +288,13 @@ menuItem_arg_map = {
 		" given as a string of the version number (e.g. \"2013\", \"2014\"). Currently only accepts"
 		" major version numbers (e.g. 2013 Ext 1, or 2013.5 should be given as \"2014\").",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"vis": {
 		"name": "visible",
 		"description": "The visible state of the menu item. A menu item is created visible by default. Note that"
 		" a menu item's actual appearance is also dependent on the visible state of its parent layout(s).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 }

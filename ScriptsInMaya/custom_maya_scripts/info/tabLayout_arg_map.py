@@ -3,7 +3,7 @@ tabLayout_arg_map = {
 		"name": "annotation",
 		"description": "Annotate the control with an extra string value.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bgc": {
 		"name": "backgroundColor",
@@ -12,7 +12,7 @@ tabLayout_arg_map = {
 		" the background is automatically enabled, unless enableBackground is also specified with"
 		" a false value.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bs": {
 		"name": "borderStyle",
@@ -23,40 +23,40 @@ tabLayout_arg_map = {
 		" frame on the left/right/bottom no top of the tab layout \"full\" - Draw a simple frame"
 		" around the body area of the tab layout",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"cc": {
 		"name": "changeCommand",
 		"description": "Command executed when a tab is selected interactively. This command is only invoked when"
 		" the selected tab changes. Re-selecting the current tab will not invoke this command.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ca": {
 		"name": "childArray",
 		"description": "Returns a string array of the names of the layout's immediate children.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"cr": {
 		"name": "childResizable",
 		"description": "Set to true if you want the child of the control layout to be as wide as the scroll area."
 		" You may also indicate a minimum width for the child using the -mcw/minChildWidth flag.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"ct": {
 		"name": "closeTab",
 		"description": "Close the tab at the given index.",
 		"type": "int",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ctc": {
 		"name": "closeTabCommand",
 		"description": "Specify a script to be executed when one of the tabs are closed by clicking on the header"
 		" widget (MMB or X button).",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dt": {
 		"name": "defineTemplate",
@@ -64,14 +64,14 @@ tabLayout_arg_map = {
 		" the command template specified in the argument. They will be used as default arguments"
 		" in any subsequent invocations of the command when templateName is set as the current template.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"dtg": {
 		"name": "docTag",
 		"description": "Add a documentation flag to the control. The documentation flag has a directory structure."
 		" (e.g., -dt render/multiLister/createNode/material)",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dcc": {
 		"name": "doubleClickCommand",
@@ -79,7 +79,7 @@ tabLayout_arg_map = {
 		" the tab and the second click will execute the double click command. Double clicking the"
 		" current tab will re-invoke the double click command.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dgc": {
 		"name": "dragCallback",
@@ -100,7 +100,7 @@ tabLayout_arg_map = {
 		" is a string and the other values are integers eg the callback string could be \"print"
 		" '%dragControls %xd %yd %modifiersd'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dpc": {
 		"name": "dropCallback",
@@ -121,7 +121,7 @@ tabLayout_arg_map = {
 		" values are integers eg the callback string could be \"print '%dragControls %dropControls"
 		" %messagesr %xd %yd %typed'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"en": {
 		"name": "enable",
@@ -129,13 +129,13 @@ tabLayout_arg_map = {
 		" enabled. Specify false and the control will appear dimmed or greyed-out indicating it"
 		" is disabled.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ebg": {
 		"name": "enableBackground",
 		"description": "Enables the background color of the control.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ekf": {
 		"name": "enableKeyboardFocus",
@@ -145,64 +145,64 @@ tabLayout_arg_map = {
 		" fields can still be selected with the mouse but it cannot be copied (except in Linux when"
 		" \"Middle Click Paste\" is enabled).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ex": {
 		"name": "exists",
 		"description": "Returns whether the specified object exists or not. Other flags are ignored.",
 		"type": "boolean",
-		"property": "C"
+		"property": "Create"
 	},
 	"fpn": {
 		"name": "fullPathName",
 		"description": "Return the full path name of the widget, which includes all the parents.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"h": {
 		"name": "height",
 		"description": "The height of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"hlc": {
 		"name": "highlightColor",
 		"description": "The highlight color of the control. The arguments correspond to the red, green, and blue"
 		" color components. Each component ranges in value from 0.0 to 1.0.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"hst": {
 		"name": "horizontalScrollBarThickness",
 		"description": "Thickness of the horizontal scroll bar. Specify an integer value greater than or equal"
 		" to zero. This flag has no effect on Windows systems.",
 		"type": "int",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"i": {
 		"name": "image",
 		"description": "Image appearing in top right corner of tab layout.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"iv": {
 		"name": "imageVisible",
 		"description": "Visibility of tab image.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"imh": {
 		"name": "innerMarginHeight",
 		"description": "Margin height for all tab children.",
 		"type": "int",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"imw": {
 		"name": "innerMarginWidth",
 		"description": "Margin width for all tab children.",
 		"type": "int",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"io": {
 		"name": "isObscured",
@@ -210,27 +210,27 @@ tabLayout_arg_map = {
 		" if its state is invisible, if it is blocked (entirely or partially) by some other control,"
 		" if it or a parent layout is unmanaged, or if the control's window is invisible or iconified.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"m": {
 		"name": "manage",
 		"description": "Manage state of the control. An unmanaged control is not visible, nor does it take up any"
 		" screen real estate. All controls are created managed by default.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"mcw": {
 		"name": "minChildWidth",
 		"description": "Specify a positive non-zero integer value indicating the minimum width the tab layout's"
 		" children. This flag only has meaning when the -cr/childResizable flag is set to true.",
 		"type": "int",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"mt": {
 		"name": "moveTab",
 		"description": "Move the tab from the current index to a new index.",
 		"type": "[int, int]",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ntc": {
 		"name": "newTabCommand",
@@ -238,7 +238,7 @@ tabLayout_arg_map = {
 		" to show the new tab button use the -snt/showNewTab flag. Using this command will override"
 		" any internal Maya logic for adding a new tab (only this command will be executed).",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"nbg": {
 		"name": "noBackground",
@@ -246,37 +246,37 @@ tabLayout_arg_map = {
 		" at all, false means the background should be drawn. The state of this flag is inherited"
 		" by children of this control.",
 		"type": "boolean",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"nch": {
 		"name": "numberOfChildren",
 		"description": "Returns in an int the number of immediate children of the layout.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"npm": {
 		"name": "numberOfPopupMenus",
 		"description": "Return the number of popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"p": {
 		"name": "parent",
 		"description": "The parent layout for this control.",
 		"type": "string",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"pma": {
 		"name": "popupMenuArray",
 		"description": "Return the names of all the popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"pmc": {
 		"name": "postMenuCommand",
 		"description": "Specify a script to be executed when the popup menu is about to be shown.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"psc": {
 		"name": "preSelectCommand",
@@ -284,27 +284,27 @@ tabLayout_arg_map = {
 		" the current tab will not invoke this command. Note that this command is not executed by"
 		" using either of the -st/selectTab or -sti/selectTabIndex flags.",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"po": {
 		"name": "preventOverride",
 		"description": "If true, this flag prevents overriding the control's attribute via the control's right"
 		" mouse button menu.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"scr": {
 		"name": "scrollable",
 		"description": "Puts all children of this layout within a scroll area.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"stb": {
 		"name": "scrollableTabs",
 		"description": "If true, the active tab in the layout can be scrolled through with the mouse wheel. Default"
 		" is true.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"sc": {
 		"name": "selectCommand",
@@ -313,41 +313,41 @@ tabLayout_arg_map = {
 		" this command is not executed by using either of the -st/selectTab or -sti/selectTabIndex"
 		" flags.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"st": {
 		"name": "selectTab",
 		"description": "The name, in short form, of the selected tab. An empty string is returned on query if there"
 		" are no child tabs.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"sti": {
 		"name": "selectTabIndex",
 		"description": "Identical to the -st/selectTab flag except this flag takes a 1-based index to identify"
 		" the selected tab. A value of 0 is returned on query if there are no child tabs.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"snt": {
 		"name": "showNewTab",
 		"description": "Set to true if you want to have a 'New Tab' button shown at the end of the tab bar. Note:"
 		" use the -ntc/newTabCommand flag to set the command executed when this button is clicked.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"sbm": {
 		"name": "statusBarMessage",
 		"description": "Extra string to display in the status bar when the mouse is over the control.",
 		"type": "string",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ti": {
 		"name": "tabIcon",
 		"description": "Set an icon for a tab. The first argument is the name of a control that must be a child"
 		" of the tab layout. The second argument is the icon file name.",
 		"type": "[string, string]",
-		"property": "C Q E M"
+		"property": "Create|Query|Edit|Multi-use"
 	},
 	"tii": {
 		"name": "tabIconIndex",
@@ -355,7 +355,7 @@ tabLayout_arg_map = {
 		" tab you want to set the icon for. If this flag is queried the tab icons for all the children"
 		" are returned.",
 		"type": "[int, string]",
-		"property": "C Q E M"
+		"property": "Create|Query|Edit|Multi-use"
 	},
 	"tl": {
 		"name": "tabLabel",
@@ -363,7 +363,7 @@ tabLayout_arg_map = {
 		" tab layout. The second argument is the label for the tab associated with that child. If"
 		" this flag is queried then the tab labels for all the children are returned.",
 		"type": "[string, string]",
-		"property": "C Q E M"
+		"property": "Create|Query|Edit|Multi-use"
 	},
 	"tli": {
 		"name": "tabLabelIndex",
@@ -371,13 +371,13 @@ tabLayout_arg_map = {
 		" tab you want to set the label for. If this flag is queried the tab labels for all the"
 		" children are returned.",
 		"type": "[int, string]",
-		"property": "C Q E M"
+		"property": "Create|Query|Edit|Multi-use"
 	},
 	"tp": {
 		"name": "tabPosition",
 		"description": "Changes the tab position. The possible values are: \"north\", \"east\" and \"west\".",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"tt": {
 		"name": "tabTooltip",
@@ -385,7 +385,7 @@ tabLayout_arg_map = {
 		" the tab layout. The second argument is the tooltip for the tab associated with that child."
 		" If this flag is queried then the tab tooltips for all the children are returned.",
 		"type": "[string, string]",
-		"property": "C Q E M"
+		"property": "Create|Query|Edit|Multi-use"
 	},
 	"tti": {
 		"name": "tabTooltipIndex",
@@ -393,51 +393,51 @@ tabLayout_arg_map = {
 		" the tab you want to set the tooltip for. If this flag is queried the tab tooltips for"
 		" all the children are returned.",
 		"type": "[int, string]",
-		"property": "C Q E M"
+		"property": "Create|Query|Edit|Multi-use"
 	},
 	"tc": {
 		"name": "tabsClosable",
 		"description": "Set to true if you want to have a close button icon on all created tabs.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"tv": {
 		"name": "tabsVisible",
 		"description": "Visibility of the tab labels.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ut": {
 		"name": "useTemplate",
 		"description": "Forces the command to use a command template other than the current one.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"vst": {
 		"name": "verticalScrollBarThickness",
 		"description": "Thickness of the vertical scroll bar. Specify an integer value greater than or equal to"
 		" zero. This flag has no effect on Windows systems.",
 		"type": "int",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"vis": {
 		"name": "visible",
 		"description": "The visible state of the control. A control is created visible by default. Note that a"
 		" control's actual appearance is also dependent on the visible state of its parent layout(s).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"vcc": {
 		"name": "visibleChangeCommand",
 		"description": "Command that gets executed when visible state of the control changes.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"w": {
 		"name": "width",
 		"description": "The width of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 }

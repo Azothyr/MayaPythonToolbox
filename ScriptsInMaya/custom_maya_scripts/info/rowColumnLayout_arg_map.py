@@ -3,13 +3,13 @@ rowColumnLayout_arg_map = {
 		"name": "adjustableColumn",
 		"description": "Specifies which column has an adjustable size that changes with the sizing of the layout.",
 		"type": "int",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ann": {
 		"name": "annotation",
 		"description": "Annotate the control with an extra string value.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bgc": {
 		"name": "backgroundColor",
@@ -18,13 +18,13 @@ rowColumnLayout_arg_map = {
 		" the background is automatically enabled, unless enableBackground is also specified with"
 		" a false value.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ca": {
 		"name": "childArray",
 		"description": "Returns a string array of the names of the layout's immediate children.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"cal": {
 		"name": "columnAlign",
@@ -32,7 +32,7 @@ rowColumnLayout_arg_map = {
 		" and \"center\". Only valid for column format, ie. number of columns specified with -nc/numberOfColumns"
 		" flag.",
 		"type": "[int, string]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"cat": {
 		"name": "columnAttach",
@@ -40,7 +40,7 @@ rowColumnLayout_arg_map = {
 		" is the 1-based column index. The second argument is the attachment, valid values are \"left\","
 		" \"right\" and \"both\". The third argument must be greater than 0 and specifies the offset.",
 		"type": "[int, string, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"co": {
 		"name": "columnOffset",
@@ -48,7 +48,7 @@ rowColumnLayout_arg_map = {
 		" index. The second argument is the attachment, valid values are \"left\", \"right\" and"
 		" \"both\". The third argument must be greater than 0 and specifies the offset.",
 		"type": "[int, string, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"cs": {
 		"name": "columnSpacing",
@@ -57,7 +57,7 @@ rowColumnLayout_arg_map = {
 		" however a valid column index is still required. The first argument is the 1-based column"
 		" index. The second argument must be greater than 0 and specifies the spacing.",
 		"type": "[int, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"cw": {
 		"name": "columnWidth",
@@ -65,7 +65,7 @@ rowColumnLayout_arg_map = {
 		" than 0. The first argument is the 1-based column index. The second argument must be greater"
 		" than 0 and specifies the column width.",
 		"type": "[int, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"dt": {
 		"name": "defineTemplate",
@@ -73,14 +73,14 @@ rowColumnLayout_arg_map = {
 		" the command template specified in the argument. They will be used as default arguments"
 		" in any subsequent invocations of the command when templateName is set as the current template.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"dtg": {
 		"name": "docTag",
 		"description": "Add a documentation flag to the control. The documentation flag has a directory structure."
 		" (e.g., -dt render/multiLister/createNode/material)",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dgc": {
 		"name": "dragCallback",
@@ -101,7 +101,7 @@ rowColumnLayout_arg_map = {
 		" is a string and the other values are integers eg the callback string could be \"print"
 		" '%dragControls %xd %yd %modifiersd'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dpc": {
 		"name": "dropCallback",
@@ -122,7 +122,7 @@ rowColumnLayout_arg_map = {
 		" values are integers eg the callback string could be \"print '%dragControls %dropControls"
 		" %messagesr %xd %yd %typed'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"en": {
 		"name": "enable",
@@ -130,13 +130,13 @@ rowColumnLayout_arg_map = {
 		" enabled. Specify false and the control will appear dimmed or greyed-out indicating it"
 		" is disabled.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ebg": {
 		"name": "enableBackground",
 		"description": "Enables the background color of the control.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ekf": {
 		"name": "enableKeyboardFocus",
@@ -146,33 +146,33 @@ rowColumnLayout_arg_map = {
 		" fields can still be selected with the mouse but it cannot be copied (except in Linux when"
 		" \"Middle Click Paste\" is enabled).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ex": {
 		"name": "exists",
 		"description": "Returns whether the specified object exists or not. Other flags are ignored.",
 		"type": "boolean",
-		"property": "C"
+		"property": "Create"
 	},
 	"fpn": {
 		"name": "fullPathName",
 		"description": "Return the full path name of the widget, which includes all the parents.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"h": {
 		"name": "height",
 		"description": "The height of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"hlc": {
 		"name": "highlightColor",
 		"description": "The highlight color of the control. The arguments correspond to the red, green, and blue"
 		" color components. Each component ranges in value from 0.0 to 1.0.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"io": {
 		"name": "isObscured",
@@ -180,14 +180,14 @@ rowColumnLayout_arg_map = {
 		" if its state is invisible, if it is blocked (entirely or partially) by some other control,"
 		" if it or a parent layout is unmanaged, or if the control's window is invisible or iconified.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"m": {
 		"name": "manage",
 		"description": "Manage state of the control. An unmanaged control is not visible, nor does it take up any"
 		" screen real estate. All controls are created managed by default.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"nbg": {
 		"name": "noBackground",
@@ -195,52 +195,52 @@ rowColumnLayout_arg_map = {
 		" at all, false means the background should be drawn. The state of this flag is inherited"
 		" by children of this control.",
 		"type": "boolean",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"nch": {
 		"name": "numberOfChildren",
 		"description": "Returns in an int the number of immediate children of the layout.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"nc": {
 		"name": "numberOfColumns",
 		"description": "Number of columns. This flag is mutually exclusive to the -nr/numRows flag. Either one"
 		" or the other can be specified.",
 		"type": "int",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"npm": {
 		"name": "numberOfPopupMenus",
 		"description": "Return the number of popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"nr": {
 		"name": "numberOfRows",
 		"description": "Number of rows. This flag is mutually exclusive to the -nc/numColumns flag. Either one"
 		" or the other can be specified.",
 		"type": "int",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"p": {
 		"name": "parent",
 		"description": "The parent layout for this control.",
 		"type": "string",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"pma": {
 		"name": "popupMenuArray",
 		"description": "Return the names of all the popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"po": {
 		"name": "preventOverride",
 		"description": "If true, this flag prevents overriding the control's attribute via the control's right"
 		" mouse button menu.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ral": {
 		"name": "rowAlign",
@@ -248,7 +248,7 @@ rowColumnLayout_arg_map = {
 		" \"center\". Only valid for row format, ie. number of rows specified with -nr/numberOfRows"
 		" flag.",
 		"type": "[int, string]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"rat": {
 		"name": "rowAttach",
@@ -256,7 +256,7 @@ rowColumnLayout_arg_map = {
 		" the 1-based row index. The second argument is the attachment, valid values are \"top\","
 		" \"bottom\" and \"both\". The third argument must be greater than 0 and specifies the offset.",
 		"type": "[int, string, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"rh": {
 		"name": "rowHeight",
@@ -264,7 +264,7 @@ rowColumnLayout_arg_map = {
 		" than 0. The first argument is the 1-based row index. The second argument must be greater"
 		" than 0 and specifies the row height.",
 		"type": "[int, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"ro": {
 		"name": "rowOffset",
@@ -272,7 +272,7 @@ rowColumnLayout_arg_map = {
 		" The second argument is the attachment, valid values are \"top\", \"bottom\" and \"both\"."
 		" The third argument must be greater than 0 and specifies the offset.",
 		"type": "[int, string, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"rs": {
 		"name": "rowSpacing",
@@ -281,38 +281,38 @@ rowColumnLayout_arg_map = {
 		" is still required. The first argument is the 1-based row index. The second argument must"
 		" be greater than 0 and specifies the spacing.",
 		"type": "[int, int]",
-		"property": "C E M"
+		"property": "Create|Edit|Multi-use"
 	},
 	"sbm": {
 		"name": "statusBarMessage",
 		"description": "Extra string to display in the status bar when the mouse is over the control.",
 		"type": "string",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ut": {
 		"name": "useTemplate",
 		"description": "Forces the command to use a command template other than the current one.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"vis": {
 		"name": "visible",
 		"description": "The visible state of the control. A control is created visible by default. Note that a"
 		" control's actual appearance is also dependent on the visible state of its parent layout(s).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"vcc": {
 		"name": "visibleChangeCommand",
 		"description": "Command that gets executed when visible state of the control changes.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"w": {
 		"name": "width",
 		"description": "The width of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 }

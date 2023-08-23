@@ -1,4 +1,5 @@
 import textwrap
+import os
 
 
 def retrieve_metadata(attr, arg_map):
@@ -57,3 +58,29 @@ def translate_arg_map_keys(arg_map, kwargs):
         else:
             print(f"Warning: Key \'{key}\' not recognized. Skipping...")
     return translated_kwargs
+
+
+def refresh_arg_lib():
+    print("preparing to run")
+    file_path = os.path.dirname(os.getcwd()) + r"\info"
+    lines_to_write = []
+    lines_to_write.extend("arg_lib = {\n")
+    for root, _dirs, files in os.walk(file_path):
+        for file_name in files:
+            if file_name.endswith("_arg_map.py"):
+                name = file_name.split("_")[0]
+                lines_to_write.extend(f"\"{name}\": {{\n")
+                with open(os.path.join(root, file_name), "r") as r_file:
+                    r_file.readline()  # Read and discard the first line
+                    lines_to_write.extend(r_file.readlines()[0:-1:])
+                if file_name == files[-1]:
+                    lines_to_write.extend("}\n}\n")
+                else:
+                    lines_to_write.extend("},\n")
+
+    with open(os.path.join(file_path, "arg_lib.py"), "w") as w_file:
+        w_file.write("".join(lines_to_write))
+    print("Completed library refresh")
+
+
+refresh_arg_lib()

@@ -1,7 +1,6 @@
 import maya.cmds as cmds
 from custom_maya_scripts.info.button_arg_map import button_arg_map as arg_map
 from custom_maya_scripts.utilities import arg_map_utils as map_handler
-from custom_maya_scripts.utilities import ui_presence_checker as ui_check
 
 
 class ButtonBase:

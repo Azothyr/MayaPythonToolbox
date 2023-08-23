@@ -5,13 +5,13 @@ text_arg_map = {
 		" the alignment will only be noticable if the control is wider than the label length. By"
 		" default, the label is aligned \"center\".",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ann": {
 		"name": "annotation",
 		"description": "Annotate the control with an extra string value.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"bgc": {
 		"name": "backgroundColor",
@@ -20,7 +20,7 @@ text_arg_map = {
 		" the background is automatically enabled, unless enableBackground is also specified with"
 		" a false value.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dt": {
 		"name": "defineTemplate",
@@ -28,14 +28,14 @@ text_arg_map = {
 		" the command template specified in the argument. They will be used as default arguments"
 		" in any subsequent invocations of the command when templateName is set as the current template.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"dtg": {
 		"name": "docTag",
 		"description": "Add a documentation flag to the control. The documentation flag has a directory structure."
 		" (e.g., -dt render/multiLister/createNode/material)",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"dgc": {
 		"name": "dragCallback",
@@ -56,7 +56,7 @@ text_arg_map = {
 		" is a string and the other values are integers eg the callback string could be \"print"
 		" '%dragControls %xd %yd %modifiersd'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"dpc": {
 		"name": "dropCallback",
@@ -77,7 +77,7 @@ text_arg_map = {
 		" values are integers eg the callback string could be \"print '%dragControls %dropControls"
 		" %messagesr %xd %yd %typed'\"",
 		"type": "script",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"drc": {
 		"name": "dropRectCallback",
@@ -89,7 +89,7 @@ text_arg_map = {
 		" of the rectangle to be drawn, followed by the width and height. This functionality is"
 		" currently only implemented in MEL.",
 		"type": "script",
-		"property": "E"
+		"property": "Edit"
 	},
 	"en": {
 		"name": "enable",
@@ -97,13 +97,13 @@ text_arg_map = {
 		" enabled. Specify false and the control will appear dimmed or greyed-out indicating it"
 		" is disabled.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ebg": {
 		"name": "enableBackground",
 		"description": "Enables the background color of the control.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ekf": {
 		"name": "enableKeyboardFocus",
@@ -113,13 +113,13 @@ text_arg_map = {
 		" fields can still be selected with the mouse but it cannot be copied (except in Linux when"
 		" \"Middle Click Paste\" is enabled).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ex": {
 		"name": "exists",
 		"description": "Returns whether the specified object exists or not. Other flags are ignored.",
 		"type": "boolean",
-		"property": "C"
+		"property": "Create"
 	},
 	"fn": {
 		"name": "font",
@@ -127,27 +127,27 @@ text_arg_map = {
 		" \"plainLabelFont\", \"smallPlainLabelFont\", \"obliqueLabelFont\", \"smallObliqueLabelFont\","
 		" \"fixedWidthFont\" and \"smallFixedWidthFont\".",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"fpn": {
 		"name": "fullPathName",
 		"description": "Return the full path name of the widget, which includes all the parents.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"h": {
 		"name": "height",
 		"description": "The height of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"hlc": {
 		"name": "highlightColor",
 		"description": "The highlight color of the control. The arguments correspond to the red, green, and blue"
 		" color components. Each component ranges in value from 0.0 to 1.0.",
 		"type": "[float, float, float]",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"hl": {
 		"name": "hyperlink",
@@ -156,7 +156,7 @@ text_arg_map = {
 		" from the MEL interpreter by preceding them with a backslash. Clicking on the link will"
 		" open it in an external Web browser.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"io": {
 		"name": "isObscured",
@@ -164,20 +164,20 @@ text_arg_map = {
 		" if its state is invisible, if it is blocked (entirely or partially) by some other control,"
 		" if it or a parent layout is unmanaged, or if the control's window is invisible or iconified.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"l": {
 		"name": "label",
 		"description": "The label text. The default label is the name of the control.",
 		"type": "string",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"m": {
 		"name": "manage",
 		"description": "Manage state of the control. An unmanaged control is not visible, nor does it take up any"
 		" screen real estate. All controls are created managed by default.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"nbg": {
 		"name": "noBackground",
@@ -185,32 +185,32 @@ text_arg_map = {
 		" at all, false means the background should be drawn. The state of this flag is inherited"
 		" by children of this control.",
 		"type": "boolean",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"npm": {
 		"name": "numberOfPopupMenus",
 		"description": "Return the number of popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"p": {
 		"name": "parent",
 		"description": "The parent layout for this control.",
 		"type": "string",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 	"pma": {
 		"name": "popupMenuArray",
 		"description": "Return the names of all the popup menus attached to this control.",
 		"type": "boolean",
-		"property": "Q"
+		"property": "Query"
 	},
 	"po": {
 		"name": "preventOverride",
 		"description": "If true, this flag prevents overriding the control's attribute via the control's right"
 		" mouse button menu.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"rs": {
 		"name": "recomputeSize",
@@ -218,45 +218,45 @@ text_arg_map = {
 		" false then the control size will remain fixed as you change the size of the label. The"
 		" default value of this flag is true.",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"sbm": {
 		"name": "statusBarMessage",
 		"description": "Extra string to display in the status bar when the mouse is over the control.",
 		"type": "string",
-		"property": "C E"
+		"property": "Create|Edit"
 	},
 	"ut": {
 		"name": "useTemplate",
 		"description": "Forces the command to use a command template other than the current one.",
 		"type": "string",
-		"property": "C"
+		"property": "Create"
 	},
 	"vis": {
 		"name": "visible",
 		"description": "The visible state of the control. A control is created visible by default. Note that a"
 		" control's actual appearance is also dependent on the visible state of its parent layout(s).",
 		"type": "boolean",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"vcc": {
 		"name": "visibleChangeCommand",
 		"description": "Command that gets executed when visible state of the control changes.",
 		"type": "script",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"w": {
 		"name": "width",
 		"description": "The width of the control. The control will attempt to be this size if it is not overruled"
 		" by parent layout conditions.",
 		"type": "int",
-		"property": "C Q E"
+		"property": "Create|Query|Edit"
 	},
 	"ww": {
 		"name": "wordWrap",
 		"description": "If true then label text is wrapped where necessary at word-breaks. If false, it is not"
 		" wrapped at all. The default value of this flag is false.",
 		"type": "boolean",
-		"property": "C Q"
+		"property": "Create|Query"
 	},
 }
