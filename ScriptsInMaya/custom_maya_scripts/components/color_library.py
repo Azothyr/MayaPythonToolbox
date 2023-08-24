@@ -1,5 +1,6 @@
 class ColorIndex:
     def __init__(self):
+        self.__name = 'Color Library'
         self.library = [
             ('Maya Default Blue', 0, (0, 0, 255)),
             ('Black', 1, (0, 0, 0)),
@@ -37,6 +38,14 @@ class ColorIndex:
         self.color_order = [item[0] for item in self.library]
         self.cvalue_order = [item[1] for item in self.library]
         self.rgb_order = [item[2] for item in self.library]
+
+    def __str__(self):
+        return self.__name
+
+    def __repr__(self):
+        formatted_return = ",\n".join(f"{color}:\nMaya Index -> {cvalue}/31\n RGB value -> {rgb}"
+                                      for color, cvalue, rgb in self.library)
+        return formatted_return
 
     def get_color_order(self):
         return self.color_order

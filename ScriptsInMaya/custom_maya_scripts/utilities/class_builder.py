@@ -139,28 +139,11 @@ def class_handler(txt, cls):
     lower_name = cls[0]
     content = [
         "import maya.cmds as cmds",
-        f"from custom_maya_scripts.info.{lower_name}_arg_map import {lower_name}_arg_map as arg_map",
-        "from custom_maya_scripts.utilities import arg_map_utils as map_handler",
-        f"\n\nclass {class_name}:",
-        "\tdef __init__(self, name, **kwargs):",
-        "\t\tself.widget = None",
-        "\t\tself.name = name",
-        "\t\tself.arg_mapping = arg_map",
-        "\n\t\t# Set attributes",
-        "\t\ttranslated_kwargs = map_handler.translate_arg_map_keys(self.arg_mapping, kwargs)",
-        "\t\tself.set_attributes(**translated_kwargs)",
-        "\t\tself._create(**translated_kwargs)",
-    ] + txt + [
-        "\n\tdef set_attributes(self, **kwargs):",
-        "\t\tmap_handler.set_class_kwargs(self, self.arg_mapping, **kwargs)",
-        "\n\tdef helper(self, attr):",
-        "\t\tprint(map_handler.retrieve_metadata(attr, self.arg_mapping))",
-        "\n\tdef _create(self, **kwargs):",
-        f"\t\tself.widget = cmds.{lower_name}(self.name, **kwargs)",
-        "\n\tdef edit(self, **kwargs):",
-        f"\t\tcmds.{lower_name}(self.name, e=True, **kwargs)",
-        "\n\tdef query(self, attribute):",
-        f"\t\treturn cmds.{lower_name}(self.name, q=True, **{{attribute: True}})\n"
+        f"from custom_maya_scripts.info.{lower_name}_arg_map import {lower_name}_arg_map as _map_src",
+        "from custom_maya_scripts.components.maya_cmds_base import CmdsBase",
+        f"\n\nclass {class_name}(CmdsBase):",
+        "\tdef __init__(self, name, **kwargs):\n\t\tsuper().__init__(name)\n",
+        "\tdef _get_arg_map(self):\n\t\treturn _map_src\n",
     ]
     return "\n".join(content)
 

@@ -6,7 +6,6 @@ import importlib.util
 def _load_map_from_file_path(file_path):
     _map, path = file_path
     print(f"Loading metadata for {_map} from file.")
-    path = path
     if not os.path.exists(path):
         raise ValueError(f"File does not exist: {path}")
     _map_name = _map + "_arg_map"
@@ -14,24 +13,23 @@ def _load_map_from_file_path(file_path):
     module_spec = importlib.util.spec_from_file_location("module.name", path)
     module = importlib.util.module_from_spec(module_spec)
     module_spec.loader.exec_module(module)
-    if _map == "all":
-        _map_name = "arg_lib"
-        for k, v in getattr(module, _map_name):
-            yield _load_map_from_file_path(k)
 
     return getattr(module, _map_name)
 
 
 def retrieve_metadata(attr, arg_map):
-    print(attr, arg_map)
-    if isinstance(arg_map, list) or isinstance(arg_map, tuple) or 'C:' in arg_map:
+    if isinstance(arg_map, list) or isinstance(arg_map, tuple):
         arg_map = _load_map_from_file_path(arg_map)
     formatted_meta = []
     if str(attr).lower() == "all":
         for k, v in arg_map.items():
-            formatted_meta.append(
-                f"Name: {k} -> {v['name']} | Arg: {v['type']} | Use case: {v['property']}\n"
-                f"\tDescription: {textwrap.fill(v['description'], width=80)}\n")
+            try:
+                formatted_meta.append(
+                    f"Name: {k} -> {v['name']} | Arg: {v['type']} | Use case: {v['property']}\n"
+                    f"\tDescription: {textwrap.fill(v['description'], width=80)}\n")
+            except KeyError:
+                print(f"KeyError for dictionary: {k}    ->    {v}")
+                continue
         return '\n'.join(formatted_meta)
     elif str(attr).lower() == "args":
         for k, v in arg_map.items():
@@ -70,17 +68,36 @@ def set_class_kwargs(class_, arg_map, **kwargs):
         setattr(class_, f"{key}_type", value.get('type'))
 
 
-def translate_arg_map_keys(arg_map, kwargs):
+def translate_for_arg_map(arg_map, kwargs):
     # Translate kwargs keys if they are in arg_mapping (short or long form)
     translated_kwargs = {}
     for key, value in kwargs.items():
-        if key in arg_map:  # short form
+        if key in arg_map:  # if in short form
             translated_kwargs[arg_map[key]['name']] = value
         elif any(data['name'] == key for data in arg_map.values()):  # long form
             translated_kwargs[key] = value
         else:
             print(f"Warning: Key \'{key}\' not recognized. Skipping...")
     return translated_kwargs
+
+
+def translate_for_kwargs(arg_map, kwargs):
+    # Translate kwargs keys if they are in arg_mapping (short or long form)
+    translated_kwargs = []
+
+    for key, value in kwargs.items():
+        if key in arg_map:  # if in short form
+            translated_kwargs.append((key, arg_map[key]['name'], value))
+        else:
+            # Check if in long form
+            for short_name, data in arg_map.items():
+                if data['name'] == key:
+                    translated_kwargs.append((short_name, key, value))
+                    break
+            else:
+                print(f"Warning: Key \'{key}\' not recognized. Skipping...")
+    return translated_kwargs
+
 
 
 def refresh_arg_lib():
