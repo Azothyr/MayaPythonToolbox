@@ -19,14 +19,18 @@ class CmdsBase(ABC):
         return self._name
 
     def __repr__(self):
-        input_values_map = "\n".join(f"{sn} | {ln}:\n\t{val}" for sn, ln, val in self._repr_kwargs)
-        splitter = '-' * 50
-        return f"\t{self._name}   ->   {self.__class__.__name__}\n{splitter}\nPROPERTIES:\n{input_values_map}\n{splitter}"
+        return self._name
 
     @abstractmethod
     def _get_arg_map(self):
         pass
-    
+
+    def show_init_kwargs(self):
+        input_values_map = "\n".join(f"{sn} | {ln}:\n\t{val}" for sn, ln, val in self._repr_kwargs)
+        splitter = '-' * 50
+        print(f"\t{self._name}   ->   {self.__class__.__name__}\n{splitter}\nPROPERTIES:\n{input_values_map}\n"
+                f"{splitter}\n")
+
     def _get_maya_cmd(self):
         return self.__class__.__name__[0].lower() + self.__class__.__name__[1:-4]
 

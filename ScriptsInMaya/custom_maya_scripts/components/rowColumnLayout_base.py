@@ -1,4 +1,3 @@
-import maya.cmds as cmds
 from custom_maya_scripts.info.rowColumnLayout_arg_map import rowColumnLayout_arg_map as _map_src
 from custom_maya_scripts.components.maya_cmds_base import CmdsBase
 

@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 from custom_maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_commands, modify_history
+from custom_maya_scripts.components.window_base import WindowBase as Window
 
 
 def layer_cmds_ui(parent_ui, tool):
@@ -62,18 +63,45 @@ def freeze_del_history_ui(parent_ui, tool):
     return freeze_tab
 
 
+def _setup_ui(parent_ui):
+    main_layout = cmds.formLayout('util_form', p=parent_ui)
+
+    # Create each UI for tools
+    layer_cmd_ui = layer_cmds_ui(main_layout, 'layer_cmds')
+    axis_visibility_ui_elem = axis_visibility_ui(main_layout, 'axis_visibility')
+    constrain_ui_elem = constrain_ui(main_layout, 'constrain')
+    freeze_del_history_ui_elem = freeze_del_history_ui(main_layout, 'freeze_del_history')
+
+    # Attach elements in form layout
+    cmds.formLayout(main_layout, edit=True,
+                    attachForm=[
+                        (layer_cmd_ui, 'top', 5),
+                        (layer_cmd_ui, 'left', 5),
+                        (layer_cmd_ui, 'right', 5),
+                        (axis_visibility_ui_elem, 'left', 5),
+                        (axis_visibility_ui_elem, 'right', 5),
+                        (constrain_ui_elem, 'left', 5),
+                        (constrain_ui_elem, 'right', 5),
+                        (freeze_del_history_ui_elem, 'left', 5),
+                        (freeze_del_history_ui_elem, 'right', 5),
+                    ],
+                    attachControl=[
+                        (axis_visibility_ui_elem, 'top', 5, layer_cmd_ui),
+                        (constrain_ui_elem, 'top', 5, axis_visibility_ui_elem),
+                        (freeze_del_history_ui_elem, 'top', 5, constrain_ui_elem),
+                    ])
+    return main_layout
+
+
 def create_ui_window(manual_run=False):
-    utility_ui_window = 'utility_ui_window'
-    if cmds.window(utility_ui_window, exists=True):
-        cmds.deleteUI(utility_ui_window)
-    cmds.window(utility_ui_window,
-                title="utility Creator",
-                widthHeight=(350, 500),
-                maximizeButton=False,
-                minimizeButton=True,
-                backgroundColor=[.35, .3, .3],
-                resizeToFitChildren=True,
-                nde=True)
+    win = Window('utility_ui_window',
+                 title="utility Creator",
+                 widthHeight=(350, 500),
+                 maximizeButton=False,
+                 minimizeButton=True,
+                 backgroundColor=[.35, .3, .3],
+                 resizeToFitChildren=True,
+                 nde=True)
 
     main_layout = cmds.formLayout()
 
@@ -102,7 +130,7 @@ def create_ui_window(manual_run=False):
                         (freeze_del_history_ui_elem, 'top', 5, constrain_ui_elem),
                     ])
 
-    cmds.showWindow(utility_ui_window)
+    win.initialize()
 
 
 def main():

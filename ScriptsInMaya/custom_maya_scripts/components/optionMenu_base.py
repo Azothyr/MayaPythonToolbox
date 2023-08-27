@@ -6,6 +6,15 @@ from custom_maya_scripts.components.maya_cmds_base import CmdsBase
 class OptionMenuBase(CmdsBase):
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
+        self.internal_items = []
 
     def _get_arg_map(self):
         return _map_src
+
+    def add_item(self, item):
+        self.internal_items.append(item)
+
+    def show_items(self):
+        print(f'{self._name} options:\n')
+        for item in self.internal_items:
+            print(item)

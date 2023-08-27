@@ -5,7 +5,7 @@ from custom_maya_scripts.components.maya_cmds_base import CmdsBase
 
 class ColumnLayoutBase(CmdsBase):
 	def __init__(self, name, **kwargs):
-		super().__init__(name)
+		super().__init__(name, **kwargs)
 
 	def _get_arg_map(self):
 		return _map_src
