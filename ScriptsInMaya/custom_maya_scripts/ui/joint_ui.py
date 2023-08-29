@@ -2,9 +2,19 @@ import maya.cmds as cmds
 from functools import partial
 from custom_maya_scripts.tools import (joint_creator, selection_renamer, parent_selection, center_locator,
                                        joint_axis_vis_toggle)
+from custom_maya_scripts.components.color_library import ColorIndex as ColorLib
+from custom_maya_scripts.components.window_base import WindowBase as Window
+from custom_maya_scripts.components.button_base import ButtonBase as Button
+from custom_maya_scripts.components.optionMenu_base import OptionMenuBase as OptionMenu
+from custom_maya_scripts.components.menuItem_base import MenuItemBase as MenuItem
+from custom_maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
+from custom_maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
+from custom_maya_scripts.components.text_base import TextBase as Text
+from custom_maya_scripts.components.textField_base import TextFieldBase as TextField
+from custom_maya_scripts.components.columnLayout_base import ColumnLayoutBase as ColLayout
+from custom_maya_scripts.utilities.global_var import GlobalVar
 
-if 'center_location' not in globals():
-    center_location = []
+center_locations = GlobalVar('center_locations', value=[])
 
 
 def _ui_setup(parent_ui, tool):
@@ -12,8 +22,6 @@ def _ui_setup(parent_ui, tool):
     Returns: Joint Creator UI
     """
     global center_locations
-    if 'center_locations' not in globals():
-        center_locations = []
 
     def add_center_to_list(*_):
         """
