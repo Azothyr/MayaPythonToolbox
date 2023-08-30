@@ -12,21 +12,13 @@ import os
 import platform
 import shutil
 from textwrap import dedent
-
-
-def clear_directory(path):
-    """Remove all files and subdirectories from a directory."""
-    for root, dirs, files in os.walk(path, topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
+from azothyr_tools.function.file_tools import print_files_at_location, clear_directory
 
 
 if __name__ == "__main__":
     if platform.system() == "Windows":
         platform_name = "win64"  # You don't use this variable in this code. Do you need it?
-        scripts_folder = os.path.join(os.path.expanduser('~\\documents\\maya\\customscripts'))
+        scripts_folder = os.path.join(os.path.expanduser('~\\documents\\custom_scripts\\maya_scripts'))
         maya_version = os.environ.get("MAYA_VERSION", "2024")
         maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\bin"
         user_setup_path = os.path.join(os.path.expanduser(f"~\\Documents\\maya\\{maya_version}\\scripts\\userSetup.py"))
@@ -43,7 +35,7 @@ if __name__ == "__main__":
                 cmds.commandPort(name=":4434")
 
             # Add custom scripts folder to sys.path
-            scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "maya", "customscripts", "custom_maya_scripts")
+            scripts_folder = os.path.join(os.path.expanduser("~"), "Documents", "custom_scripts", "maya_scripts")
             if scripts_folder not in sys.path:
                 sys.path.append(scripts_folder)
             
@@ -55,7 +47,7 @@ if __name__ == "__main__":
         clear_directory(scripts_folder)
 
         cwd = os.getcwd()
-        file_exceptions = ["custom_scripts_inserter.py", "manual_tool_runner.py"]
+        file_exceptions = ["maya_scripts_inserter.py", "manual_tool_runner.py"]
         try:
             for _root, _dirs, _files in os.walk(cwd):
                 for file_name in _files:
@@ -68,6 +60,8 @@ if __name__ == "__main__":
                         shutil.copy2(src_file_path, dest_file_path)
         except PermissionError:
             print(f"Insufficient permissions to add folder to '{scripts_folder}'.\nPlease run file as admin...")
+        finally:
+            print_files_at_location(scripts_folder)
 
         with open(user_setup_path, 'w') as f:
             f.write(code)
