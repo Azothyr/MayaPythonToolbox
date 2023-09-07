@@ -1,5 +1,5 @@
 import os
-from custom_maya_scripts.utilities import arg_map_utils as map_handler
+from maya_scripts.utilities import arg_map_utils as map_handler
 
 
 def _get_data_from_file(src):
@@ -139,8 +139,8 @@ def class_handler(txt, cls):
     lower_name = cls[0]
     content = [
         "import maya.cmds as cmds",
-        f"from custom_maya_scripts.info.{lower_name}_arg_map import {lower_name}_arg_map as _map_src",
-        "from custom_maya_scripts.components.maya_cmds_base import CmdsBase",
+        f"from maya_scripts.info.{lower_name}_arg_map import {lower_name}_arg_map as _map_src",
+        "from maya_scripts.components.maya_cmds_base import CmdsBase",
         f"\n\nclass {class_name}(CmdsBase):",
         "\tdef __init__(self, name, **kwargs):\n\t\tsuper().__init__(name)\n",
         "\tdef _get_arg_map(self):\n\t\treturn _map_src\n",
@@ -189,12 +189,12 @@ def main(output_file_path="", name=""):
     text_data = _get_data_from_file(src)
     if output_file_path == "":
         if "Demon" in os.path.expanduser("~"):
-            output_file_path = "C:\\GitRepos\\MayaPythonToolbox\\ScriptsInMaya\\custom_maya_scripts\\"
+            output_file_path = "C:\\GitRepos\\MayaPythonToolbox\\ScriptsInMaya\\maya_scripts\\"
         elif "zacst" in os.path.expanduser("~"):
-            output_file_path = "C:\\Repos\\MayaPythonToolbox\\ScriptsInMaya\\custom_maya_scripts\\"
+            output_file_path = "C:\\Repos\\MayaPythonToolbox\\ScriptsInMaya\\maya_scripts\\"
         else:
             raise ValueError("Must give an output file path")
-    update_file_path = os.path.expanduser(f"~\\Documents\\maya\\customscripts\\custom_maya_scripts\\")
+    update_file_path = os.path.expanduser(f"~\\Documents\\maya\\customscripts\\maya_scripts\\")
     print(f"Output path = {output_file_path}\n")
     if name == "":
         name = "test"

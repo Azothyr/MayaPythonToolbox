@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from custom_maya_scripts.utilities import selection_check
+from maya_scripts.utilities import selection_check
 
 
 def create_at_joint(radius):

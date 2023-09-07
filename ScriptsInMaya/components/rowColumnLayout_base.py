@@ -1,5 +1,5 @@
-from custom_maya_scripts.info.rowColumnLayout_arg_map import rowColumnLayout_arg_map as _map_src
-from custom_maya_scripts.components.maya_cmds_base import CmdsBase
+from maya_scripts.info.rowColumnLayout_arg_map import rowColumnLayout_arg_map as _map_src
+from maya_scripts.components.maya_cmds_base import CmdsBase
 
 
 class RowColumnLayoutBase(CmdsBase):

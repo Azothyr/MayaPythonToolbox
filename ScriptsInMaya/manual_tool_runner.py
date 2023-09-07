@@ -1,4 +1,4 @@
-from custom_maya_scripts.utilities.global_var import GlobalVar
+from maya_scripts.utilities.global_var import GlobalVar
 
 center_locations = GlobalVar('center_locations', value=[0.0, 1, 2])
 print(len(center_locations))

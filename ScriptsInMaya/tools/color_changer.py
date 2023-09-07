@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from custom_maya_scripts.components import color_library
+from maya_scripts.components import color_library
 
 
 def change_color(_color, obj_lyst):

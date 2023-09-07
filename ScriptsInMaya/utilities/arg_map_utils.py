@@ -103,7 +103,7 @@ def translate_for_kwargs(arg_map, kwargs):
 def refresh_arg_lib():
     print("preparing to refresh Arg Library")
     input_path = os.path.dirname(os.getcwd()) + r"\info"
-    lines_to_write = ["import os\n\nbase_path = os.path.join(os.path.expanduser(\"~\"), \"Documents\", \"maya\", \"customscripts\", \"custom_maya_scripts\", \"info\")\narg_lib = {\n"]
+    lines_to_write = ["import os\n\nbase_path = os.path.join(os.path.expanduser(\"~\"), \"Documents\", \"maya\", \"customscripts\", \"maya_scripts\", \"info\")\narg_lib = {\n"]
     _all = "(\"all\", os.path.join(base_path, \"arg_lib.py\"))"
     for root, _dirs, files in os.walk(input_path):
         for file_name in files:

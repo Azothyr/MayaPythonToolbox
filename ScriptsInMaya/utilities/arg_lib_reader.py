@@ -1,5 +1,5 @@
-from custom_maya_scripts.info.arg_lib import arg_lib
-from custom_maya_scripts.utilities import arg_map_utils as map_handler
+from maya_scripts.info.arg_lib import arg_lib
+from maya_scripts.utilities import arg_map_utils as map_handler
 
 
 class LibReader:

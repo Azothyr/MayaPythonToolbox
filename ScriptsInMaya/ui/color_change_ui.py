@@ -1,14 +1,14 @@
-from custom_maya_scripts.tools import color_changer as color_tool
-from custom_maya_scripts.utilities import selection_check
-from custom_maya_scripts.components.color_library import ColorIndex as ColorLib
-from custom_maya_scripts.components.window_base import WindowBase as Window
-from custom_maya_scripts.components.button_base import ButtonBase as Button
-from custom_maya_scripts.components.optionMenu_base import OptionMenuBase as OptionMenu
-from custom_maya_scripts.components.menuItem_base import MenuItemBase as MenuItem
-from custom_maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
-from custom_maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
-from custom_maya_scripts.components.text_base import TextBase as Text
-from custom_maya_scripts.components.columnLayout_base import ColumnLayoutBase as ColLayout
+from maya_scripts.tools import color_changer as color_tool
+from maya_scripts.utilities import selection_check
+from maya_scripts.components.color_library import ColorIndex as ColorLib
+from maya_scripts.components.window_base import WindowBase as Window
+from maya_scripts.components.button_base import ButtonBase as Button
+from maya_scripts.components.optionMenu_base import OptionMenuBase as OptionMenu
+from maya_scripts.components.menuItem_base import MenuItemBase as MenuItem
+from maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
+from maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
+from maya_scripts.components.text_base import TextBase as Text
+from maya_scripts.components.columnLayout_base import ColumnLayoutBase as ColLayout
 
 
 def _ui_setup(parent_ui, tool):

@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from custom_maya_scripts.utilities import custom_exception as util
+from maya_scripts.utilities import custom_exception as util
 
 
 def is_selection(_selection=None):

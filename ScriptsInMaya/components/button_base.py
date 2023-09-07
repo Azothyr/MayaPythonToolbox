@@ -1,6 +1,6 @@
 import maya.cmds as cmds
-from custom_maya_scripts.info.button_arg_map import button_arg_map as _map_src
-from custom_maya_scripts.components.maya_cmds_base import CmdsBase
+from maya_scripts.info.button_arg_map import button_arg_map as _map_src
+from maya_scripts.components.maya_cmds_base import CmdsBase
 
 
 class ButtonBase(CmdsBase):

@@ -1,6 +1,6 @@
-from custom_maya_scripts.ui import joint_ui, control_ui, color_change_ui, utilities_ui
-from custom_maya_scripts.components.window_base import WindowBase as Window
-from custom_maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
+from maya_scripts.ui import joint_ui, control_ui, color_change_ui, utilities_ui
+from maya_scripts.components.window_base import WindowBase as Window
+from maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
 
 
 def create_ui_window(manual_run=False):

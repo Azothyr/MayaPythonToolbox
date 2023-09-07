@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from custom_maya_scripts.utilities import arg_map_utils as map_handler
+from maya_scripts.utilities import arg_map_utils as map_handler
 from abc import ABC, abstractmethod
 
 

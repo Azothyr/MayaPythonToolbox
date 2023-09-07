@@ -1,16 +1,16 @@
 import unittest
 import maya.cmds as cmds
 import os
-from custom_maya_scripts.utilities.arg_map_utils import refresh_arg_lib
-from custom_maya_scripts.utilities.arg_lib_reader import LibReader
-from custom_maya_scripts.components.window_base import WindowBase as Win
-from custom_maya_scripts.components.button_base import ButtonBase as Button
-from custom_maya_scripts.components.optionMenu_base import OptionMenuBase as OpMenu
-from custom_maya_scripts.components.menuItem_base import MenuItemBase as MItem
-from custom_maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase as RCLay
-from custom_maya_scripts.components.tabLayout_base import TabLayoutBase as TabLay
-from custom_maya_scripts.components.text_base import TextBase as Txt
-from custom_maya_scripts.components.textField_base import TextFieldBase as TxtF
+from maya_scripts.utilities.arg_map_utils import refresh_arg_lib
+from maya_scripts.utilities.arg_lib_reader import LibReader
+from maya_scripts.components.window_base import WindowBase as Win
+from maya_scripts.components.button_base import ButtonBase as Button
+from maya_scripts.components.optionMenu_base import OptionMenuBase as OpMenu
+from maya_scripts.components.menuItem_base import MenuItemBase as MItem
+from maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase as RCLay
+from maya_scripts.components.tabLayout_base import TabLayoutBase as TabLay
+from maya_scripts.components.text_base import TextBase as Txt
+from maya_scripts.components.textField_base import TextFieldBase as TxtF
 
 
 def perform_maya_test():

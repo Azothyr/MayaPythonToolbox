@@ -1,6 +1,6 @@
 import maya.cmds as cmds
-from custom_maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_commands, modify_history
-from custom_maya_scripts.components.window_base import WindowBase as Window
+from maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_commands, modify_history
+from maya_scripts.components.window_base import WindowBase as Window
 
 
 def layer_cmds_ui(parent_ui, tool):
