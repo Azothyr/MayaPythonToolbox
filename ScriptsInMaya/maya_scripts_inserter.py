@@ -10,19 +10,20 @@ Set a sys env variable "pythonpath" with script folder path value.
 """
 import os
 import platform
-import shutil
 from textwrap import dedent
-from azothyr_tools.functions.file_tools import print_files_at_location, clear_directory
+from azothyr_tools.cus_funcs.file_tools import (get_file_path_from_lib, clear_directory,
+                                                transfer_py_dir_in_current, write_to_file)
 
 
 if __name__ == "__main__":
     if platform.system() == "Windows":
-        platform_name = "win64"  # You don't use this variable in this code. Do you need it?
-        scripts_folder = os.path.join(os.path.expanduser('~\\documents\\custom_scripts\\maya_scripts'))
-        maya_version = os.environ.get("MAYA_VERSION", "2024")
-        maya_path = f"C:\\Program Files\\Autodesk\\Maya{maya_version}\\bin"
-        user_setup_path = os.path.join(os.path.expanduser(f"~\\Documents\\maya\\{maya_version}\\scripts\\userSetup.py"))
-
+        repo, scripts_folder, maya_path, user_setup_path = get_file_path_from_lib(maya_repo=True,
+                                                                                  maya_scripts=True,
+                                                                                  maya_exe=True,
+                                                                                  maya_userSetup=True)
+        if repo is None:
+            print("No repo found")
+            exit()
         code = dedent(f"""\
             import maya.cmds as cmds
             import sys
@@ -45,29 +46,10 @@ if __name__ == "__main__":
         os.makedirs(scripts_folder, exist_ok=True)
 
         clear_directory(scripts_folder)
+        _exceptions = ["maya_scripts_inserter.py", "manual_tool_runner.py", "Scratch.py"]
 
-        cwd = os.getcwd()
+        transfer_py_dir_in_current(repo, scripts_folder, _exceptions)
 
-        file_exceptions = ["maya_scripts_inserter.py", "manual_tool_runner.py", "Scratch.py"]
-        try:
-            for _root, _dirs, _files in os.walk(cwd):
-                for __dir in _dirs:
-                    if __dir == "ScriptsInMaya":
-                        for file_name in _files:
-                            if file_name.endswith(".py") and file_name not in file_exceptions:
-                                rel_path = os.path.relpath(_root, cwd)
-                                dest_folder = os.path.join(scripts_folder, rel_path)
-                                os.makedirs(dest_folder, exist_ok=True)
-                                src_file_path = os.path.join(_root, file_name)
-                                dest_file_path = os.path.join(dest_folder, file_name)
-                                shutil.copy2(src_file_path, dest_file_path)
-        except PermissionError:
-            print(f"Insufficient permissions to add folder to '{scripts_folder}'.\nPlease run file as admin...")
-        finally:
-            print_files_at_location(scripts_folder)
-
-        with open(user_setup_path, 'w') as f:
-            f.write(code)
-        print(f"Successfully created userSetup.py in {user_setup_path}")
+        write_to_file(user_setup_path, code, completion_txt=f"UserSetup.py created successfully at: {user_setup_path}")
     else:
         raise RuntimeError(f"Unsupported platform: {platform.system()}")

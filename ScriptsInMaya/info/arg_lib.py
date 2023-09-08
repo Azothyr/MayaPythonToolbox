@@ -1,4 +1,6 @@
 import os
+from azothyr_tools.file_tools import get_file_path as get_path
+
 
 base_path = os.path.join(os.path.expanduser("~"), "Documents", "maya_scripts", "info")
 arg_lib = {
