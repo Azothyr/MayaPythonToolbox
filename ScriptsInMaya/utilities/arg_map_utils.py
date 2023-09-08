@@ -1,6 +1,8 @@
 import textwrap
 import os
 import importlib.util
+from azothyr_tools.cus_funcs.file_tools import write_to_file
+from azothyr_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
 
 
 def _load_map_from_file_path(file_path):
@@ -101,21 +103,18 @@ def translate_for_kwargs(arg_map, kwargs):
 
 def refresh_arg_lib():
     print("preparing to refresh Arg Library")
-    input_path = os.path.dirname(os.getcwd()) + r"\info"
-    lines_to_write = ["import os\n"
-                      "from azothyr_tools.file_tools import get_file_path as get_path\n\n"
-                      "base_path = \n"
-                      "arg_lib = {\n"]
-    for root, _dirs, files in os.walk(input_path):
-        for file_name in files:
-            if file_name.endswith("_arg_map.py"):
-                name = file_name.split("_")[0]
-                pass_vars = f"(\"{name}\", os.path.join(base_path, \"{file_name}\"))"
-                lines_to_write.append(f"\t\"{name}\": {pass_vars},\n")
+    arg_lib_path, arg_maps = get_path(maya_arg_lib=True, arg_maps=True)
+    lines_to_write = ["import os",
+                      "from azothyr_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path\n",
+                      f"base_path = get_path(maya_info=True)",
+                      "arg_lib = {"]
+    for key, value in arg_maps:
+        lines_to_write.append(f"\t'{key}': {value},")
+    lines_to_write.append("}")
 
-    _all = "(\"all\", os.path.join(base_path, \"arg_lib.py\"))"
-    lines_to_write.append(f"\t\"all\": {_all}\n}}\n")
-
-    with open(os.path.join(input_path, "arg_lib.py"), "w") as w_file:
-        w_file.write("".join(lines_to_write))
+    write_to_file(arg_lib_path, "\n".join(lines_to_write))
     return "Completed library refresh"
+
+
+if __name__ == "__main__":
+    refresh_arg_lib()

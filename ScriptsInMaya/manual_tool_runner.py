@@ -1,6 +1,4 @@
-from maya_scripts.utilities.global_var import GlobalVar
+from maya_scripts.utilities import arg_map_utils as map_handler
 
-center_locations = GlobalVar('center_locations', value=[0.0, 1, 2])
-print(len(center_locations))
-for val in center_locations:
-    print(val)
+
+map_handler.refresh_arg_lib()
