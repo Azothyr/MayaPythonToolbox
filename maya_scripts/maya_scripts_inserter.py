@@ -29,7 +29,7 @@ if __name__ == "__main__":
             import maya.cmds as cmds
             import sys
             from maya_scripts.ui import main_win_tab
-            from azothyr_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+            from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
             
             
             # Set Maya command line to Pycharm listener

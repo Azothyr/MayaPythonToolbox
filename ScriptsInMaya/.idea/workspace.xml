@@ -5,62 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="edc989d5-fed8-4c56-98e4-7877482ce9f1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ScriptsInMaya.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/.idea/MayaPythonToolbox.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/button_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/button_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/color_library.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/color_library.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/columnLayout_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/columnLayout_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/maya_cmds_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/maya_cmds_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/menuItem_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/menuItem_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/optionMenu_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/optionMenu_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/rowColumnLayout_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/rowColumnLayout_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tabLayout_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/tabLayout_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/text_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/text_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/textfield_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/textField_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/window_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/components/window_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/arg_lib.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/arg_lib.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/button_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/button_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/columnLayout_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/columnLayout_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/menuItem_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/menuItem_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/optionMenu_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/optionMenu_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/rowColumnLayout_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/rowColumnLayout_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/tabLayout_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/tabLayout_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/textField_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/textField_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/text_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/text_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/window_arg_map.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/info/window_arg_map.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manual_tool_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/manual_tool_runner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts_inserter.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/maya_scripts_inserter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/globalvar_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tests/globalvar_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/center_locator.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/center_locator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/color_changer.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/color_changer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/constrain_commands.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/constrain_commands.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/control_creator.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/control_creator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/distance_measurment.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/distance_measurment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/joint_axis_vis_toggle.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/joint_axis_vis_toggle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/joint_creator.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/joint_creator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/joint_orient.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/joint_orient.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/layer_control.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/layer_control.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/modify_history.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/modify_history.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/parent_selection.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/parent_selection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/selection_renamer.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/tools/selection_renamer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/color_change_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/ui/color_change_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/ui/control_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/ui/joint_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/main_win_tab.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/ui/main_win_tab.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/toolbox_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/ui/toolbox_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/utilities_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/ui/utilities_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities/arg_lib_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/utilities/arg_lib_reader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities/arg_map_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/utilities/arg_map_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities/cmds_class_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/utilities/cmds_class_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities/global_var.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/utilities/global_var.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities/selection_check.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/utilities/selection_check.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities/test_components.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/utilities/test_components.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities/ui_presence_checker.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/utilities/ui_presence_checker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../maya_scripts/manual_tool_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/manual_tool_runner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../maya_scripts/maya_scripts_inserter.py" beforeDir="false" afterPath="$PROJECT_DIR$/../maya_scripts/maya_scripts_inserter.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +42,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.Update Scripts to Local">
+  <component name="RunManager" selected="MayaCharm.MayaCharm">
     <configuration name="MayaCharm" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION">
       <option name="executionType" value="FILE" />
       <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
@@ -150,6 +97,9 @@
       <workItem from="1694198807675" duration="317000" />
       <workItem from="1694199137650" duration="403000" />
       <workItem from="1694213863736" duration="89000" />
+      <workItem from="1694214090009" duration="338000" />
+      <workItem from="1694214444414" duration="155000" />
+      <workItem from="1694214776568" duration="63000" />
     </task>
     <servers />
   </component>
@@ -158,9 +108,9 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/ScriptsInMaya$Update_Scripts_to_Local.coverage" NAME="Update Scripts to Local Coverage Results" MODIFIED="1694199028631" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/MayaToolbox$manual_tool_runner.coverage" NAME="manual_tool_runner Coverage Results" MODIFIED="1694199497818" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../maya_scripts" />
+    <SUITE FILE_PATH="coverage/MayaToolbox$manual_tool_runner.coverage" NAME="manual_tool_runner Coverage Results" MODIFIED="1694214564655" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../maya_scripts" />
     <SUITE FILE_PATH="coverage/ScriptsInMaya$calculator.coverage" NAME="calculator Coverage Results" MODIFIED="1694108026249" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../Scripts_Private/Python/PythonScripts/personal_projects/components" />
-    <SUITE FILE_PATH="coverage/MayaToolbox$Update_Scripts_to_Local.coverage" NAME="Update Scripts to Local Coverage Results" MODIFIED="1694213865790" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/MayaToolbox$Update_Scripts_to_Local.coverage" NAME="Update Scripts to Local Coverage Results" MODIFIED="1694214786598" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/ScriptsInMaya$maya_scripts_inserter.coverage" NAME="maya_scripts_inserter Coverage Results" MODIFIED="1694109376699" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
