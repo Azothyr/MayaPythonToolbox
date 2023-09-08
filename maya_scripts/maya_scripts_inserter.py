@@ -11,9 +11,9 @@ Set a sys env variable "pythonpath" with script folder path value.
 import os
 import platform
 from textwrap import dedent
-from azothyr_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
-from azothyr_tools.cus_funcs.file_tools import (clear_directory,
-                                                transfer_py_dir_in_current, write_to_file)
+from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+from script_tools.cus_funcs.file_tools import (clear_directory,
+                                               transfer_py_dir_in_current, write_to_file)
 
 if __name__ == "__main__":
     if platform.system() == "Windows":
@@ -21,6 +21,7 @@ if __name__ == "__main__":
                                                                          maya=True,
                                                                          maya_exe=True,
                                                                          user_setup=True)
+        print(repo, maya_scripts_folder, maya_path, user_setup_path)
         if repo is None:
             print("No repo found")
             exit()

@@ -12,7 +12,6 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="PythonScripts.CS1410_Summer2023.Projects.payable.PayType.cash" />
-          <option value="tests.math_func_tests.unittest" />
         </list>
       </option>
     </inspection_tool>

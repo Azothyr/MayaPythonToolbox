@@ -2,6 +2,7 @@ import maya.cmds as cmds
 import os
 from functools import partial
 from maya_scripts.ui import color_change_ui, control_ui, joint_ui, toolbox_ui, utilities_ui
+from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
 
 
 def run_script(script_path, *_):
@@ -29,10 +30,10 @@ def create_tools_menu():
     cmds.menu("customToolsMenu", label="Custom Tools", parent="MayaWindow", tearOff=True, allowOptionBoxes=True)
 
     # Define the directory where the custom scripts reside
-    script_directory =
+    script_directory = get_path(maya_ui=True)
 
     # List all scripts in the directory
-    scripts = [script for script in os.listdir(script_directory) if script.endswith(('.mel', '_ui.py'))]
+    scripts = [script for script in os.listdir(script_directory) if script.endswith(('_ui.mel', '_ui.py'))]
 
     for script in scripts:
         print("Original Script:", script)

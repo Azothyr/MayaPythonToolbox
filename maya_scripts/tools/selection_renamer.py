@@ -1,5 +1,6 @@
 import maya.cmds as cmds
-from maya_scripts.utilities import selection_check, custom_exception
+from maya_scripts.utilities import selection_check
+from script_tools.components import custom_exception
 
 
 def _single_renamer(new_name, obj):

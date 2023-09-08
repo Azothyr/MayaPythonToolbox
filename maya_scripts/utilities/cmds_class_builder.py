@@ -189,9 +189,9 @@ def main(output_file_path="", name=""):
     text_data = _get_data_from_file(src)
     if output_file_path == "":
         if "Demon" in os.path.expanduser("~"):
-            output_file_path = "C:\\GitRepos\\MayaPythonToolbox\\ScriptsInMaya\\maya_scripts\\"
+            output_file_path = "C:\\GitRepos\\MayaPythonToolbox\\maya_scripts\\maya_scripts\\"
         elif "zacst" in os.path.expanduser("~"):
-            output_file_path = "C:\\Repos\\MayaPythonToolbox\\ScriptsInMaya\\maya_scripts\\"
+            output_file_path = "/\\maya_scripts\\"
         else:
             raise ValueError("Must give an output file path")
     update_file_path = os.path.expanduser(f"~\\Documents\\maya\\customscripts\\maya_scripts\\")

@@ -1,5 +1,5 @@
 import os
-from azothyr_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
 
 base_path = get_path(maya_info=True)
 arg_lib = {

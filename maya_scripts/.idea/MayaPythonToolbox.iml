@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$/../Maya_DevKit/completion/py" />
+    <content url="file://$MODULE_DIR$/../Maya_DevKit/completion/py">
+      <sourceFolder url="file://$MODULE_DIR$/../Maya_DevKit/completion/py" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$" />
-    <content url="file://$USER_HOME$/Documents/custom_scripts" />
+    <content url="file://$USER_HOME$/Documents/custom_scripts">
+      <sourceFolder url="file://$USER_HOME$/Documents/custom_scripts" isTestSource="true" />
+    </content>
     <orderEntry type="jdk" jdkName="Maya Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

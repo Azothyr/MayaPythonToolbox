@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from maya_scripts.utilities import custom_exception as util
+from script_tools.components.custom_exception import CustomException
 
 
 def is_selection(_selection=None):
@@ -7,7 +7,7 @@ def is_selection(_selection=None):
         _selection = cmds.ls(selection=True)
 
     if not _selection:
-        raise util.CustomException("No objects selected in Maya!")
+        raise CustomException("No objects selected in Maya!")
     return _selection
 
 

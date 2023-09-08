@@ -1,8 +1,8 @@
 import textwrap
 import os
 import importlib.util
-from azothyr_tools.cus_funcs.file_tools import write_to_file
-from azothyr_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+from script_tools.cus_funcs.file_tools import write_to_file
+from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
 
 
 def _load_map_from_file_path(file_path):
