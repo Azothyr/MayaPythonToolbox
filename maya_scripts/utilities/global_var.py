@@ -61,3 +61,12 @@ class GlobalVar:
             self.globals_dict[self._name] = self._value
         else:
             raise TypeError(f"'{type(self._value).__name__}' object has no method 'append'")
+
+    def clear(self):
+        try:
+            if isinstance(self._value, list):
+                self._value = []
+            else:
+                self._value = None
+        finally:
+            self.globals_dict[self._name] = self._value

@@ -11,46 +11,44 @@ Set a sys env variable "pythonpath" with script folder path value.
 import os
 import platform
 from textwrap import dedent
+from maya_scripts.utilities.maya_setup import push_scripts_to_sys
 from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
 from script_tools.cus_funcs.file_tools import (clear_directory,
                                                transfer_py_dir_in_current, write_to_file)
 
-if __name__ == "__main__":
+
+def check_if_windows():
     if platform.system() == "Windows":
-        repo, maya_scripts_folder, maya_path, user_setup_path = get_path(maya_repo=True,
-                                                                         maya=True,
-                                                                         maya_exe=True,
-                                                                         user_setup=True)
-        print(repo, maya_scripts_folder, maya_path, user_setup_path)
-        if repo is None:
-            print("No repo found")
-            exit()
-        code = dedent(f"""\
-            import maya.cmds as cmds
-            import sys
-            from maya_scripts.ui import main_win_tab
-            from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
-            
-            
-            # Set Maya command line to Pycharm listener
-            if not cmds.commandPort(":4434", query=True):
-                cmds.commandPort(name=":4434")
-
-            # Add custom scripts folder to sys.path
-            scripts_folder = get_path(custom_scripts=True)
-            if scripts_folder not in sys.path:
-                sys.path.append(scripts_folder)
-            
-            # Create Custom Tools tab at the top of the Maya main window for every scene
-            cmds.scriptJob(event=("SceneOpened", main_win_tab.create_tools_menu))
-            """)
-        os.makedirs(maya_scripts_folder, exist_ok=True)
-
-        clear_directory(maya_scripts_folder)
-        _exceptions = ["maya_scripts_inserter.py", "manual_tool_runner.py", "Scratch.py"]
-
-        transfer_py_dir_in_current(repo, maya_scripts_folder, _exceptions)
-
-        write_to_file(user_setup_path, code, completion_txt=f"UserSetup.py created successfully at: {user_setup_path}")
+        return True
     else:
         raise RuntimeError(f"Unsupported platform: {platform.system()}")
+
+
+def main():
+    repo, maya_scripts_folder, maya_path, user_setup_path = get_path(maya_repo=True,
+                                                                     maya=True,
+                                                                     maya_exe=True,
+                                                                     user_setup=True)
+    # print(repo, maya_scripts_folder, maya_path, user_setup_path)
+    if repo is None:
+        print("No repo found")
+        exit()
+    code = dedent(f"""\
+            from maya_scripts.utilities import set_maya_on_start
+
+            set_maya_on_start()
+            """)
+    os.makedirs(maya_scripts_folder, exist_ok=True)
+
+    clear_directory(maya_scripts_folder)
+    _exceptions = ["maya_scripts_inserter.py", "manual_tool_runner.py", "Scratch.py"]
+
+    transfer_py_dir_in_current(repo, maya_scripts_folder, _exceptions)
+
+    write_to_file(user_setup_path, code, completion_txt=f"UserSetup.py created successfully at: {user_setup_path}")
+
+    push_scripts_to_sys()
+
+
+if __name__ == "__main__":
+    main()
