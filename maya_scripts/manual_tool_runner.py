@@ -51,5 +51,6 @@ def create_tools_menu():
 
     print("Script Directory:", script_directory)
 
+
 script_directory = get_path(maya_ui=True)
 print(script_directory)
