@@ -1,12 +1,33 @@
+"""
+Script to automate the creation of Maya commands base classes and their associated argument maps.
+
+last update: 2023-09-12
+"""
 import os
 from maya_scripts.utilities import arg_map_utils as map_handler
 from script_tools.components.custom_exception import CustomException
+from script_tools.cus_funcs.file_tools import read_from_file as reader
 
 
 def _get_data_from_file(src):
+    """
+    Parse data from the provided source file. It especially handles multi-line records enclosed in
+    parentheses and returns a processed list of these records.
+
+    Expected input file format: if desired output for one line spans multiple lines, code expects that the first
+    line will start with a '(' and the last line will start with a ')' and that all lines in between will be merged to
+    form one line.
+
+    Args:
+        src (str): Path to the source file.
+
+    Returns:
+        list: Processed records from the source file.
+    """
     result = []
     buffer = ""
     inside_parenthesis = False
+    file_contents = reader(src)
 
     with open(src, "r") as f:
         for line in f:
@@ -34,6 +55,15 @@ def _get_data_from_file(src):
 
 
 def _process_variables(text):
+    """
+    Process the extracted variable text and return organized data.
+
+    Args:
+        text (list): Raw extracted data.
+
+    Returns:
+        tuple: Organized long names, short names, types, properties, and descriptions.
+    """
     prop_values = {
         "createqueryeditmultiuse": "Create|Query|Edit|Multi-use",
         "createqueryedit": "Create|Query|Edit",
@@ -72,6 +102,15 @@ def _process_variables(text):
 
 
 def class_arg_map_creator(data):
+    """
+    Create an argument map and class map from the provided data.
+
+    Args:
+        data (tuple): Parsed long names, short names, types, properties, and descriptions.
+
+    Returns:
+        tuple: Argument map and class map.
+    """
     long_names, short_names, types, properties, descriptions = data
     arg_map = {}
     class_map = []
@@ -105,6 +144,19 @@ def class_arg_map_creator(data):
 
 
 def write_to_specific_file(txt, ofp, ufp, handler_func, *handler_args, ):
+    """
+    Writes the given text to a specific file, handling duplicates and file creation if necessary.
+
+    Args:
+        txt (str): Text to write.
+        ofp (str): Output file path.
+        ufp (str): Update file path.
+        handler_func (function): Function to handle the content generation.
+        *handler_args: Variable list of arguments to be passed to handler_func.
+
+    Returns:
+        str: Status message indicating the outcome of the operation.
+    """
     duplicate, problem = _check_duplicates(ufp, txt)
     if duplicate is None:
         print(problem)
@@ -128,6 +180,16 @@ def write_to_specific_file(txt, ofp, ufp, handler_func, *handler_args, ):
 
 
 def arg_map_handler(arg_map, cls):
+    """
+    Generates the content for the argument map file.
+
+    Args:
+        arg_map (dict): Argument map data.
+        cls (tuple): Class name information.
+
+    Returns:
+        str: Generated content for the argument map file.
+    """
     content = [f"{cls[0]}_arg_map = {{"]
     for short_name, attribute_data in arg_map.items():
         line = f"\t\"{short_name}\": {{\n"
@@ -142,6 +204,16 @@ def arg_map_handler(arg_map, cls):
 
 
 def class_handler(txt, cls):
+    """
+    Generates the content for the base class file.
+
+    Args:
+        txt (str): Template or information for the content.
+        cls (tuple): Class name information.
+
+    Returns:
+        str: Generated content for the base class file.
+    """
     class_name = cls[0][0].capitalize() + cls[0][1::] + cls[1].capitalize()
     lower_name = cls[0]
     content = [
@@ -156,6 +228,16 @@ def class_handler(txt, cls):
 
 
 def _check_duplicates(path, check_lyst):
+    """
+    Checks for duplicate lines in a file against a provided list.
+
+    Args:
+        path (str): Path to the file to check.
+        check_lyst (list): List of lines to check for duplicates.
+
+    Returns:
+        tuple: Boolean indicating if duplicates were found, and a related message.
+    """
     if not os.path.exists(path):
         return None, f"File {path} does not exist!"
 
@@ -170,12 +252,31 @@ def _check_duplicates(path, check_lyst):
 
 
 def _create_file(file_path):
+    """
+    Creates an empty file at the given path.
+
+    Args:
+        file_path (str): Path where the file should be created.
+    """
     with open(file_path, 'w'):
         pass
     print(f"File created at {file_path}")
 
 
 def write_to_file(ofp, ufp, arg_items, class_items, name):
+    """
+    Write the generated content for argument maps and class attributes to respective files.
+
+    Args:
+        ofp (str): Base output file path.
+        ufp (str): Update file path.
+        arg_items (dict): Argument map items.
+        class_items (dict): Class map items.
+        name (str): Name for the class.
+
+    Returns:
+        str: Status message indicating the outcome of the operations.
+    """
     files = [f'info\\{name[0]}_arg_map.py', f'components\\{name[0]}_base.py']
     output_paths = []
     update_paths = []
@@ -192,6 +293,13 @@ def write_to_file(ofp, ufp, arg_items, class_items, name):
 
 
 def main(output_file_path="", name=""):
+    """
+    Main function: reads Maya flags, processes the data, and writes the necessary files.
+
+    Args:
+        output_file_path (str, optional): Destination path for the output files. Defaults to an inferred path.
+        name (str, optional): Name of the class to be generated. Defaults to "test".
+    """
     src = os.path.expanduser("~\\Downloads\\mayaflags.txt")
     text_data = _get_data_from_file(src)
     if output_file_path == "":
