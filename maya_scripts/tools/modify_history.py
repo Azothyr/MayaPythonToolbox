@@ -17,7 +17,7 @@ def _delete_history(obj):
     print(f"Deleted {obj} history.")
 
 
-def perform_freeze_delete(obj_lyst):
+def freeze_delete(obj_lyst):
     for obj in obj_lyst:
         _delete_history(obj)
         _freeze_transformations(obj)

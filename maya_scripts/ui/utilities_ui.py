@@ -79,7 +79,7 @@ def freeze_del_history_ui(_parent_ui, tool):
     cmds.text(l="Freeze the transformations and delete history of selected objects", p=f'{tool}_top_row')
 
     def on_execute(*_):
-        modify_history.perform_freeze_delete(cmds.ls(sl=True))
+        modify_history.freeze_delete(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Freeze and Delete History", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return freeze_tab

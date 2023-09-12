@@ -33,9 +33,7 @@ def _sequential_renamer(txt, lyst):
 
 def perform_rename(txt, selection=None):
     try:
-        print(f"txt: {txt}")
-        print(f"selection: {selection}")
-        selection_check.is_selection(selection)
+        selection_check.check_selection(selection)
         if len(selection) > 1 and "#" not in txt:
             txt = txt + "##"
     except CustomException as err:
@@ -46,3 +44,20 @@ def perform_rename(txt, selection=None):
         new_names = _single_renamer(txt, selection)
 
     return new_names
+
+
+def rename_selected():
+    """
+    Renames selected objects.
+    """
+    selection = selection_check.check_selection()
+    new_name = cmds.promptDialog(
+        title='Rename',
+        message='Enter Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel')
+    if new_name == 'OK':
+        new_name = cmds.promptDialog(query=True, text=True)
+        perform_rename(new_name, selection)

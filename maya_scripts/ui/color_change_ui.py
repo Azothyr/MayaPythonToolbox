@@ -30,7 +30,7 @@ def _ui_setup(parent_ui, tool):
 
     def on_execute(*_):
         selected_color = color_option_menu.query('value')
-        objects = selection_check.is_selection()
+        objects = selection_check.check_selection()
         color_tool.change_color(selected_color, objects)
 
     exec_button = Button(f'{tool}_button', l="Change Color",

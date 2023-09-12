@@ -7,8 +7,10 @@ def parent_selected(lyst):
     first is the lowest step)
     Returns: top of hierarchy selected
     """
+    if isinstance(lyst, str):
+        lyst = [lyst]
+    cmds.select(clear=True)
     for value in range(len(lyst)):
-        cmds.select(clear=True)
         cmds.select(lyst[value])
         if (len(lyst) - 1) > value:
             cmds.select(lyst[value + 1], add=True)
@@ -22,6 +24,8 @@ def unparent_selected(lyst):
     first is the lowest step)
     Returns: top of hierarchy selected
     """
+    if isinstance(lyst, str):
+        lyst = [lyst]
     for obj in lyst:
         cmds.select(clear=True)
         parent = cmds.listRelatives(obj, parent=True)
