@@ -25,16 +25,19 @@ def check_if_windows():
 
 
 def main():
+    if not check_if_windows():
+        exit()
     repo, maya_scripts_folder, maya_path, user_setup_path = get_path(maya_repo=True,
                                                                      maya=True,
                                                                      maya_exe=True,
-                                                                     user_setup=True)
+                                                                     user_setup=True,
+                                                                     debug=True)
     # print(repo, maya_scripts_folder, maya_path, user_setup_path)
     if repo is None:
         print("No repo found")
         exit()
     code = dedent(f"""\
-            from maya_scripts.utilities import set_maya_on_start
+            from maya_scripts.utilities.maya_setup import set_maya_on_start
 
             set_maya_on_start()
             """)

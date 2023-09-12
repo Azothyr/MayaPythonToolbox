@@ -1,10 +1,10 @@
 import maya.cmds as cmds
-from maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_commands, modify_history
+from maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_cmds, modify_history, parent_cmds
 from maya_scripts.components.window_base import WindowBase as Window
 
 
-def layer_cmds_ui(parent_ui, tool):
-    layer_cmds_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.2, .2, .35], p=parent_ui)
+def layer_cmds_ui(_parent_ui, tool):
+    layer_cmds_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.2, .2, .35], p=_parent_ui)
     cmds.rowColumnLayout(f'{tool}_selection_row', p=f'{tool}_base', adj=True,
                          nc=2, cal=[(1, 'center'), (2, 'left')], bgc=[.5, .5, .5])
     cmds.columnLayout(f'{tool}_select_1', p=f'{tool}_selection_row')
@@ -21,8 +21,8 @@ def layer_cmds_ui(parent_ui, tool):
     return layer_cmds_tab
 
 
-def axis_visibility_ui(parent_ui, tool):
-    axis_visibility_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.1, .1, .3], p=parent_ui)
+def axis_visibility_ui(_parent_ui, tool):
+    axis_visibility_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.1, .1, .3], p=_parent_ui)
 
     cmds.rowColumnLayout(f'{tool}_top_row', p=f'{tool}_base', adj=True, bgc=[.5, .5, .5])
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
@@ -35,22 +35,44 @@ def axis_visibility_ui(parent_ui, tool):
     return axis_visibility_tab
 
 
-def constrain_ui(parent_ui, tool):
-    parent_scale_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .1, .1], p=parent_ui)
+def parent_scale_ui(_parent_ui, tool):
+    parent_scale_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .1, .1], p=_parent_ui)
 
     cmds.rowColumnLayout(f'{tool}_top_row', p=f'{tool}_base', adj=True, bgc=[.5, .5, .5])
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
     cmds.text(l="Parent, Scale constrain between every other selected objects", p=f'{tool}_top_row')
 
     def on_execute(*_):
-        constrain_commands.parent_scale_constrain(cmds.ls(sl=True))
+        constrain_cmds.parent_scale_constrain(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Parent and Scale", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return parent_scale_tab
 
 
-def freeze_del_history_ui(parent_ui, tool):
-    freeze_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.2, .2, .35], p=parent_ui)
+def parent_tool_ui(_parent_ui, tool1='parent', tool2='unparent'):
+    parent_tab = cmds.columnLayout(f'{tool1}_base', adj=True, bgc=[.3, .1, .1], p=_parent_ui)
+
+    cmds.rowColumnLayout(f'{tool1}_top_row1', p=f'{tool1}_base', adj=True, bgc=[.5, .5, .5])
+    cmds.columnLayout(f'{tool1}_bot_button1', p=f'{tool1}_base', adj=True, w=200)
+    cmds.text(l="Parent selected objects (Last object is parent of all children, first is the lowest step)",
+              p=f'{tool1}_top_row1')
+
+    cmds.rowColumnLayout(f'{tool1}_top_row2', p=f'{tool1}_base', adj=True, bgc=[.5, .5, .5])
+    cmds.columnLayout(f'{tool1}_bot_button2', p=f'{tool1}_base', adj=True, w=200)
+
+    def on_execute1(*_):
+        parent_cmds.parent_selected(cmds.ls(sl=True))
+
+    def on_execute2(*_):
+        parent_cmds.unparent_selected(cmds.ls(sl=True))
+
+    cmds.button(f'{tool1}_button', l="Parent", p=f'{tool1}_bot_button1', c=on_execute1, bgc=[0, 0, 0])
+    cmds.button(f'{tool2}_button', l="Un_Parent", p=f'{tool1}_bot_button2', c=on_execute2, bgc=[0, 0, 0])
+    return parent_tab
+
+
+def freeze_del_history_ui(_parent_ui, tool):
+    freeze_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.2, .2, .35], p=_parent_ui)
 
     cmds.rowColumnLayout(f'{tool}_top_row', p=f'{tool}_base', adj=True, bgc=[.5, .5, .5])
     cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
@@ -63,13 +85,14 @@ def freeze_del_history_ui(parent_ui, tool):
     return freeze_tab
 
 
-def _setup_ui(parent_ui):
-    main_layout = cmds.formLayout('util_form', p=parent_ui)
+def _setup_ui(_parent_ui):
+    main_layout = cmds.formLayout('util_form', p=_parent_ui)
 
     # Create each UI for tools
     layer_cmd_ui = layer_cmds_ui(main_layout, 'layer_cmds')
     axis_visibility_ui_elem = axis_visibility_ui(main_layout, 'axis_visibility')
-    constrain_ui_elem = constrain_ui(main_layout, 'constrain')
+    constrain_ui_elem = parent_scale_ui(main_layout, 'constrain')
+    parent_tool_ui_elem = parent_tool_ui(main_layout, 'parent', 'un_parent')
     freeze_del_history_ui_elem = freeze_del_history_ui(main_layout, 'freeze_del_history')
 
     # Attach elements in form layout
@@ -82,13 +105,16 @@ def _setup_ui(parent_ui):
                         (axis_visibility_ui_elem, 'right', 5),
                         (constrain_ui_elem, 'left', 5),
                         (constrain_ui_elem, 'right', 5),
+                        (parent_tool_ui_elem, 'left', 5),
+                        (parent_tool_ui_elem, 'right', 5),
                         (freeze_del_history_ui_elem, 'left', 5),
                         (freeze_del_history_ui_elem, 'right', 5),
                     ],
                     attachControl=[
                         (axis_visibility_ui_elem, 'top', 5, layer_cmd_ui),
                         (constrain_ui_elem, 'top', 5, axis_visibility_ui_elem),
-                        (freeze_del_history_ui_elem, 'top', 5, constrain_ui_elem),
+                        (parent_tool_ui_elem, 'top', 5, constrain_ui_elem),
+                        (freeze_del_history_ui_elem, 'top', 5, parent_tool_ui_elem),
                     ])
     return main_layout
 
@@ -103,12 +129,13 @@ def create_ui_window(manual_run=False):
                  resizeToFitChildren=True,
                  nde=True)
 
-    main_layout = cmds.formLayout()
+    main_layout = cmds.formLayout('main_layout')
 
     # Create each UI for tools
     layer_cmd_ui = layer_cmds_ui(main_layout, 'layer_cmds')
     axis_visibility_ui_elem = axis_visibility_ui(main_layout, 'axis_visibility')
-    constrain_ui_elem = constrain_ui(main_layout, 'constrain')
+    constrain_ui_elem = parent_scale_ui(main_layout, 'constrain')
+    parent_tool_ui_elem = parent_tool_ui(main_layout, 'parent', 'un_parent')
     freeze_del_history_ui_elem = freeze_del_history_ui(main_layout, 'freeze_del_history')
 
     # Attach elements in form layout
@@ -121,13 +148,16 @@ def create_ui_window(manual_run=False):
                         (axis_visibility_ui_elem, 'right', 5),
                         (constrain_ui_elem, 'left', 5),
                         (constrain_ui_elem, 'right', 5),
+                        (parent_tool_ui_elem, 'left', 5),
+                        (parent_tool_ui_elem, 'right', 5),
                         (freeze_del_history_ui_elem, 'left', 5),
                         (freeze_del_history_ui_elem, 'right', 5),
                     ],
                     attachControl=[
                         (axis_visibility_ui_elem, 'top', 5, layer_cmd_ui),
                         (constrain_ui_elem, 'top', 5, axis_visibility_ui_elem),
-                        (freeze_del_history_ui_elem, 'top', 5, constrain_ui_elem),
+                        (parent_tool_ui_elem, 'top', 5, constrain_ui_elem),
+                        (freeze_del_history_ui_elem, 'top', 5, parent_tool_ui_elem),
                     ])
 
     win.initialize()

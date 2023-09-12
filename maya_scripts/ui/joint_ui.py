@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 from functools import partial
-from maya_scripts.tools import (joint_creator, selection_renamer, parent_selection, center_locator,
-                                       joint_axis_vis_toggle)
+from maya_scripts.tools import (joint_creator, selection_renamer, parent_cmds, center_locator,
+                                joint_axis_vis_toggle)
 from maya_scripts.components.color_library import ColorIndex as ColorLib
 from maya_scripts.components.window_base import WindowBase as Window
 from maya_scripts.components.button_base import ButtonBase as Button
@@ -29,11 +29,10 @@ def _ui_setup(parent_ui, tool):
         """
         global center_locations
         center = center_locator.get_obj_center(cmds.ls(sl=True))
-        for xyz in center:
-            center_locations.append(xyz)
-            center_txt = str(xyz)
-            cmds.textScrollList('position_list', edit=True, append=f'{len(center_locations)}: {center_txt}')
-            cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
+        center_locations.append(center)
+        center_txt = str(center)
+        cmds.textScrollList('position_list', edit=True, append=f'{len(center_locations)}: {center_txt}')
+        cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
 
     def move_center_item_up(*_):
         global center_locations
@@ -164,9 +163,9 @@ def _ui_setup(parent_ui, tool):
     naming_option = cmds.optionMenu("NamingOpMenu", changeCommand=update_name_field,
                                     backgroundColor=[.5, .5, .5], parent='name_columns')
     cmds.menuItem(label='User Input', parent="NamingOpMenu")
-    sequential_schemas = ['Spine', 'Arm', 'L_Arm', 'R-Arm', 'Finger', 'L_Finger', 'R_Finger',
+    sequential_schemas = ['Spine', 'Arm', 'L_Arm', 'R-Arm', 'L_Clav', 'R_Clav', 'Finger', 'L_Finger', 'R_Finger',
                           'Leg', 'L_Leg', 'R_Leg', 'L_FT_Leg', 'R_FT_Leg', 'L_BK_Leg', 'R_BK_Leg',
-                          'L_Toe', 'R_Toe', 'Head']
+                          'L_Toe', 'R_Toe', 'Head', 'Neck', 'Tail', 'L_Tail', 'R_Tail', 'Eye', 'L_Eye', 'R_Eye']
     single_schemas = ['ROOT_JNT', 'COG_Jnt', 'Hip_Jnt']
     for name in sequential_schemas:
         cmds.menuItem(label=f'{name}_##_Jnt', parent="NamingOpMenu")
@@ -194,6 +193,7 @@ def _ui_setup(parent_ui, tool):
 
     def on_execute(*_):
         global center_locations
+        # add a check box for clearing list on execute
         rename = cmds.checkBox(rename_bool, query=True, value=True)
         naming_input = cmds.textField(name_input, query=True, text=True)
         name_choice = cmds.optionMenu(naming_option, query=True, value=True)
@@ -218,7 +218,7 @@ def _ui_setup(parent_ui, tool):
             selected_joints.reverse()
             if parent_name != 'None':
                 selected_joints.append(str(parent_name))
-            parent_selection.parent_selected(selected_joints)
+            parent_cmds.parent_selected(selected_joints)
 
     update_joint_list()
 
@@ -232,7 +232,7 @@ def create_ui_window(manual_run=False):
     joint_ui_window = "joint_ui_window"
     if cmds.window(joint_ui_window, ex=True):
         cmds.deleteUI(joint_ui_window)
-    cmds.window(joint_ui_window, t="Toolbox", wh=(100, 50), mxb=False, mnb=True, rtf=True, nde=True)
+    cmds.window(joint_ui_window, t="Joint Toolbox", wh=(100, 50), mxb=False, mnb=True, rtf=True, nde=True)
     tabs_ui = cmds.tabLayout('tabs_ui', innerMarginWidth=5, innerMarginHeight=5)
 
     joint_tab = _ui_setup(tabs_ui, 'joint')

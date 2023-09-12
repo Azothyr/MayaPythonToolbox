@@ -22,6 +22,11 @@ def set_tool_tab_on_start():
     cmds.scriptJob(event=("SceneOpened", main_win_tab.create_tools_menu))
 
 
+def refresh_tools():
+    # Refresh the tools menu
+    main_win_tab.create_tools_menu()
+
+
 def set_maya_on_start():
     set_maya_command_port()
     push_scripts_to_sys()

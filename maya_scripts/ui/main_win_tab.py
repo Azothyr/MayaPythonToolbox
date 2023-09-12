@@ -50,3 +50,7 @@ def create_tools_menu():
         )
 
     print("Script Directory:", script_directory)
+
+
+if __name__ == "__main__":
+    create_tools_menu()
