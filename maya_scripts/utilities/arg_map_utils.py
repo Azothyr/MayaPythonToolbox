@@ -23,6 +23,7 @@ def retrieve_metadata(attr, arg_map):
     if isinstance(arg_map, list) or isinstance(arg_map, tuple):
         arg_map = _load_map_from_file_path(arg_map)
     formatted_meta = []
+    print(attr)
     if str(attr).lower() == "all":
         for k, v in arg_map.items():
             try:

@@ -1,5 +1,6 @@
 import os
 from maya_scripts.utilities import arg_map_utils as map_handler
+from script_tools.components.custom_exception import CustomException
 
 
 def _get_data_from_file(src):
@@ -49,13 +50,19 @@ def _process_variables(text):
     }
 
     items = []
-    for idx, line in enumerate(text[::2]):
+    for idx, line in enumerate(text):
         parts = [item.strip() for item in line.split('\t')]
         if len(parts) < 3:
-            print(f"Error: Line {idx * 2} '{line}' does not have 3 tab-separated values.")
-            continue
-        items.append(parts)
-
+            if idx % 2 == 0:
+                error_txt = (f"Error: Line {idx - 2} >>>'{text[idx - 2]}'<<<\n"
+                             f"\n>>>\tThis line from the file is causing the error."
+                             "If the description in the file spans multiple lines,"
+                             "\n>>>\tmake sure to put a '(' at the start of the first"
+                             " line and a ')' at the beginning of the last line"
+                             "\n>>>\tof the description.")
+                raise CustomException(error=error_txt, exit=True)
+        else:
+            items.append(parts)
     long_names, short_names = zip(*[name.replace(")", "").split('(') for name, _, _ in items])
     types = [type_.strip() for _, type_, _ in items]
     properties = [prop_values[property_.strip()] for _, _, property_ in items]
@@ -97,7 +104,7 @@ def class_arg_map_creator(data):
     return arg_map, class_map
 
 
-def write_to_specific_file(txt, ofp, ufp, handler_func, *handler_args,):
+def write_to_specific_file(txt, ofp, ufp, handler_func, *handler_args, ):
     duplicate, problem = _check_duplicates(ufp, txt)
     if duplicate is None:
         print(problem)
@@ -209,4 +216,5 @@ def main(output_file_path="", name=""):
 
 
 if __name__ == "__main__":
-    main(input("Where would you like these files to output?"), input("What will the name of this class be?"))
+    main(input("Where would you like these files to output?\nPress enter for default...\n>>\t"),
+         name=input("What will the name of this class be?\n>>\t"))
