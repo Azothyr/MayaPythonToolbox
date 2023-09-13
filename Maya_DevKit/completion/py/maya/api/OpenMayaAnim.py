@@ -796,7 +796,7 @@ class _MFnDependencyNode(_MFnBase):
         pass
     def addExternalContentForFileAttr(*args, **kwargs):
         """
-        Adds content info to the specified table from a file path attribute.
+        Adds content config to the specified table from a file path attribute.
         """
         pass
     def affectsAnimation(*args, **kwargs):
@@ -971,7 +971,7 @@ class _MFnDependencyNode(_MFnBase):
         pass
     def setExternalContentForFileAttr(*args, **kwargs):
         """
-        Sets content info in the specified attribute from the table.
+        Sets content config in the specified attribute from the table.
         """
         pass
     def setFlag(*args, **kwargs):
@@ -1168,7 +1168,7 @@ class MAnimMessage(_MMessage):
         axis, then a single callback event will be invoked with a MObject
         for each of the 5 keyframes.  The MObjects can then be used in the
         MFnKeyframeDelta function set. Refer to MFnKeyframeDelta function set
-        documentation for more info.
+        documentation for more config.
         
          * function - callable which will be passed a MObjectArray object containing
            an array of keyframes that were edited, and the clientData object
@@ -1210,7 +1210,7 @@ class MAnimMessage(_MMessage):
         callback event will be invoked with a MObject for each of the 5
         keyframes.  The MObjects can then be used in the MFnKeyframeDelta
         function set. Refer to MFnKeyframeDelta function set documentation
-        for more info.
+        for more config.
         
          * animNode (MObject) - the param curve node you want to watch.
          * function - callable which will be passed a MObject indicating the

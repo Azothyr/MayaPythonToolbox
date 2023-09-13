@@ -15,7 +15,7 @@ in customer cuts.
     {
         "dbtrace" :
         {
-            "help" : "Synopsis: dbtrace [flags]Flags:   -q -query   -f -filter   String   -i -info       -k -keyword  String (multi-use) (Query Arg Optional)   -l -level    UnsignedInt (multi-use) (Query Arg Mandatory)   -m -mark       -o -output   String -off -           -t -title    String  -tm -timed    on|off   -v -verbose Command Type: Command",
+            "help" : "Synopsis: dbtrace [flags]Flags:   -q -query   -f -filter   String   -i -config       -k -keyword  String (multi-use) (Query Arg Optional)   -l -level    UnsignedInt (multi-use) (Query Arg Mandatory)   -m -mark       -o -output   String -off -           -t -title    String  -tm -timed    on|off   -v -verbose Command Type: Command",
             "keywords" :
             {
                 "compute" : "High level trace of the compute path."
@@ -101,13 +101,13 @@ def dbtrace_capabilities():
     """
     Find the current capabilities for the dbtrace command and return it
     in a dictionary. Only the help information and a summary of each
-    available keyword derived from the 'info' flag is provided.
+    available keyword derived from the 'config' flag is provided.
     
         {
             "help" : "HELP INFORMATION FROM 'help dbtrace'"
             "keywords" :
             {
-                "KEYWORD" : "SUMMARY FROM 'dbtrace -k KEYWORD -q -info'"
+                "KEYWORD" : "SUMMARY FROM 'dbtrace -k KEYWORD -q -config'"
             }
         }
     """

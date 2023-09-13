@@ -5370,7 +5370,7 @@ def timeEditorClip(*args, **kwargs):
         In query mode, this flag can accept a value.
     
     - duplicateClip : dcl            (bool)          [edit]
-        Duplicate clip into two clips with the same timing info.
+        Duplicate clip into two clips with the same timing config.
     
     - duration : d                   (time)          [create,query]
         Relative duration of the new clip.

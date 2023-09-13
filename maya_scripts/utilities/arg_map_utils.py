@@ -1,8 +1,8 @@
 import textwrap
 import os
 import importlib.util
-from script_tools.cus_funcs.file_tools import write_to_file
-from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+from utils.file_ops import write_to_file
+from utils.file_ops import get_file_path_from_lib as get_path
 
 
 def _load_map_from_file_path(file_path):
@@ -106,7 +106,7 @@ def refresh_arg_lib():
     print("preparing to refresh Arg Library")
     arg_lib_path, arg_maps = get_path(maya_arg_lib=True, arg_maps=True)
     lines_to_write = ["import os",
-                      "from azothyr_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path\n",
+                      "from azothyr_tools.functions.file_tools import get_file_path_from_lib as get_path\n",
                       f"base_path = get_path(maya_info=True)",
                       "arg_lib = {"]
     for key, value in arg_maps:

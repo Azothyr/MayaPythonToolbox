@@ -32,7 +32,7 @@ class ProgressObservable(observable.SingletonObservable):
         """
         Whenever the owner wants to notify observers of progress being done
         on the way to completing the long operation, this should be called
-        with the percentage of progress already done and the info on the
+        with the percentage of progress already done and the config on the
         'suboperation' being computed.
         """
         pass

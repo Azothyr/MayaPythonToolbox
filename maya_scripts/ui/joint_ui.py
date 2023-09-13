@@ -28,7 +28,7 @@ def _ui_setup(parent_ui, tool):
         Calls center_locator module and adds the center to the list.
         """
         global center_locations
-        center = center_locator.get_obj_center(cmds.ls(sl=True))
+        center = center_locator.get_center(cmds.ls(sl=True))
         center_locations.append(center)
         center_txt = str(center)
         cmds.textScrollList('position_list', edit=True, append=f'{len(center_locations)}: {center_txt}')

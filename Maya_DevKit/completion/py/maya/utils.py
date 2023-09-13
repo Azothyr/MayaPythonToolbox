@@ -108,7 +108,7 @@ def formatGuiException(exceptionType, exceptionObject, traceBack, detail='2'):
         exceptionType   : Type of exception
         exceptionObject : Detailed exception information
         traceBack       : Exception traceback stack information
-        detail          : 0 = no trace info, 1 = line/file only, 2 = full trace
+        detail          : 0 = no trace config, 1 = line/file only, 2 = full trace
                           
     To perform an action when an exception occurs without modifying Maya's 
     default printing of exceptions, do the following::
@@ -184,7 +184,7 @@ def _guiExceptHook(exceptionType, exceptionObject, traceBack, detail='2'):
         exceptionType   : Type of exception
         exceptionObject : Detailed exception information
         traceBack       : Exception traceback stack information
-        detail          : 0 = no trace info, 1 = line/file only, 2 = full trace
+        detail          : 0 = no trace config, 1 = line/file only, 2 = full trace
     """
     pass
 def _origShellLogHandler():

@@ -1,7 +1,7 @@
 """
 Bookmarks are saved using the special node nodeGraphEditorBookmarkInfo.
 
-Each Node Editor Bookmark is represented by a nodeGraphEditorBookmarkInfo which stores the bookmark info, i.e. the view state and the graph state, including the state of each individual node in the scene.
+Each Node Editor Bookmark is represented by a nodeGraphEditorBookmarkInfo which stores the bookmark config, i.e. the view state and the graph state, including the state of each individual node in the scene.
 """
 
 

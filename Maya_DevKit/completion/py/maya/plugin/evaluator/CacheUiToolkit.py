@@ -93,7 +93,7 @@ class CacheUiToolkit(CacheUiBase):
     @staticmethod
     def callback_show_cache_correctness_test_details(tool, test_type):
         """
-        Invoked when the user clicks the info button to show cache correctness test details
+        Invoked when the user clicks the config button to show cache correctness test details
         """
         pass
     @staticmethod
@@ -155,7 +155,7 @@ def local_dbg(msg):
 def run_cache_test(test_type, verbose):
     """
     Run the named cache correctness test.
-    The test information is drawn from the test info in CACHE_CORRECTNESS_TESTS.
+    The test information is drawn from the test config in CACHE_CORRECTNESS_TESTS.
     
     :param test_type: Test type - from the keys of CACHE_CORRECTNESS_TESTS
     :param verbose: True means add more detail to the output

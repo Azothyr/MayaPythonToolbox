@@ -646,7 +646,7 @@ class metaReadOnlyAttr(type):
     
     def __setattr__(cls, name, value):
         """
-        overload __setattr__ to forbid modification of read only class info
+        overload __setattr__ to forbid modification of read only class config
         """
         pass
     @staticmethod

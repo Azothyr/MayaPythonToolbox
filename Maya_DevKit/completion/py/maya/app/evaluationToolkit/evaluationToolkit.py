@@ -315,7 +315,7 @@ def setSchedulingTypeOverride(nodeType, schedulingInfo):
     """
     Set the scheduling type override of the given node type.
     
-    The scheduling info is an array of flags for scheduling type to set to true.
+    The scheduling config is an array of flags for scheduling type to set to true.
     """
     pass
 def callback_11_UpdateFreezeInvisibleNodes(tool):
@@ -396,7 +396,7 @@ def callback_06_PrintDeformerClusters(*args, **kwargs): pass
 def callback_08_GenerateFullGraph(*args, **kwargs): pass
 def callback_04_GetEvaluatorInfo(tool, evaluator):
     """
-    Return the evaluator's info value
+    Return the evaluator's config value
     :param tool: The evaluation toolkit manager
     :param evalatuor: The name of the evaluator whose information is to be returned
     """

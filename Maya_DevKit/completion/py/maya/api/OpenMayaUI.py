@@ -1428,7 +1428,7 @@ class _MPxNode(object):
         """
         addExternalContentForFileAttr(table, attr) -> bool
         
-        This method is a helper for derived clases implementing getExternalContent().  It augments the external content info table passed in with an entry describing external content whose location is described by the specified attribute.
+        This method is a helper for derived clases implementing getExternalContent().  It augments the external content config table passed in with an entry describing external content whose location is described by the specified attribute.
         
         The method will not overwrite existing items, i.e. items with the same key. (attribute name).  In this context, overwriting an item means the caller has called this function twice with the same attribute, or that two separate but identically named attributes were used.  If replacing an entry is the desired effect, it is the caller's responsibility to erase the previous item first.
         
@@ -2569,12 +2569,12 @@ class MPxSurfaceShapeUI(object):
         pass
     def drawUV(*args, **kwargs):
         """
-        drawUV(view, info) -> self
+        drawUV(view, config) -> self
         
         This method is called when the surface shape is selected and the texture view is open.  Users should override this method if their custom shape supports UVs.
         
         * view (M3dView) - Texture view in which to draw UVs.
-        * info (MTextureEditorDrawInfo) - Drawing parameters.
+        * config (MTextureEditorDrawInfo) - Drawing parameters.
         """
         pass
     def material(*args, **kwargs):
@@ -3871,7 +3871,7 @@ class _MFnDependencyNode(_MFnBase):
         pass
     def addExternalContentForFileAttr(*args, **kwargs):
         """
-        Adds content info to the specified table from a file path attribute.
+        Adds content config to the specified table from a file path attribute.
         """
         pass
     def affectsAnimation(*args, **kwargs):
@@ -4046,7 +4046,7 @@ class _MFnDependencyNode(_MFnBase):
         pass
     def setExternalContentForFileAttr(*args, **kwargs):
         """
-        Sets content info in the specified attribute from the table.
+        Sets content config in the specified attribute from the table.
         """
         pass
     def setFlag(*args, **kwargs):

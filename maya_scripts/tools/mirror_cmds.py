@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 from maya_scripts.utilities import selection_check
-from maya_scripts.tools import xform_handler, select_cmds, selection_renamer, modify_history, parent_cmds
+from maya_scripts.tools import xform_handler, select_cmds, selection_renamer, history_cmds, parent_cmds
 
 
 def mirror_controls():

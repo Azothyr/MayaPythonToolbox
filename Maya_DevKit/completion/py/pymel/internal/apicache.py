@@ -59,7 +59,7 @@ class ApiCache(BaseApiClassInfoCache):
     def __init__(self, docLocation='None'): pass
     def addMayaType(self, mayaType, apiType='None', updateObj='None'):
         """
-        Add a type to the MayaTypes lists. Fill as many dictionary caches as we have info for.
+        Add a type to the MayaTypes lists. Fill as many dictionary caches as we have config for.
         
             - mayaTypesToApiTypes
             - mayaTypesToApiEnums

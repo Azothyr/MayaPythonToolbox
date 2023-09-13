@@ -92,7 +92,7 @@ class FCP(Translator):
         pass
     def writeClip(self, track_elem, clip_info):
         """
-        Add a clip to the specified track. clip_info must contain the following info:
+        Add a clip to the specified track. clip_info must contain the following config:
         name            = name of the clip item
         duration        = in frames
         enabled         = True/False
@@ -131,7 +131,7 @@ class FCP(Translator):
         pass
     def writeTrack(self, seq_elem, track_info):
         """
-        Add a track to the specified sequence. track_info must contain the following info:
+        Add a track to the specified sequence. track_info must contain the following config:
         
         type            = "audio" or "video"
         name            = name of track

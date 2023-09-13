@@ -272,7 +272,7 @@ class MColorManagementUtilities(object):
         this block of data, the external renderer can  reproduce the same
         color transformations as in Maya
         
-        Returns the color transform data block info (bytearray).
+        Returns the color transform data block config (bytearray).
         """
         pass
     @staticmethod
@@ -3412,7 +3412,7 @@ class MPxDrawOverride(object):
         
         The default implementation makes no changes to 'path', 'components' or 'objectMask' and returns True (i.e. the selection is accepted).
         
-        * selectInfo (MSelectionInfo) - The selection info
+        * selectInfo (MSelectionInfo) - The selection config
         * hitItem (MRenderItem) - The render item hit
         * path [IN/OUT] (MDagPath) - The selected path
         * components [IN/OUT] (MObject) - The selected components
@@ -3475,7 +3475,7 @@ class MPxDrawOverride(object):
         
         This method is called during the hit test phase of Viewport 2.0 selection if wantUserSelection() returns true, in order to override the default hit test implementation for the associated DAG object. 
         
-        The selection info encapsulates the selection states such as the selection region. The draw context along with the user data cached by prepareForDraw() provides information the same as that being passed to the draw callback, thus makes it possible for a draw override to match its custom hit test with its custom drawing (a.k.a. WYSIWYG selection). 
+        The selection config encapsulates the selection states such as the selection region. The draw context along with the user data cached by prepareForDraw() provides information the same as that being passed to the draw callback, thus makes it possible for a draw override to match its custom hit test with its custom drawing (a.k.a. WYSIWYG selection).
         
         If the object is hit, the implementation should add the DAG path and if appropriate its component to selectionList. It is the responsibility of the implementation to add world-space coordinate of the intersection between the selected item and selection ray to worldSpaceHitPts. 
         
@@ -3489,7 +3489,7 @@ class MPxDrawOverride(object):
         
         This method should return true if at least one object was hit. The default value is false. 
         
-        * selectInfo [IN] (MSelectionInfo) - The selection info
+        * selectInfo [IN] (MSelectionInfo) - The selection config
         * context [IN] (MDrawContext) - The draw context
         * objPath [IN] (MDagPath) - The path to the associated DAG object
         * data [IN] (MUserData) - The data cached by prepareForDraw()
@@ -3503,7 +3503,7 @@ class MPxDrawOverride(object):
         
         This method is called during the hit test phase of Viewport 2.0 selection and is used to indicate whether or not the userSelect() method should be called to override the default hit test implementation for the associated DAG object. 
         
-        This method returns false by default. In this case the draw callback method is invoked for the selection pass, with a special shader that encodes each entity with a different plain color, then the draw buffer is scanned and each color found inside the selection region is transformed into hit info that will be used by the later selection interpretation phase, including selected item and world-space hit point. 
+        This method returns false by default. In this case the draw callback method is invoked for the selection pass, with a special shader that encodes each entity with a different plain color, then the draw buffer is scanned and each color found inside the selection region is transformed into hit config that will be used by the later selection interpretation phase, including selected item and world-space hit point.
         
         If a custom hit test implementation is required, this method must be overridden to return true in order for userSelect() to be called.
         """
@@ -5100,7 +5100,7 @@ class MPxGeometryOverride(object):
         
         The default implementation makes no changes to 'path', 'components' or 'objectMask' and returns True (i.e. the selection is accepted).
         
-        * selectInfo (MSelectionInfo) - The selection info
+        * selectInfo (MSelectionInfo) - The selection config
         * hitItem (MRenderItem) - The render item hit
         * path [IN/OUT] (MDagPath) - The selected path
         * components [IN/OUT] (MObject) - The selected components

@@ -23,7 +23,7 @@ def _writeXmlSettings():
 def writeArchive(archivePath, frameData):
     """
     # Write a zip file containing the file textures and
-    # the xml info file
+    # the xml config file
     """
     pass
 def writeXmlFile(xmlFilePath, timeList, fileList, layerList, durationList):

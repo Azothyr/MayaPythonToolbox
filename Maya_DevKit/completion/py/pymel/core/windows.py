@@ -4902,7 +4902,7 @@ def cmdScrollFieldReporter(*args, **kwargs):
         Suppress errors.
     
     - suppressInfo : si              (bool)          [create,query,edit]
-        Suppress info.
+        Suppress config.
     
     - suppressResults : sr           (bool)          [create,query,edit]
         Suppress results.

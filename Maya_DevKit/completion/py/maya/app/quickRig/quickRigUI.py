@@ -357,7 +357,7 @@ def convertSpine(tweakParameters, spineCount, wantHipsTranslation, hipsPosition,
     pass
 def qrAddInfoAttribute(character):
     """
-    This method adds the Quick Rig info attribute to the character node.
+    This method adds the Quick Rig config attribute to the character node.
     
     This attribute is a compound that holds information about meshes and guides
     associated with this character.

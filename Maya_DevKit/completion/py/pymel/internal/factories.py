@@ -533,7 +533,7 @@ class _MetaMayaCommandWrapper(MetaMayaTypeWrapper):
     @classmethod
     def getMelCmd(cls, classdict):
         """
-        Retrieves the name of the mel command the generated class wraps, and whether it is an info command.
+        Retrieves the name of the mel command the generated class wraps, and whether it is an config command.
         
         Intended to be overridden in derived metaclasses.
         """
@@ -558,7 +558,7 @@ class MetaMayaUIWrapper(_MetaMayaCommandWrapper):
 class MetaMayaNodeWrapper(_MetaMayaCommandWrapper):
     """
     A metaclass for creating classes based on node type.  Methods will be added to the new classes
-    based on info parsed from the docs on their command counterparts.
+    based on config parsed from the docs on their command counterparts.
     """
     
     
@@ -567,7 +567,7 @@ class MetaMayaNodeWrapper(_MetaMayaCommandWrapper):
     def getMelCmd(cls, classdict):
         """
         Retrieves the name of the mel command for the node that the generated class wraps,
-        and whether it is an info command.
+        and whether it is an config command.
         
         Derives the command name from the mel node name - so '__melnode__' must already be set
         in classdict.
@@ -753,7 +753,7 @@ def fixCallbacks(inFunc, commandFlags, funcName='None'):
     'passSelf'.  When set to True, an instance of the calling UI class will be
     passed as the first argument.
     
-    if inFunc has been renamed, pass a funcName to lookup command info in apicache.cmdlist
+    if inFunc has been renamed, pass a funcName to lookup command config in apicache.cmdlist
     """
     pass
 def getProxyResult(self, apiClass, method, final_do='()'): pass
@@ -1068,7 +1068,7 @@ def mayaTypeToApiType(mayaType):
 def asEdit(self, func, kwargs, flag, val): pass
 def addMayaType(mayaType, apiType='None'):
     """
-    Add a type to the MayaTypes lists. Fill as many dictionary caches as we have info for.
+    Add a type to the MayaTypes lists. Fill as many dictionary caches as we have config for.
     
     - mayaTypesToApiTypes
     - mayaTypesToApiEnums
@@ -1142,7 +1142,7 @@ def wrapApiMethod(apiClass, methodName, newName='None', proxy='True', overloadIn
     
         #. process input args, if any
         #. call MFnTransform.getTranslation() to get the current translation.
-        #. append to the api undo queue, with necessary info to undo/redo
+        #. append to the api undo queue, with necessary config to undo/redo
            later (the current method, the current args, and the current
            translation)
         #. call MFnTransform.setTranslation() with the passed args

@@ -1501,7 +1501,7 @@ class Attribute(PyNode):
         Returns:
         'unicode'
         
-        Derived from api method `maya.OpenMaya.MPlug.info`
+        Derived from api method `maya.OpenMaya.MPlug.config`
         """
         pass
     def inputs(self, **kwargs):
@@ -2949,7 +2949,7 @@ class AttributeSpec(PyNode):
         pass
     def isRenderSource(self):
         """
-        Returns true if this attribute is a render source. This attribute is used on rendering nodes to override the rendering sampler info.
+        Returns true if this attribute is a render source. This attribute is used on rendering nodes to override the rendering sampler config.
         
         Returns:
         'bool'
@@ -3201,7 +3201,7 @@ class AttributeSpec(PyNode):
         pass
     def setRenderSource(self, state):
         """
-        Sets whether this attribute should be used as a render source attribute. When writing shader plug-ins, it is sometimes useful to be able to modify the sampler info, so upstream shading network can be re- evaluated with different sampler info values.
+        Sets whether this attribute should be used as a render source attribute. When writing shader plug-ins, it is sometimes useful to be able to modify the sampler config, so upstream shading network can be re- evaluated with different sampler config values.
         
         Parameters:
         state : 'bool'

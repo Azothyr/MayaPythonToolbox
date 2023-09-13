@@ -140,7 +140,7 @@ class AnalyticsWindow(object):
     @staticmethod
     def on_info(tool, analytic_name):
         """
-        Callback when the info button is hit for the named analytic.
+        Callback when the config button is hit for the named analytic.
         Pop open a message box with the detailed help provided by the analytic.
         """
         pass

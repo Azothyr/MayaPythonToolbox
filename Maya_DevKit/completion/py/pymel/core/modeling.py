@@ -1380,7 +1380,7 @@ def rebuildCurve(*args, **kwargs):
         arguments, passed either as a tuple or a list.
     
     - smartSurfaceCurveRebuild : scr (bool)          [create,query,edit]
-        If true, curve on surface is rebuild in 3D and 2D info is kept Default:false
+        If true, curve on surface is rebuild in 3D and 2D config is kept Default:false
     
     - smooth : sm                    (float)         []
     

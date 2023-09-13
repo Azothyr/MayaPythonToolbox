@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import sys
 from maya_scripts.ui import main_win_tab
-from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+from utils.file_ops import get_file_path_from_lib as get_path
 
 
 def set_maya_command_port():

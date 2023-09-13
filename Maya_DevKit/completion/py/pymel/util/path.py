@@ -149,7 +149,7 @@ class path(unicode):
         pass
     def copy2(src, dst):
         """
-        Copy data and all stat info ("cp -p src dst").
+        Copy data and all stat config ("cp -p src dst").
         
         The destination may be a directory.
         """
@@ -166,7 +166,7 @@ class path(unicode):
         pass
     def copystat(src, dst):
         """
-        Copy all stat info (mode bits, atime, mtime, flags) from src to dst
+        Copy all stat config (mode bits, atime, mtime, flags) from src to dst
         """
         pass
     def copytree(src, dst, symlinks='False', ignore='None'):

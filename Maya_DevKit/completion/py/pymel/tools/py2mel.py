@@ -116,7 +116,7 @@ def _shortnameByConvention(name):
 def _invalidName(commandName, longname, operation): pass
 def _getArgInfo(obj, allowExtraKwargs='True', maxVarArgs='10', filter='None'):
     """
-    Returns a dict giving info about the arugments for the function/property
+    Returns a dict giving config about the arugments for the function/property
     
     If obj is None, will return the 'defaults'.
     """

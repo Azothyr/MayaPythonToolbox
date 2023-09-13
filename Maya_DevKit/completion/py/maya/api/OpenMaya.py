@@ -279,7 +279,7 @@ class MItMeshFaceVertex(object):
         
         Returns the relative index of the vertex within the current face. This
         index together with the faceId can be used for a fast access to get
-        various info stored per vertex (normals, uvs, colors).
+        various config stored per vertex (normals, uvs, colors).
         """
         pass
     def geomChanged(*args, **kwargs):
@@ -2819,7 +2819,7 @@ class MItDependencyNodes(object):
         Resets the iterator.
         
         
-           dagInfoObject (MIteratorType) - Iterator object having info on filter or filterlist.
+           dagInfoObject (MIteratorType) - Iterator object having config on filter or filterlist.
            filterType (MFn.Type) - Function set type, defaults to MFn.kInvalid.
         """
         pass
@@ -4037,7 +4037,7 @@ class MItDag(object):
         
            rootObject (MObject) - Root node to begin the next traversal.
            rootPath (MDagPath) - Root path to to begin the next traversal. Useful with instances.
-           dagInfoObject (MIteratorType) - Iterator object having info on filter or filterlist.
+           dagInfoObject (MIteratorType) - Iterator object having config on filter or filterlist.
            traversalType (MItDag.TraversalType) - Enumerated type that determines the direction of the traversal, defaults to kDepthFirst.
            filterType (MFn.Type) - Function set type, defaults to MFn.kInvalid
         """
@@ -5281,7 +5281,7 @@ class MExternalContentInfoTable(object):
         * unresolvedLocation (string) - Path as stored in the node (i.e. without any token replacement performed).
         * resolvedLocation (string) - Full path to the content if it exists at the time of creation of this object.
         * contextNodeFullName (string) - The fullname of the URI owner (node) if it applies, an empty string otherwise.
-        * roles (list of strings) - An enumeration of all roles this content plays in the context of the node. The actual strings are not rigidly defined as of this writing. This is mostly for offline browsing of the content info: to assist in sorting content by role.  A better content type system may be introduced later on to        formalize this.
+        * roles (list of strings) - An enumeration of all roles this content plays in the context of the node. The actual strings are not rigidly defined as of this writing. This is mostly for offline browsing of the content config: to assist in sorting content by role.  A better content type system may be introduced later on to        formalize this.
         """
         pass
     def addUnresolvedEntry(*args, **kwargs):
@@ -5542,7 +5542,7 @@ class MItDependencyGraph(object):
         
            rootObject (MObject) - Root node to begin the next traversal.
            rootPlug (MPlug) - Root plug to to begin the next traversal.
-           infoObject (MIteratorType) - Iterator object having info on filter or filterlist.
+           infoObject (MIteratorType) - Iterator object having config on filter or filterlist.
            filter (MFn.Type) - Function set type, defaults to MFn.kInvalid
            direction (MItDependencyGraph.Direction) - Primary direction of iteration, defaults to MItDependencyGraph.kDownstream
            traversal (MItDependencyGraph.Traversal) - Order of traversal, defaults to MItDependencyGraph.kDepthFirst
@@ -7986,7 +7986,7 @@ class MPxNode(object):
         """
         addExternalContentForFileAttr(table, attr) -> bool
         
-        This method is a helper for derived clases implementing getExternalContent().  It augments the external content info table passed in with an entry describing external content whose location is described by the specified attribute.
+        This method is a helper for derived clases implementing getExternalContent().  It augments the external content config table passed in with an entry describing external content whose location is described by the specified attribute.
         
         The method will not overwrite existing items, i.e. items with the same key. (attribute name).  In this context, overwriting an item means the caller has called this function twice with the same attribute, or that two separate but identically named attributes were used.  If replacing an entry is the desired effect, it is the caller's responsibility to erase the previous item first.
         
@@ -16921,7 +16921,7 @@ class MURI(object):
         """
         getUserInfo() -> string
         
-        Returns the user info component of the URI.
+        Returns the user config component of the URI.
         """
         pass
     def getUserName(*args, **kwargs):
@@ -16998,7 +16998,7 @@ class MURI(object):
         """
         setPassword(string) -> self
         
-        Sets the password part of the user info component.
+        Sets the password part of the user config component.
         """
         pass
     def setPath(*args, **kwargs):
@@ -17047,7 +17047,7 @@ class MURI(object):
         """
         setUserName(string) -> self
         
-        Sets the user name part of the user info component.
+        Sets the user name part of the user config component.
         """
         pass
     @staticmethod
@@ -21594,7 +21594,7 @@ class MFnDependencyNode(MFnBase):
         pass
     def addExternalContentForFileAttr(*args, **kwargs):
         """
-        Adds content info to the specified table from a file path attribute.
+        Adds content config to the specified table from a file path attribute.
         """
         pass
     def affectsAnimation(*args, **kwargs):
@@ -21769,7 +21769,7 @@ class MFnDependencyNode(MFnBase):
         pass
     def setExternalContentForFileAttr(*args, **kwargs):
         """
-        Sets content info in the specified attribute from the table.
+        Sets content config in the specified attribute from the table.
         """
         pass
     def setFlag(*args, **kwargs):
@@ -25279,7 +25279,7 @@ class MFnMesh(MFnDagNode):
         colorset. This method should be used if it is needed to shrink the
         actual size of the color set. In this case, the user should call
         clearColors(), setColors() and then assignColors() to rebuild the
-        mapping info.
+        mapping config.
         
         When called on mesh data, the colors are removed. When called on a
         shape with no history, the colors are removed and the attributes are
@@ -25297,7 +25297,7 @@ class MFnMesh(MFnDagNode):
         uvset. This method should be used if it is needed to shrink the
         actual size of the uv set. In this case, the user should call
         clearUVs(), setUVs() and then assignUVs() to rebuild the
-        mapping info.
+        mapping config.
         
         When called on mesh data, the uvs are removed. When called on a
         shape with no history, the uvs are removed and the attributes are
@@ -27522,7 +27522,7 @@ class MFnNurbsSurface(MFnDagNode):
         
         This method should be used if it is needed to shrink the size of the
         UV table. In this case, the user should call clearUVs, setUVs and
-        then assignUVs to rebuild the mapping info.
+        then assignUVs to rebuild the mapping config.
         
         When called on a dataNurbsSurface the UVs are removed. When called
         on a shape with no history, the UVs are removed and the attributes

@@ -6,7 +6,7 @@ last update: 2023-09-12
 import os
 from maya_scripts.utilities import arg_map_utils as map_handler
 from script_tools.components.custom_exception import CustomException
-from script_tools.cus_funcs.file_tools import read_from_file as reader
+from utils.file_ops import read_file as reader
 
 
 def _get_data_from_file(src):

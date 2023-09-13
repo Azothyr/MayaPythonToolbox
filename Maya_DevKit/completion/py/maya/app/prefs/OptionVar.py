@@ -15,7 +15,7 @@ class OptionVar(object):
         :member value_type: One of the OPTION_VAR_TYPE_xxx constants indicating what type of variable this is
         :member value_remembered: Value that was remembered when requested
         :member title: Short title describing the preference
-        :member info: Longer description of the preference
+        :member config: Longer description of the preference
         :member option_var_job: scriptJob ID for the job that updates the preference when the optionVar changes
         :member clients: Dictionary of client methods to call when the OptionVar changes,
                          either directly or via the Maya state - usually for UI. KEY=client, VALUE=callback

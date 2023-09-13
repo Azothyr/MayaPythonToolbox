@@ -88,7 +88,7 @@ def raiseLog(logger, level, message, errorClass='"<type \'exceptions.RuntimeErro
         raiseLog(_logger, _logger.INFO, "oh noes! something weird happened!")
     ...then what happens will depend on what the value of ERRORLEVEL (controlled
     by the environment var %s) is - if it was not set, or set to ERROR, or
-    WARNING, then the call will result in issuing a _logger.info(...) call;
+    WARNING, then the call will result in issuing a _logger.config(...) call;
     if it was set to INFO or DEBUG, then an error would be raised.
     
     For convenience, raiseLog is installed onto logger instances created with

@@ -7,7 +7,7 @@ import maya.cmds as cmds
 import ast
 
 
-def _calculate_center(obj):
+def _calculate_object_center(obj):
     """
     :param obj: Object name in Maya
     :return: center xyz of provided obj
@@ -24,7 +24,7 @@ def _calculate_center(obj):
     return obj_center
 
 
-def _get_average_center(obj_lyst):
+def _average_centers(obj_lyst):
     """
     :param obj_lyst:
     :return: a single average xyz value for all the provided objects
@@ -47,12 +47,12 @@ def _get_selection_centers(obj_lyst):
     """
     centers_lyst = []
     for obj in obj_lyst:
-        centers_lyst.append(_calculate_center(obj))
-    center = _get_average_center(centers_lyst)
+        centers_lyst.append(_calculate_object_center(obj))
+    center = _average_centers(centers_lyst)
     return center
 
 
-def get_obj_center(_input=None):
+def get_center(_input=None):
     """
     finds the selection(s) center of mass.
     Returns: (center x, center y, center z)
@@ -68,7 +68,7 @@ def get_obj_center(_input=None):
     if isinstance(_input, list):
         return _get_selection_centers(_input)
     elif isinstance(_input, str):
-        return _calculate_center(_input)
+        return _calculate_object_center(_input)
     else:
         cmds.warning("input must be a selected object or a list of selected objects.")
         return

@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_cmds, modify_history, parent_cmds
+from maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_cmds, history_cmds, parent_cmds
 from maya_scripts.components.window_base import WindowBase as Window
 
 
