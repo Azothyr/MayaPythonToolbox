@@ -1,8 +1,8 @@
 import textwrap
 import os
 import importlib.util
-from utils.file_ops import write_to_file
-from utils.file_ops import get_file_path_from_lib as get_path
+from script_tools.utils.file_ops.file_basic_ops import write_to_file
+from script_tools.utils.file_ops.file_path_ops import get_file_path_from_lib as get_path
 
 
 def _load_map_from_file_path(file_path):

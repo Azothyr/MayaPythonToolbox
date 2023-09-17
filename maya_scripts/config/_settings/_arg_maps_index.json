@@ -1,0 +1,12 @@
+{
+    "all": "os.path.expanduser(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\_arg_maps_index.json)",
+    "button": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\button_arg_map.py.json')",
+    "columnLayout": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\columnLayout_arg_map.py.json')",
+    "menuItem": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\menuItem_arg_map.py.json')",
+    "optionMenu": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\optionMenu_arg_map.py.json')",
+    "rowColumnLayout": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\rowColumnLayout_arg_map.py.json')",
+    "tabLayout": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\tabLayout_arg_map.py.json')",
+    "textField": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\textField_arg_map.py.json')",
+    "text": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\text_arg_map.py.json')",
+    "window": "os.path.join(~\\Documents\\custom_scripts\\maya_scripts\\config\\_settings\\window_arg_map.py.json')"
+}
