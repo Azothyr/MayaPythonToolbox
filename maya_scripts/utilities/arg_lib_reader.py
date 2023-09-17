@@ -1,4 +1,4 @@
-from maya_scripts.info.arg_lib import arg_lib
+from maya_scripts.config.arg_lib import arg_lib
 from maya_scripts.utilities import arg_map_utils as map_handler
 
 

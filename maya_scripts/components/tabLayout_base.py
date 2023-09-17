@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from maya_scripts.info.tabLayout_arg_map import tabLayout_arg_map as _map_src
+from maya_scripts.config.tabLayout_arg_map import tabLayout_arg_map as _map_src
 from maya_scripts.components.maya_cmds_base import CmdsBase
 
 

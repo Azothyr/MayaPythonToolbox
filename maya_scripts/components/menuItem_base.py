@@ -1,4 +1,4 @@
-from maya_scripts.info.menuItem_arg_map import menuItem_arg_map as _map_src
+from maya_scripts.config.menuItem_arg_map import menuItem_arg_map as _map_src
 from maya_scripts.components.optionMenu_base import OptionMenuBase as OptionMenu
 from maya_scripts.components.maya_cmds_base import CmdsBase
 

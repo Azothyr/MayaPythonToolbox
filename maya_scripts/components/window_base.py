@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 from maya_scripts.components.maya_cmds_base import CmdsBase
-from maya_scripts.info.window_arg_map import window_arg_map as _map_src
+from maya_scripts.config.window_arg_map import window_arg_map as _map_src
 
 
 class WindowBase(CmdsBase):

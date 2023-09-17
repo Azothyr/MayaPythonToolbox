@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from maya_scripts.info.optionMenu_arg_map import optionMenu_arg_map as _map_src
+from maya_scripts.config.optionMenu_arg_map import optionMenu_arg_map as _map_src
 from maya_scripts.components.maya_cmds_base import CmdsBase
 
 
