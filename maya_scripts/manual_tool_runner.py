@@ -194,6 +194,9 @@ def broken_fk(hierarchical_sort=False, outliner_sort=False):
         # connect the attribute to the translation constraint weight 0
         cmds.connectAttr('%s.FollowRotate' % follower, '%s.w0' % rotate_contraint, f=True)"""
 
+    # Get all selected objects.
+    selected_objects = cmds.ls(selection=True,
+                               long=True)  # Using long=True ensures full path names, which is useful when dealing with hierarchies.
 
 class ControlGroup:
     def __init__(self, control_objects):
