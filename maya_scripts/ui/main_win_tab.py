@@ -7,10 +7,10 @@ from script_tools.functions.file_tools import get_file_path_from_lib as get_path
 
 def run_script(script_path, *_):
     ui_build = {
+        "toolbox_ui": toolbox_ui.create_ui_window,
         "color_change_ui": color_change_ui.create_ui_window,
         "control_ui": control_ui.create_ui_window,
         "joint_ui": joint_ui.create_ui_window,
-        "toolbox_ui": toolbox_ui.create_ui_window,
         "utilities_ui": utilities_ui.create_ui_window
     }
     print(script_path)

@@ -4,7 +4,7 @@ from maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
 
 
 def create_ui_window(manual_run=False):
-    win = Window('toolbox_ui_window', t="Toolbox", wh=(100, 50), mxb=False, mnb=True, rtf=True, nde=True)
+    win = Window('toolbox_ui_window', t="All Tools", wh=(100, 50), mxb=False, mnb=True, rtf=True, nde=True)
     tabs_ui = TabLayout('tabs_ui', innerMarginWidth=5, innerMarginHeight=5)
 
     joint_tab = joint_ui._ui_setup(tabs_ui, 'joint')
