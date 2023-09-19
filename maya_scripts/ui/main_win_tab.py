@@ -2,7 +2,7 @@ import maya.cmds as cmds
 import os
 from functools import partial
 from maya_scripts.ui import color_change_ui, control_ui, joint_ui, toolbox_ui, utilities_ui
-from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+from script_tools.functions.file_tools import get_file_path_from_lib as get_path
 
 
 def run_script(script_path, *_):

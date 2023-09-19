@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import sys
 from maya_scripts.ui import main_win_tab
-from script_tools.cus_funcs.file_tools import get_file_path_from_lib as get_path
+from script_tools.functions.file_tools import get_file_path_from_lib as get_path
 
 
 def set_maya_command_port():
@@ -31,3 +31,9 @@ def set_maya_on_start():
     set_maya_command_port()
     push_scripts_to_sys()
     set_tool_tab_on_start()
+
+
+if __name__ == "__main__":
+    set_maya_on_start()
+    refresh_tools()
+    

@@ -4,6 +4,7 @@ from maya_scripts.tools import select_cmds
 from maya_scripts.tools import mirror_cmds
 from maya_scripts.utilities.arg_lib_reader import LibReader as Reader
 from maya_scripts.components.window_base import WindowBase as Window
+from maya_scripts.ui import main_win_tab
 from maya_scripts.utilities import cmds_class_builder as class_builder
 
 
@@ -12,6 +13,7 @@ def pass_to_func(func, *args, **kwargs):
 
 
 if __name__ == "__main__":
+    pass_to_func(main_win_tab.create_tools_menu())
     # pass_to_func(xform_handler.set_xform_values, rotation=True, x=0)
     # pass_to_func(select_cmds.select_all_hierarchy())
     """
