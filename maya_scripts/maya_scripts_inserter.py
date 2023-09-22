@@ -12,8 +12,9 @@ import os
 import platform
 from textwrap import dedent
 from maya_scripts.utilities.maya_setup import push_scripts_to_sys
-from utils.file_ops import get_file_path_from_lib as get_path
-from utils.file_ops import (clear_directory, transfer_py_dir_in_current, write_to_file)
+from script_tools.functions.file_tools import get_file_path_from_lib as get_path
+from script_tools.functions.file_tools import (clear_directory,
+                                               transfer_py_dir_in_current, write_to_file)
 
 
 def check_if_windows():

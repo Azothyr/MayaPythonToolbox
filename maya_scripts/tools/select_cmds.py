@@ -19,7 +19,7 @@ def clear_selection():
     cmds.select(clear=True)
 
 
-def select_all_hierarchy():
+def select_all_children():
     selected_objects = __selection()
     for obj in selected_objects:
         children = cmds.listRelatives(obj, allDescendents=True)
@@ -61,4 +61,4 @@ def select_top_multi(**kwargs):
 
 def select_chain():
     select_top_hierarchy()
-    select_all_hierarchy()
+    select_all_children()
