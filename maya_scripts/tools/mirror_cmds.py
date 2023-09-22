@@ -17,6 +17,6 @@ def mirror_controls():
         xform_handler.set_xform_values(scale=True, x=-1)
         mirrored_controls.extend(mirrored_control)
     select_cmds.replace_selection(mirrored_controls)
-    modify_history.freeze_delete(mirrored_controls)
+    history_cmds.freeze_delete(mirrored_controls)
     select_cmds.replace_selection(mirrored_controls)
     print("Mirrored controls.")
