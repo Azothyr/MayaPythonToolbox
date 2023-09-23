@@ -10,14 +10,14 @@ def create_at_joint(radius):
     for joint in joints_to_process:
         joint_position = cmds.xform(joint, q=True, ws=True, t=True)
         joint_rotation = cmds.xform(joint, q=True, ws=True, ro=True)
-        circle = cmds.circle(nr=[1, 0, 0], r=radius)[0]
+        circle = cmds.circle(normal=[1, 0, 0], radius=radius)[0]
 
         circle_rename = joint.replace("Jnt", "Ctrl")
         circle = cmds.rename(circle, circle_rename)
 
         control_lyst.append(circle)
 
-        null_group = cmds.group(em=True)
+        null_group = cmds.group(empty=True)
         null_group_rename = joint.replace("Jnt", "Ctrl_Grp")
         null_group = cmds.rename(null_group, null_group_rename)
 

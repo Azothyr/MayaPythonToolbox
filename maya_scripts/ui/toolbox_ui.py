@@ -1,4 +1,4 @@
-from maya_scripts.ui import joint_ui, control_ui, color_change_ui, utilities_ui
+from maya_scripts.gui import joint_ui, control_ui, color_change_ui, utilities_ui
 from maya_scripts.components.window_base import WindowBase as Window
 from maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
 

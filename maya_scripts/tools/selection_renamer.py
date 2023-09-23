@@ -7,6 +7,8 @@ def _single_renamer(new_name, obj):
     """
     Renames selected object
     """
+    print(obj)
+    print(new_name)
     cmds.rename(obj, new_name)
     cmds.select(clear=True)
     cmds.select(new_name, replace=True)
@@ -22,12 +24,15 @@ def _sequential_renamer(txt, lyst):
     objects_changed = 0
 
     new_names = []
-    for i in range(len(lyst)):
-        new_name = scheme_parts[0] + str(i + 1).zfill(count) + scheme_parts[2]
-        new_names.append(cmds.rename(lyst[i], new_name))
-        objects_changed += 1
-    cmds.select(clear=True)
-    cmds.select(new_names, replace=True)
+    try:
+        for i in range(len(lyst)):
+            new_name = scheme_parts[0] + str(i + 1).zfill(count) + scheme_parts[2]
+            new_names.append(cmds.rename(lyst[i], new_name))
+            objects_changed += 1
+        cmds.select(clear=True)
+        cmds.select(new_names, replace=True)
+    except CustomException as err:
+        print(err)
     return new_names
 
 

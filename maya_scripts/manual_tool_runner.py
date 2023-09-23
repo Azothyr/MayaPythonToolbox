@@ -1,359 +1,275 @@
 import maya.cmds as cmds
-# from maya_scripts.tools import xform_handler
-# from maya_scripts.tools import select_cmds
-# from maya_scripts.tools import mirror_cmds
-# from maya_scripts.utilities.arg_lib_reader import LibReader as Reader
-# from maya_scripts.components.window_base import WindowBase as Window
-# from maya_scripts.utilities import cmds_class_builder as class_builder
+
+try:
+    class IkManager:
+
+        def __init__(self):
+            self.operation_data = IkDataFactory().create_operation_data()
+
+        def __repr__(self):
+            return f"IkManager: {''.join([f'{k}, {v}' for k, v in self.operation_data.items()])}"
+
+        def create_ik(self, ik_type):
+            pass
 
 
-def pass_to_func(func, *args, **kwargs):
-    func(*args, **kwargs)
+    class IkDataFactory:
+        def __init__(self):
+            self.namer = lambda x: NameParser(x).prefix
+            self.selected_joints = SelectionOperator().get("joint")
+            self.relation_manager = RelationshipManager()
+
+        def create_operation_data(self):
+            joint_data = {}
+
+            if not self.selected_joints:
+                raise Exception("No joints selected. Please select at least 1 joints.")
+            if len(self.selected_joints) < 3:
+                try:
+                    for joint in self.selected_joints:
+                        parent, child = self.relation_manager.get_relations(joint, "joint", _parent=True,
+                                                                            _children=False)
+                        if parent:
 
 
-"""def constraint_removal(selection=None):
-    if selection is None:
-        selection = cmds.ls(sl=True)
-
-    def recursive_removal_from_hierarchy(_node):
-
-        # List all the constraints attached to the node.
-        constraints = cmds.listRelatives(_node, type='constraint')
-
-        # If there are constraints, delete them.
-        if constraints:
-            for constraint in constraints:
-                cmds.delete(constraint)
-
-        # Check children and continue the process recursively.
-        children = cmds.listRelatives(_node, children=True, fullPath=True)
-        if children:
-            for child in children:
-                recursive_removal_from_hierarchy(child)
-
-    for node in selection:
-        recursive_removal_from_hierarchy(node)
-"""
 
 
-class ConstraintRemoval:
-    @staticmethod
-    def remove_from_hierarchy(selection=None):
-        if selection is None:
-            selection = cmds.ls(sl=True)
-        for node in selection:
-            ConstraintRemoval.recursive_removal_from_hierarchy(node)
+                            """
+                            #   THIS IS WHERE YOU WERE WHEN YOU GOT OFF.
+                            # 
+                            # 
+                            # 
+                            # 
+                            """
+                            # self.selected_joints.append(parent)
+                        if child:
+                            # self.selected_joints.append(child)
+                        self.relation_manager.get_relations(self.selected_joints[0], "joint", _parent=False,
+                                                            _children=True)
+                except Exception as err:
+                    print(err)
+                    raise Exception("Please select at least 3 joints.")
 
-    @staticmethod
-    def recursive_removal_from_hierarchy(_node):
-        constraints = cmds.listRelatives(_node, type='constraint')
-        if constraints:
-            for constraint in constraints:
-                cmds.delete(constraint)
+            def set_joint_tuples():
+                if self.selected_joints:
+                    count = 0
+                    joint_tuples = []
+                    _joint_tuple = []
+                    for joint in self.selected_joints:
+                        if count != 3:
+                            _joint_tuple.append(joint)
+                            count += 1
 
-        children = cmds.listRelatives(_node, children=True, fullPath=True)
-        if children:
-            for child in children:
-                ConstraintRemoval.recursive_removal_from_hierarchy(child)
+                        # When _joint_tuple has 3 items
+                        if len(_joint_tuple) == 3:
+                            parent, child1, child2 = _joint_tuple
 
-    @staticmethod
-    def remove_from_control_leader(control_leader_group):
-        constraints = cmds.listRelatives(control_leader_group, type='constraint')
-        if constraints:
-            for constraint in constraints:
-                cmds.delete(constraint)
+                            actual_parent1, _ = self.relation_manager.get_relations(child1, "joint", _parent=True,
+                                                                                    _children=False) or (None, None)
+                            actual_parent2, _ = self.relation_manager.get_relations(child2, "joint", _parent=True,
+                                                                                    _children=False) or (None, None)
+
+                            # Check if the first and second children are actually children of the 'parent'.
+                            if actual_parent1 != parent or actual_parent2 != parent:
+                                # Correct the hierarchy here
+                                print(f"Warning: {child1} and {child2} are not children of {parent}. Correcting...")
+
+                            _joint_tuple = tuple(_joint_tuple)
+                            joint_tuples.append(_joint_tuple)
+                            count = 0
+                            _joint_tuple = []
+                    return joint_tuples
+
+            for joint_tuple in set_joint_tuples():
+                prefix = self.namer(str(joint_tuple[0]))
+                joint_data[prefix] = {
+                    "Base": ["_Ctrl_Grp", "_Ctrl", joint_tuple[0]],
+                    "PV": ["_Ctrl_Grp", "_Ctrl", "_Offset", joint_tuple[1]],
+                    "Tip": ["_Ctrl_Grp", "_Ctrl", "_IK_Handle", joint_tuple[2]]
+                }
+            return self.parse_operation_data(joint_data)
+
+        @staticmethod
+        def parse_operation_data(broken_data):
+            op_data = {}
+            for key, value in broken_data.items():
+
+                main_group = key + "_IK_Ctrl_Grp"
+                prefix = key + "_IK"
+                for k, v in value.items():
+                    center = f"_{k}"
+                    group = prefix + center + v[0]
+                    control = prefix + center + v[1]
+                    joint = v[-1]
+
+                    op_data[main_group] = {"group": group,
+                                           "control": control,
+                                           "joint": joint}
+
+                    if "_Offset" in v:
+                        offset_group = prefix + center + v[2]
+                        op_data[main_group]["offset_group"] = offset_group
+                    if "_IK_Handle" in v:
+                        ik_handle = key + v[2]
+                        op_data[main_group]["ik_handle"] = ik_handle
+            return op_data
 
 
-"""
-def broken_fk(hierarchical_sort=False, outliner_sort=False):
-    unsorted_selection: list[object] = cmds.ls(sl=True)
-    constraint_order = {}
+    class SelectionOperator:
+        @staticmethod
+        def __get_selection(_type=None, long=False):
+            return cmds.ls(sl=True, type=_type, long=long)
 
-    def __get_group_from_control(control: object):
-        try:
-            if cmds.objectType(control) == "transform":
-                group = cmds.listRelatives(control, parent=True, type="transform")[0]
-                if not str(control).lower().endswith("_ctrl"):
-                    raise ValueError(f"ERROR --- group must end with _grp, not {group}".upper())
-                return group
+        def get(self, _type: object):
+            return self.__get_selected_type(_type)
+
+        def count(self, _type: object):
+            return self.get_selected_type_count(_type)
+
+        def __get_selected_type(self, _type):
+            match _type:
+                case "joint": return self.__get_selection("joint")
+                case "control": return self.__get_selection("transform")
+                case "mesh": return self.__get_selection("mesh")
+                case "curve": return self.__get_selection("nurbsCurve")
+                case "transform": return self.__get_selection("transform")
+                case "all": return self.__get_selection()
+                case "long": return self.__get_selection(long=True)
+                case _: return None
+
+        def get_selected_type_count(self, _type):
+            match _type:
+                case "joint": return len(self.__get_selection("joint"))
+                case "control": return len(self.__get_selection("transform"))
+                case "mesh": return len(self.__get_selection("mesh"))
+                case "curve": return len(self.__get_selection("nurbsCurve"))
+                case "transform": return len(self.__get_selection("transform"))
+                case "all": return len(self.__get_selection())
+                case _: return None
+
+
+    class ControlCreator: pass
+
+
+    class XformHandler: pass
+
+
+    class Duplicator: pass
+
+
+    class GroupCreator: pass
+
+
+    class RelationshipManager:
+        @staticmethod
+        def check_IK_hierarchy(*args):
+            def _get_parent(_object):
+                return cmds.listRelatives(_object, parent=True)
+
+            # def _get_child(_object):
+            if len(args) % 3 == 0:
+
+                parent, child1, child2 = args
+                actual_parent1, _ = RelationshipManager.get_relations(child1, "joint", _parent=True, _children=False) or (None, None)
+                actual_parent2, _ = RelationshipManager.get_relations(child2, "joint", _parent=True, _children=False) or (None, None)
+
+                # Check if the first and second children are actually children of the 'parent'.
+                if actual_parent1 != parent or actual_parent2 != parent:
+                    # Correct the hierarchy here
+                    print(f"Warning: {child1} and {child2} are not children of {parent}. Correcting...")
+
+        @staticmethod
+        def get_relations(_object, _type, _parent=False, _children=False, count=1):
+            parent = cmds.listRelatives(_object, parent=True) if _parent else None
+            if _children:
+                children = cmds.listRelatives(_object, children=True, type=_type)[0:count] if count > 1 else\
+                    cmds.listRelatives(_object, children=True, type=_type)
             else:
-                raise ValueError(f"ERROR --- control must end with _ctrl, {control}".upper())
-        except ValueError as e:
-            raise ValueError(e)
-
-    def __get_control_from_group(group: object):
-        try:
-            if cmds.objectType(group) == "transform":
-                control = cmds.listRelatives(group, children=True, type="transform")[0]
-                if not str(control).lower().endswith("_ctrl"):
-                    raise ValueError(f"ERROR --- control must end with _ctrl, {control}".upper())
-                return control
-            else:
-                raise ValueError(f"ERROR --- group must end with _grp, not {group}".upper())
-        except ValueError as e:
-            raise ValueError(e)
-
-    def __recursively_set_relationship(data: list[object]):
-        if len(data) < 2:  # if there is only one item left in the list, stop the recursion
-            return
-        elif data[0] in constraint_order.items():
-            return  # if the _leader is already in the constraint order, stop the recursion
-        else:
-            # pulls the _leader from the list, so it can recursively set the next index as the _follower
-            _leader: object = data.pop(0)  # grab and remove the first item in the list
-            _follower = data[0]  # _follower is next in list due to the pop
-            # find group and ctrl of _leader and _follower
-            if str(_leader).lower().endswith("_grp"):
-                _leader_group = _leader
-                _leader = __get_control_from_group(_leader)
-            else:
-                _leader_group = __get_group_from_control(_leader)
-            if str(_follower).lower().endswith("_grp"):
-                _follower_group = _follower
-                _follower = __get_control_from_group(_follower)
-            else:
-                _follower_group = __get_group_from_control(_follower)
-
-            # create a dictionary with the _leader_group as the key and the _follower, _follower_group and
-            # _leader_control as the values
-            result = {
-                "leader's_group": _leader_group,
-                "leading_control": _leader,
-                "follower_group": _follower_group,
-                "follower_control": _follower
-            }
-            constraint_order[_leader_group] = result
-            __recursively_set_relationship(data)
-
-    # If hierarchy_sort is True, it will sort the selection based on maya outliner hierarchy. If False, it will not.
-    if hierarchical_sort:
-        sorted_selection = []
-
-        def find_and_insert(child, unsorted, sorted_list):
-            parent = cmds.listRelatives(child, parent=True)
-            if parent:
-                parent = parent[0]
-                if parent in unsorted:
-                    find_and_insert(parent, unsorted, sorted_list)
-            if child not in sorted_list:
-                sorted_list.append(child)
-
-        for obj in unsorted_selection:
-            find_and_insert(obj, unsorted_selection, sorted_selection)
-
-        __recursively_set_relationship(sorted_selection)
-
-    # If outliner_sort is True, it will sort the selection based on maya outliner order. If False, it will not.
-    elif outliner_sort:
-        def sort_by_outliner_order(unsorted_objects):
-            # Get a list of all objects in the Maya scene in their hierarchical and creation order
-            all_objects = cmds.ls(dag=True, long=True)
-
-            # Convert long names to short names
-            short_all_objects = [x.split('|')[-1] for x in all_objects]
-
-            # Get indices of the selected objects
-            object_indices = {_obj: short_all_objects.index(_obj) for _obj in unsorted_objects}
-
-            # Sort the selected objects based on these indices
-            return sorted(unsorted_objects, key=lambda x: object_indices[x])
-
-        sorted_selection = sort_by_outliner_order(unsorted_selection)
-        __recursively_set_relationship(sorted_selection)
-
-    # If neither hierarchical_sort nor outliner_sort are True, it will sort the selection based on the order of the
-    # selection.
-    else:
-        __recursively_set_relationship(unsorted_selection)
-
-    print("\n".join([f"LEADER --> {v}" for k, v in constraint_order.items()]))
-
-    for keys, values in constraint_order.items():
-        leader = values["leading_control"]
-        follower_grp = values["follower_group"]
-        follower = values["follower_control"]
-
-        # create constraints
-        translate_contraint = cmds.parentConstraint(leader, follower_grp, mo=True, skipRotate=["x", "y", "z"],
-                                                    weight=1)[0]
-        rotate_contraint = cmds.parentConstraint(leader, follower_grp, mo=True, skipTranslate=["x", "y", "z"],
-                                                 weight=1)[0]
-        scale_constraint = cmds.scaleConstraint(leader, follower_grp, weight=1)[0]  # noqa
-
-        # create attributes on the child if not already there
-        if not cmds.attributeQuery('FollowTranslate', node=follower, exists=True):
-            cmds.addAttr(follower, ln='FollowTranslate', at='double', min=0, max=1, dv=1)
-            cmds.setAttr('%s.FollowTranslate' % follower, e=True, keyable=True)
-
-        if not cmds.attributeQuery('FollowRotate', node=follower, exists=True):
-            cmds.addAttr(follower, ln='FollowRotate', at='double', min=0, max=1, dv=1)
-            cmds.setAttr('%s.FollowRotate' % follower, e=True, keyable=True)
-
-        # connect the child's attribute to the rotate constraint weight 0
-        cmds.connectAttr('%s.FollowTranslate' % follower, '%s.w0' % translate_contraint, f=True)
-        # connect the attribute to the translation constraint weight 0
-        cmds.connectAttr('%s.FollowRotate' % follower, '%s.w0' % rotate_contraint, f=True)"""
-
-    # Get all selected objects.
-    selected_objects = cmds.ls(selection=True,
-                               long=True)  # Using long=True ensures full path names, which is useful when dealing with hierarchies.
-
-class ControlGroup:
-    def __init__(self, control_objects):
-        self.group, self.control = self._split_to_control_and_group(control_objects)
-
-    @staticmethod
-    def _split_to_control_and_group(_object) -> tuple:
-        try:
-            if cmds.objectType(_object) == "transform":
-                if _object.lower().endswith("_ctrl"):
-                    ctrl = _object
-                    grp = cmds.listRelatives(_object, parent=True, type="transform")[0]
-                elif _object.lower().endswith("_grp"):
-                    grp = _object
-                    ctrl = cmds.listRelatives(_object, children=True, type="transform")[0]
-                else:
-                    raise ValueError(f"ERROR --- Controls must end with _Ctrl and Groups must end with _Grp. {_object} "
-                                     f"Does not follow this.".upper())
-                return grp, ctrl
-            else:
-                raise ValueError(f"ERROR --- Incorrect _object selected {_object} of type "
-                                 f"{cmds.objectType(_object)}".upper())
-        except ValueError as e:
-            raise e
+                children = None
+            return {"parent": parent, "children": children}
 
 
-class ConstraintOrder:
-    def __init__(self):
-        self.constraint_order = {}
+    class NameParser:
+        def __init__(self, item: str, splitter: str = "_"):
+            self.item = item
+            self.split_symbol = splitter
+            self.prefix = self.__parse_string()
 
-    def recursively_set_relationship(self, control_groups):
-        if len(control_groups) < 2:
-            return
-        else:
-            leader = control_groups.pop(0)
-            follower = control_groups[0]
-            result = {
-                "leader's_group": leader.group,
-                "leading_control": leader.control,
-                "follower_group": follower.group,
-                "follower_control": follower.control
-            }
-            self.constraint_order[leader.group] = result
-            self.recursively_set_relationship(control_groups)
+        def __parse_string(self):
+            parts = self.item.split(self.split_symbol)
+            prefix = f"{parts[0]}_{parts[1]}"
+            return prefix
 
 
-# Base class for sorting
-class SortMethod:
-    def sort(self, unsorted_selection):
-        raise NotImplementedError("This method should be overridden by subclass")
+    class Constrainer:
+        def __init__(self, name: str, leader: object, follower: object, constraint_type: str):
+            self.name = name
+            self.leader = leader
+            self.follower = follower
+            self.constraint_type = constraint_type
+
+        def create_constraint(self):
+            match self.constraint_type:
+                case "point": self.create_point_constraint()
+                case "orient": self.create_orient_constraint()
+                case "parent": self.create_parent_constraint()
+                case "aim": self.create_aim_constraint()
+                case _: pass
+
+        def create_point_constraint(self):
+            cmds.pointConstraint(self.leader, self.follower, name=self.name)
+
+        def create_orient_constraint(self):
+            cmds.orientConstraint(self.leader, self.follower, name=self.name)
+
+        def create_parent_constraint(self):
+            cmds.parentConstraint(self.leader, self.follower, name=self.name)
+
+        def create_aim_constraint(self):
+            cmds.aimConstraint(self.leader, self.follower, name=self.name)
 
 
-# Hierarchical sort
-class HierarchicalSort(SortMethod):
-    def sort(self, unsorted_selection):
-        sorted_selection = []
+    class IkCreator:
+        def __init__(self, name: str, base_joint: object, tip_joint: object, ik_type: str):
+            self.name = name
+            self.base = base_joint
+            self.tip = tip_joint
+            self.ik_type = ik_type
 
-        def find_and_insert(child, unsorted, sorted_list):
-            parent = cmds.listRelatives(child, parent=True)
-            if parent:
-                parent = parent[0]
-                if parent in unsorted:
-                    find_and_insert(parent, unsorted, sorted_list)
-            if child not in sorted_list:
-                sorted_list.append(child)
+        def create_ik(self):
+            match self.ik_type:
+                case "ik":
+                    self.create_ik_handle()
+                case "pole":
+                    self.create_pole_vector()
+                case "spring":
+                    self.create_spring_ik()
+                case "stretchy":
+                    self.create_stretchy_ik()
+                case "stretchy_spline":
+                    self.create_stretchy_spline_ik()
+                case _:
+                    pass
 
-        for obj in unsorted_selection:
-            find_and_insert(obj, unsorted_selection, sorted_selection)
+        def create_ik_handle(self):
+            cmds.ikHandle(startJoint=self.base, endEffector=self.tip)
 
-        return sorted_selection
+        def create_pole_vector(self):
+            pass
 
+        def create_spring_ik(self):
+            pass
 
-# Outliner sort
-class OutlinerSort(SortMethod):
-    def sort(self, unsorted_selection):
-        all_objects = cmds.ls(dag=True, long=True)
-        short_all_objects = [x.split('|')[-1] for x in all_objects]
-        object_indices = {obj: short_all_objects.index(obj) for obj in unsorted_selection}
-        return sorted(unsorted_selection, key=lambda x: object_indices[x])
+        def create_stretchy_ik(self):
+            pass
 
+        def create_stretchy_spline_ik(self):
+            pass
 
-# No sort
-class NoSort(SortMethod):
-    def sort(self, unsorted_selection):
-        return unsorted_selection
-
-
-class BrokenFkConstraintFactory:
-    @staticmethod
-    def create_constraints(constraint_order):
-        for keys, values in constraint_order.items():
-            leader = values["leading_control"]
-            follower_grp = values["follower_group"]
-            follower = values["follower_control"]
-
-            # Create constraints
-            translate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                         name=f'{leader}_Constraining_TRANSLATION_via_parent_constraint',
-                                                         mo=True, skipRotate=["x", "y", "z"], weight=1)[0]
-
-            rotate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                      name=f'{leader}_Constraining_ROTATION_via_parent_constraint',
-                                                      mo=True, skipTranslate=["x", "y", "z"], weight=1)[0]
-
-            scale_constraint = cmds.scaleConstraint(leader, follower_grp,  # noqa
-                                                    name=f'{leader}_Constraining_SCALE_via_parent_constraint',
-                                                    weight=1)[0]
-
-            # Create attributes on the child if not already there
-            if not cmds.attributeQuery('FollowTranslate', node=follower, exists=True):
-                cmds.addAttr(follower, ln='FollowTranslate', at='double', min=0, max=1, dv=1)
-                cmds.setAttr('%s.FollowTranslate' % follower, e=True, keyable=True)
-
-            if not cmds.attributeQuery('FollowRotate', node=follower, exists=True):
-                cmds.addAttr(follower, ln='FollowRotate', at='double', min=0, max=1, dv=1)
-                cmds.setAttr('%s.FollowRotate' % follower, e=True, keyable=True)
-
-            # Connect the child's attribute to the rotate constraint weight 0
-            cmds.connectAttr('%s.FollowTranslate' % follower, '%s.w0' % translate_constraint, f=True)
-            # Connect the attribute to the translation constraint weight 0
-            cmds.connectAttr('%s.FollowRotate' % follower, '%s.w0' % rotate_constraint, f=True)
-
-
-class BrokenFkManager:
-    def __init__(self, _sort_method):
-        self.sort_method = _sort_method
-        self.unsorted_selection = cmds.ls(sl=True)
-        self.constraint_order_manager = ConstraintOrder()
-
-    def run(self):
-        # Remove existing constraints before applying new ones
-        for control_group in self.constraint_order_manager.constraint_order.keys():
-            ConstraintRemoval.remove_from_control_leader(control_group)
-
-        sorted_controls = self.sort_method.sort(self.unsorted_selection)
-
-        # Exclude the last control group from having constraints set
-        # sorted_controls = sorted_controls[:-1]
-
-        control_groups = [ControlGroup(control) for control in sorted_controls]
-        self.constraint_order_manager.recursively_set_relationship(control_groups)
-        self.create_constraints()
-
-    def create_constraints(self):
-        BrokenFkConstraintFactory.create_constraints(self.constraint_order_manager.constraint_order)
-
+except Exception as e:
+    print(f"IkManager {e} {e.__traceback__.tb_lineno}")
+    raise e
 
 if __name__ == "__main__":
-    # TODO make spring IK for quadrupeds
-    # pass_to_func(xform_handler.set_xform_values, rotation=True, x=0)
-    # pass_to_func(select_cmds.select_all_hierarchy())
-    # pass_to_func(select_cmds.select_chain()
-    # pass_to_func(xform_handler.check_strange_values())
-    # pass_to_func(mirror_cmds.mirror_controls())
-    # class_builder.main(name=input("What will the name of this class be?"))
-    # constraint_removal()
-    # broken_fk(outliner_sort=True)
-    sort_method = NoSort()
-    fk_manager = BrokenFkManager(sort_method)
-    fk_manager.run()
+    ik = IkManager()
+    print(ik)
