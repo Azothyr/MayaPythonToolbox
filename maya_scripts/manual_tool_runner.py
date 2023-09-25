@@ -1,11 +1,12 @@
 import maya.cmds as cmds
 from collections import defaultdict
-from maya_scripts.tools.xform_handler import xform_attributes, check_strange_values, set_xform_values, get_xform_values
 import traceback
 
 style_presets = {
-    "SECTION": {'div': ("|" + "-"*100 + "|\n")*2, 'add_div': True, 'add_function': True},
-    "CONTAINER": {'div': ("-"*100 + "\n")*1, 'add_div': True, 'add_function': True},
+    "SECTION": {'div': ("|" + "-"*100 + "|\n")*2, 'add_div': True, 'header_function': True},
+    "SECTION-END": {'div': ("\n|" + "-"*100 + "|")*2, 'add_end_div': True, 'header_function': True},
+    "SUBSECTION": {'div': ("|" + "-"*100 + "|\n"), 'add_div': True, 'header_function': True},
+    "CONTAINER": {'div': (" "*25+"-"*50+"\n")*1, 'end_div': ("\n"+" "*25+"-"*50)*1, 'add_div': True, 'add_end_div': True, 'header_function': True},
 }
 
 
@@ -38,17 +39,32 @@ def debug_print(message, style=None, **kwargs):
 
     div = kwargs.get('div', "-")
     header = kwargs.get('header', stack['function'])
+    end_div = kwargs.get('end_div', div)
 
     if kwargs.get('to_format', None):
-        result = '\n'.join([f"{k}, {v}" for k, v in kwargs.get('to_format').items()])
-        message = f"{message}\n{result}\n{div}"
+        data = kwargs.get('to_format')
+        if isinstance(data, dict):
+            result = "{\n"+'\n'.join([f"\t\t{k}, {v}" for k, v in data.items()])+"\n\t\t}"
+        elif isinstance(data, list):
+            result = "[\n\t\t"+'\n\t\t'.join(data)+"\n\t\t]"
+        elif isinstance(data, tuple):
+            result = "{\n\t\t"+'\n\t\t'.join(data)+"\n\t\t}"
+        else:
+            result=data
+        message = f"{message}\n\t\t{result}"
 
     if kwargs.get('add_div', False):
         message = f"{div}{message}"
 
-    if kwargs.get('add_function', False):
-        header = f"{' '*(50-(len(header)//2))}{header}.{stack['function']}".upper()
+    if kwargs.get('add_end_div', False):
+        message = f"{message}{end_div}"
+
+    if kwargs.get('header_function', False):
+        header = f"{' '*(50-(len(header)))}{header}.{stack['function']}".upper()
         message = f"{header}\n{message}"
+
+    if kwargs.get('add_function', False):
+        message = f"\t{stack['function']}{message}"
 
     print(f"{message}\n\t\tFile \"{stack['file']}\", line {stack['line_num']}, in {stack['function']}\n")
 
@@ -689,12 +705,13 @@ class GenericTree:
         self.sorted_nodes = []
 
     def build_tree(self, node_list, get_parent_callback=None):
-        debug_print(f"BUILDING TREE WITH NODE LIST: {node_list}")  # DEBUGGER
+        debug_print(f"BUILDING TREE WITH NODE LIST:", to_format=node_list, style="CONTAINER",
+                    header="GenericTree")  # DEBUGGER
         for node in node_list:
             parent = get_parent_callback(node) if get_parent_callback else None
             debug_print(f"WORKING ON NODE: {node}\tNODE'S PARENT SET TO: {parent}")  # DEBUGGER
             self.tree[parent].append(node)
-        debug_print("UPDATED TREE: defaultdict(list)\n{}", style='CONTAINER',
+        debug_print("UPDATED TREE: defaultdict(list)", style='CONTAINER',
                     to_format=self.tree, header="GenericTree")  # DEBUGGER
 
     def traverse_tree(self, node):
