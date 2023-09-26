@@ -1,9 +1,11 @@
+from collections import deque
+
 import maya.cmds as cmds
 import traceback
-from typing import Type, Dict, Any
+from typing import Type
 import inspect
 
-debug_level = 8  # 0 - 10
+debug_level = 0  # 0 - 10
 style_presets = {
     "SECTION": {'div': ("|" + "~~" * 50 + "|\n"), 'add_div': True, 'header_function': True, 'section': True},
     "SECTION-END": {'div': ("\n|" + "/\\" * 50 + "|\n|" + "\\/" * 50 + "|"), 'add_end_div': True,
@@ -98,22 +100,43 @@ def debug_print(message, style=None, **kwargs):
 
 
 class IkManager:
-    def __init__(self):
+    def __init__(self, _selection=None):
         debug_print("START OF IK MANAGER INITIALIZATION", style="SECTION", header="IkManager",
                     level=10)  # DEBUGGER
-        self.selection = SelectionOperator()
-        self.joint_list = self.selection.get(_type="joint", _all=True)
-        debug_print("IK MANAGER GETTING ALL JOINT'S IN MAYA SCENE", to_format=self.joint_list,
-                    style="CONTAINER", header="IkManager", level=4)  # DEBUGGER
-        self.tree = MayaObjectTree(self.joint_list, MayaObject, _type="joint")
-        debug_print("IK MANAGER GETTING ALL JOINT'S IN MAYA SCENE", to_format=self.tree.nodes["ENDS"],
-                    style="CONTAINER", header="IkManager", level=8)  # DEBUGGER
+        self.selection = MayaSelectionOperator().selection
+        self.mapped_selection = MayaSelectionOperator().map_hierarchy(self.selection)
+        debug_print("IK MANAGER GETTING SELECTION IN MAYA SCENE", to_format=self.mapped_selection,
+                    style="CONTAINER", header="IkManager", level=10)  # DEBUGGER
+        self.tree = MayaObjectTree(self.mapped_selection, MayaObject)
+        debug_print("IK MANAGER GETTING ALL SELECTED HIERARCHIES IN MAYA SCENE",
+                    to_format=self.tree.nodes, style="CONTAINER", header="IkManager", level=10)  # DEBUGGER
         debug_print("END OF IK MANAGER INITIALIZATION", style="SECTION", header="IkManager",
                     level=10)  # DEBUGGER
 
 
-class SelectionOperator:
-    # A mapping between the _type and the argument passed to __get_selection.
+class MayaSelectionOperator:
+    selection = cmds.ls(sl=True)
+
+    def __init__(self):
+        debug_print("INITIALIZING SELECTION OPERATOR", style="SECTION", header="MayaSelectionOperator",
+                    level=10)
+
+    @staticmethod
+    def generic_getter(func):
+        def wrapper(self, _object, *args, **kwargs):  # noqa
+            expected_args = len(inspect.signature(func).parameters)
+            debug_print(f"GETTING: {func} FROM: MayaObject EXPECTS {expected_args} ARGS", level=1)
+
+            # Check if the function expects just one argument, and call accordingly
+            if expected_args == 1:
+                debug_print(f"CALLING: {func} WITH 1 ARG: {_object}", level=1)
+                return func(_object)
+            else:
+                debug_print(f"CALLING: {func} WITH ARGS: {_object}, {args}, {kwargs}", level=1)
+                return func(_object, *args, **kwargs)
+
+        return wrapper
+
     type_to_arg = {
         "joint": "joint",
         "control": "transform",
@@ -123,6 +146,10 @@ class SelectionOperator:
         "all": {"all": True},
         "long": {"long": True},
     }
+
+    @staticmethod
+    def strip_path(value):
+        return value[0].split("|")[-1] if isinstance(value, list) else value
 
     @staticmethod
     def __get_selection(_type=None, long=False, _all=False):
@@ -162,6 +189,54 @@ class SelectionOperator:
         else:
             return len(arg) if isinstance(arg, list) else 1
 
+    def map_hierarchy(self, item_list: list | str):
+        debug_print(f"MAPPING HIERARCHY OF: {item_list}", style="CONTAINER", header="MayaSelectionOperator",
+                    level=5)
+
+        def find_top_parent(_node: str):
+            if _node is None:
+                return None
+            parent = cmds.listRelatives(_node, parent=True)
+            return _node if parent is None else find_top_parent(self.strip_path(parent[0]))
+
+        def get_hierarchy(_root):
+            debug_print(f"GETTING HIERARCHY OF: {_root}", style="CONTAINER", header="MayaSelectionOperator",
+                        level=5)
+            _hierarchy = {}
+            queue = deque([(_root, _hierarchy)])
+            while queue:
+                current, parent_dict = queue.popleft()
+                children = cmds.listRelatives(current, children=True) or []
+                parent_dict[current] = child_dict = {}
+                for child in children:
+                    queue.append((child, child_dict))
+            debug_print(f"HIERARCHY OF: {_root} IS: {_hierarchy}", style="CONTAINER",
+                        header="MayaSelectionOperator", level=5)
+
+            return _hierarchy
+
+        result = {}
+        if isinstance(item_list, str):
+            item_list = [item_list]
+
+        for item in item_list:
+            if item is None:
+                debug_print("NO ITEM PROVIDED TO TREE", level=6)
+                raise Exception("No item or item list provided")
+
+            if cmds.objExists(item):
+                debug_print(f"INITIALIZING TREE WITH: {item}", level=4)
+                root = find_top_parent(item)
+            else:
+                raise Exception(f"Item: {item} does not exist in scene")
+            hierarchy = get_hierarchy(root)
+            result[root] = hierarchy
+
+        if len(result) > 1:
+            result = {"multiple_roots": result}
+
+        return result
+
 
 class TreeNode:
     _instances = {}
@@ -174,6 +249,7 @@ class TreeNode:
         return instance
 
     def __init__(self, identity, ):
+        self.children = None
         self._identity = identity
         self._parent_node = None
         self._children_nodes = []
@@ -225,14 +301,17 @@ class TreeNode:
         debug_print(f"CHILDREN OF {self}:\n",
                     to_format=self._children_nodes, style="CONTAINER", header="TreeNode", level=4)  # DEBUGGER
 
+    def get(self, param):
+        pass
+
 
 class MayaObject(TreeNode):
 
     @staticmethod
     def generic_getter(func):
-        def wrapper(self, _object, *args, **kwargs):
+        def wrapper(self, _object, *args, **kwargs):  # noqa
             expected_args = len(inspect.signature(func).parameters)
-            debug_print(f"GETTING: {func} FROM: MayaObject ExPECTS {expected_args} ARGS", level=1)
+            debug_print(f"GETTING: {func} FROM: MayaObject EXPECTS {expected_args} ARGS", level=1)
 
             # Check if the function expects just one argument, and call accordingly
             if expected_args == 1:
@@ -343,7 +422,7 @@ class MayaObject(TreeNode):
         return cmds.distanceDimension(sp=self.center, ep=other.get_center())
 
     def duplicate(self, name: str):
-        new_object = MayaObject(name, self._type)
+        new_object = MayaObject(name)
         new_object.world_position = self.world_position
         new_object.rotation = self.rotation
         new_object.scale = self.scale
@@ -357,9 +436,9 @@ class BaseTree:
         self.leaves = []
         self.nodes = {}
         self.node_class = node_class if node_class else TreeNode
-        self.nodes = self.initialize_from_list(item_list) if item_list else None
+        self.nodes = self.initialize(item_list) if item_list else None
 
-    def initialize_from_list(self, item_list):
+    def initialize(self, item_list):
         pass
 
     @staticmethod
@@ -375,10 +454,51 @@ class MayaObjectTree(BaseTree):
                     style="CONTAINER", to_format=item_list, header="MayaObjectTree", level=2)  # DEBUGGER
         super().__init__(item_list, node_class, _type)
 
-    def __instance_nodes(self, name_list):
-        debug_print(f"INSTANCING NODES FROM: {name_list}", style="CONTAINER", header="MayaObjectTree",
+    def __repr__(self):
+        return
+
+    def __instance_nodes_list(self, name_list: list):
+        debug_print(f"INSTANCING NODES FROM <NODE LIST>: {name_list}", style="CONTAINER", header="MayaObjectTree",
                     level=2)  # DEBUGGER
         return dict((name, self.node_class(name)) for name in name_list if self.node_class(name).get("object_exists"))
+
+    def __instance_nodes_dict(self, node_map: dict, parent_node, collector: dict = None):
+        debug_print(f"INSTANCING NODES FROM <NODE DICT>: {node_map}", header="MayaObjectTree",
+                    level=1)  # DEBUGGER
+        if collector is None:
+            debug_print(f"COLLECTOR IS NONE, SETTING TO EMPTY DICT", header="MayaObjectTree",
+                        level=2)  # DEBUGGER
+            collector = {}
+
+        for node_name, children in node_map.items():
+            if node_name == "multiple_roots":
+                debug_print(f"NODE: {node_name} IS A MULTIPLE ROOTS DICT", style="CONTAINER",
+                            header="MayaObjectTree", level=1)  # DEBUGGER
+                for root, children in node_map["multiple_roots"].items():
+                    debug_print(f"NODE: {node_name} HAS ROOT: {root}", header="MayaObjectTree",
+                                level=3)  # DEBUGGER
+                    self.__instance_nodes_dict(children, self.node_class(root), collector)
+                    if self.node_class(root).get("object_exists"):
+                        collector[root] = self.node_class(root)
+            else:
+                current_node = self.node_class(node_name)
+                if parent_node and current_node.get("object_exists"):
+                    debug_print(f"NODE: {node_name} HAS PARENT: {parent_node}",  header="MayaObjectTree",
+                                level=1)  # DEBUGGER
+                    parent_node.add_child(current_node)
+
+                if current_node.get("object_exists"):
+                    debug_print(f"NODE: {node_name} IS A VALID NODE", header="MayaObjectTree",
+                                level=1)  # DEBUGGER
+                    collector[node_name] = current_node
+
+                if children:
+                    debug_print(f"NODE: {node_name} HAS CHILDREN: {children}", header="MayaObjectTree",
+                                level=1)  # DEBUGGER
+                    self.__instance_nodes_dict(children, current_node, collector)
+        debug_print(f"INSTANCED NODES:", to_format=collector, style="CONTAINER", header="MayaObjectTree",
+                    level=2)  # DEBUGGER
+        return collector
 
     def __get_node_parent(self, node_name: str):
         debug_print(f"GETTING PARENT OF: {node_name}", header="MayaObjectTree", level=1)  # DEBUGGER
@@ -426,9 +546,10 @@ class MayaObjectTree(BaseTree):
             return maya_object.children_nodes
         raise Exception(f"NODE: {node_name} PARENT IS NOT {child_node}")
 
-    def __find_roots_and_leaf_nodes(self, node_list: str):
+    def __find_roots_and_leaf_nodes(self, node_list: list):
         debug_print(f"FINDING ROOTS AND LEAVES FROM: {node_list}", style="CONTAINER",
                     header="MayaObjectTree", level=1)  # DEBUGGER
+
         for node in node_list:
             debug_print(f"WORKING ON NODE: {node}", header="MayaObjectTree", level=1)  # DEBUGGER
             maya_object = self.node_class(node)
@@ -449,11 +570,11 @@ class MayaObjectTree(BaseTree):
                     level=2)  # DEBUGGER
 
     def __clean_final_return(self, return_dict):
-        debug_print(f"CLEANING RETURN: {return_dict}", style="CONTAINER", header="MayaObjectTree",
+        debug_print(f"CLEANING RETURN:", to_format=return_dict, style="CONTAINER", header="MayaObjectTree",
                     level=2)  # DEBUGGER
         result = {"NODES": {}, "ENDS": {"LEAVES": None, "ROOTS": None}}
         for key, value in return_dict.items():
-            result["NODES"] = {key: self.node_class(key)}
+            result["NODES"].update({key: self.node_class(key)})
         #     result["DATA"]{key: 'parent'} = self.node_class(value).parent_node.name if value.parent_node else None
         #     result["DATA"]{key: 'children'} = [child for child in self.node_class(key).children_nodes]
         #     result["DATA"]{key: 'type'} = value.type
@@ -462,41 +583,58 @@ class MayaObjectTree(BaseTree):
         #     result["DATA"]{key: 'scale'} = value.scale
         result["ENDS"]["LEAVES"] = "".join([f"\n\t\t\tNAME: {leaf.name}" for leaf in self.leaves])  # noqa
         result["ENDS"]["ROOTS"] = "".join([f"\n\t\t\tNAME: {root.name}" for root in self.roots])  # noqa
-        debug_print(f"CLEANED RETURN: {result}", style="CONTAINER", header="MayaObjectTree",
-                    level=2)
+        debug_print(f"CLEANED RETURN:", to_format=result, style="CONTAINER", header="MayaObjectTree",
+                    level=10)
         return result
 
-    def initialize_from_list(self, item_list):
-        instances = self.__instance_nodes(item_list)
-        debug_print(f"INSTANCES: {instances}", style="CONTAINER", header="MayaObjectTree", level=2)  # DEBUGGER
-
-        for item_name, node in instances.items():
+    def __set_relationships(self, _node_instances: dict):
+        for node_name, node in _node_instances.items():
             try:
-                debug_print(f"WORKING ON ITEM: {item_name} AND NODE: {node}", style="CONTAINER",
+                debug_print(f"WORKING ON ITEM: {node_name} AND NODE: {node}", style="CONTAINER",
                             header="MayaObjectTree", level=4)  # DEBUGGER
-                self.__set_parent_node(item_name)
-                self.__set_children_nodes(item_name)
+                self.__set_parent_node(node_name)
+                self.__set_children_nodes(node_name)
             except Exception as e:
-                debug_print(f"Error while processing item: {item_name}. Error: {str(e)}", header="MayaObjectTree",
+                debug_print(f"Error while processing item: {node_name}. Error: {str(e)}", header="MayaObjectTree",
                             level=8)  # DEBUGGER
 
-        self.__find_roots_and_leaf_nodes(item_list)
+    def initialize(self, node_map: list | str | dict):
+        debug_print(f"INITIALIZING TREE WITH: {node_map}", style="CONTAINER", header="MayaObjectTree",
+                    level=2)
+        if isinstance(node_map, dict):
+            debug_print(f"INSTANCING NODES FROM DICT", debug_level=1)
+            instances = self.__instance_nodes_dict(node_map, None)
+
+        elif isinstance(node_map, list):
+            debug_print(f"INSTANCING NODES FROM LIST", debug_level=1)
+            instances = self.__instance_nodes_list(node_map)
+        else:
+            debug_print(f"INSTANCING NODES FROM STR", debug_level=1)
+            instances = self.__instance_nodes_list([node_map])
+        debug_print(f"RETURNED INSTANCES:", to_format=instances, style="CONTAINER", header="MayaObjectTree",
+                    level=4) if instances else None  # DEBUGGER
+        self.__set_relationships(instances)
+        self.__find_roots_and_leaf_nodes([nodes for _, nodes in instances.items()])
         instances = self.__clean_final_return(instances)
         if self.nodes is None:
             debug_print(f"SETTING TREE TO: {instances}", style="CONTAINER", header="MayaObjectTree",
                         level=2)  # DEBUGGER
             debug_print("END OF INITIALIZING TREE", style="END-SECTION", header="MayaObjectTree",
-                        level=10)  # DEBUGGER
+                        level=2)  # DEBUGGER
             self.nodes = instances
         else:
             debug_print(f"ADDING TO TREE: {instances}", style="CONTAINER", header="MayaObjectTree",
                         level=2)  # DEBUGGER
 
             debug_print("END OF INITIALIZING TREE", style="END-SECTION", header="MayaObjectTree",
-                        level=10)  # DEBUGGER
+                        level=2)  # DEBUGGER
             return instances
 
 
 if __name__ == "__main__":
-    ik = IkManager()
+    selection = MayaSelectionOperator().selection
+    ik = IkManager(selection)
+
+    # joint_list = MayaSelectionOperator().get(_type="joint", _all=True)
+    # ik = IkManager(joint_list)
     # ik.create_ik()
