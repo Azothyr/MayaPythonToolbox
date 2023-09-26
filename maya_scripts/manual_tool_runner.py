@@ -1,8 +1,9 @@
 import maya.cmds as cmds
 import traceback
-from typing import Type
+from typing import Type, Dict, Any
+import inspect
 
-debug_level = 0  # 0 - 10
+debug_level = 8  # 0 - 10
 style_presets = {
     "SECTION": {'div': ("|" + "~~" * 50 + "|\n"), 'add_div': True, 'header_function': True, 'section': True},
     "SECTION-END": {'div': ("\n|" + "/\\" * 50 + "|\n|" + "\\/" * 50 + "|"), 'add_end_div': True,
@@ -58,7 +59,8 @@ def debug_print(message, style=None, **kwargs):
             result = "{\n" + '\n'.join([f"\t\t{k}, {v}" for k, v in data.items()]) + "\n\t\t}"
         elif isinstance(data, list or tuple):
             if all(isinstance(item, float or int) for item in data):
-                result = "[\n\t\t" + '\n\t\t'.join([f"X: {item[0]}, Y: {item[1]}, Z: {item[2]}" for item in data]) + "\n\t\t]"
+                result = "[\n\t\t" + '\n\t\t'.join(
+                    [f"X: {item[0]}, Y: {item[1]}, Z: {item[2]}" for item in data]) + "\n\t\t]"
             else:
                 result = "[\n\t\t" + '\n\t\t'.join([f"{item}," for item in data]) + "\n\t\t]"
         else:
@@ -97,11 +99,17 @@ def debug_print(message, style=None, **kwargs):
 
 class IkManager:
     def __init__(self):
+        debug_print("START OF IK MANAGER INITIALIZATION", style="SECTION", header="IkManager",
+                    level=10)  # DEBUGGER
         self.selection = SelectionOperator()
         self.joint_list = self.selection.get(_type="joint", _all=True)
         debug_print("IK MANAGER GETTING ALL JOINT'S IN MAYA SCENE", to_format=self.joint_list,
                     style="CONTAINER", header="IkManager", level=4)  # DEBUGGER
         self.tree = MayaObjectTree(self.joint_list, MayaObject, _type="joint")
+        debug_print("IK MANAGER GETTING ALL JOINT'S IN MAYA SCENE", to_format=self.tree.nodes["ENDS"],
+                    style="CONTAINER", header="IkManager", level=8)  # DEBUGGER
+        debug_print("END OF IK MANAGER INITIALIZATION", style="SECTION", header="IkManager",
+                    level=10)  # DEBUGGER
 
 
 class SelectionOperator:
@@ -124,6 +132,8 @@ class SelectionOperator:
             return cmds.ls(sl=True, long=long) if _type is None else cmds.ls(sl=True, type=_type, long=long)
 
     def get(self, _type: object, _all: bool = False):
+        debug_print(f"GETTING: {self.__get_selected_type(_type, _all=_all)}", style="CONTAINER",
+                    header="SelectionOperator", level=5)  # DEBUGGER
         return self.__get_selected_type(_type, _all=_all)
 
     @staticmethod
@@ -154,338 +164,203 @@ class SelectionOperator:
 
 
 class TreeNode:
-    def __init__(self, external_id, _type=None):
-        debug_print("INITIALIZING TREE NODE", style="SECTION", header="tree node", level=2)  # DEBUGGER
-        debug_print(f"PASSED TO TREE NODE, NAME: {external_id}, TYPE: {_type}", level=3)  # DEBUGGER
-        self.__dict__.update({
-            'data': {},
-        })
-        self.data['name'] = external_id
-        self.data['type'] = _type
-        self.data['children']: list[TreeNode] = []
-        self.data['parent'] = None
-        debug_print(f"SELF.__DICT__:", to_format=self.__dict__, style="CONTAINER", header="tree node",
-                    level=4)  # DEBUGGER
+    _instances = {}
+
+    def __new__(cls, identity, *args, **kwargs):
+        if identity in cls._instances:
+            return cls._instances[identity]
+        instance = super(TreeNode, cls).__new__(cls)
+        cls._instances[identity] = instance
+        return instance
+
+    def __init__(self, identity, ):
+        self._identity = identity
+        self._parent_node = None
+        self._children_nodes = []
 
     def __repr__(self):
-        debug_print(f"GETTING REPRESENTATION OF: {self}", level=1)  # DEBUGGER
-        return self
+        return f"{self.__class__}({self._identity})"
 
     def __str__(self):
-        debug_print(f"GETTING STRING REPRESENTATION OF: {self}", level=1)  # DEBUGGER
-        return f"{self.type}: {self.name}"
+        return f"{self.__class__}({self._identity})"
 
-    def __getattr__(self, attr_name):
-        # Remove leading underscore if exists
-        cleaned_name = attr_name.lstrip("_")
+    @property
+    def parent_node(self):
+        return self._parent_node
 
-        # Search in 'data' dict
-        if cleaned_name in self.__dict__.get("data", {}):
-            return self.__dict__["data"][cleaned_name]
+    @parent_node.setter
+    def parent_node(self, parent_node):
+        self.add_parent(parent_node)
 
-        # Search in other known attributes
-        known_attrs = ['data', 'children', 'parent', 'type', 'name']
-        for known_attr in known_attrs:
-            if cleaned_name == known_attr:
-                return self.__dict__[known_attr]
+    @property
+    def children_nodes(self):
+        return self._children_nodes
 
-        # If we reach here, the attribute wasn't found
-        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr_name}'")
+    @parent_node.setter
+    def parent_node(self, child_node):
+        self.add_child(child_node)
 
-    def __setattr__(self, _key, value):
-        debug_print(f"SETTING ATTRIBUTE {_key} TO {value}", header="tree node", level=2)  # DEBUGGER
-        if 'data' in self.__dict__:
-            containers = ['data', '_children', '_parent', '_type', '_name']
-            if _key in containers:  # Add other base attributes as needed
-                debug_print(f"SETTING ATTRIBUTE IN {containers}, KEY: {_key} TO: {value}", level=3)  # DEBUGGER
-                self.__dict__[_key] = value  # Directly set the attribute in the instance dictionary
-            else:
-                debug_print(f"SETTING ATTRIBUTE, KEY: {_key} TO: {value}", level=3)  # DEBUGGER
-                self.__dict__['data'][_key] = value  # Otherwise, add it to the 'data' dictionary
+    def add_parent(self, parent_node: 'TreeNode'):
+        debug_print(f"ADDING PARENT: {parent_node} TO: {self._identity}", level=3)
+        self._parent_node = parent_node
+        parent_node.add_child(self)
+        debug_print(f"PARENT OF {self._identity} IS {self._parent_node._identity}:\n", header="TreeNode", level=4)
+
+    def remove_parent(self, parent_node: 'TreeNode'):
+        debug_print(f"REMOVING PARENT: {parent_node} FROM: {self._identity}", level=3)
+        self._parent_node = None
+        parent_node.remove_child(self)
 
     def add_child(self, child_node: 'TreeNode'):
         debug_print(f"ADDING CHILD: {child_node} TO: {self}", level=3)  # DEBUGGER
-        self._children.append(child_node)
-        child_node.parent = self
+        self._children_nodes.append(child_node)
+        child_node._parent_node = self
         debug_print(f"CHILDREN OF {self}:\n",
-                    to_format=self.children, style="CONTAINER", header="TreeNode", level=4)  # DEBUGGER
+                    to_format=self._children_nodes, style="CONTAINER", header="TreeNode", level=4)  # DEBUGGER
 
     def remove_child(self, child_node: 'TreeNode'):
         debug_print(f"REMOVING CHILD: {child_node} FROM: {self}", level=3)  # DEBUGGER
-        self._children.remove(child_node)
-        child_node.parent = None
+        self._children_nodes.remove(child_node)
+        child_node._parent_node = None
         debug_print(f"CHILDREN OF {self}:\n",
-                    to_format=self.children, style="CONTAINER", header="TreeNode", level=4)  # DEBUGGER
+                    to_format=self._children_nodes, style="CONTAINER", header="TreeNode", level=4)  # DEBUGGER
 
 
 class MayaObject(TreeNode):
-    def __init__(self, ext_id: str, _type: str = None, parent: str = None):
-        debug_print("INITIALIZING MAYA OBJECT", style="SECTION", header="maya object", level=2)  # DEBUGGER
-        debug_print(f"PASSED VALUES, NAME: {ext_id}, TYPE: {_type}", level=1)  # DEBUGGER
-        if isinstance(ext_id, list):
-            debug_print(f"EXT_ID IS A LIST, GETTING FIRST ITEM", level=1)  # DEBUGGER
-            ext_id = ext_id[0]
-        debug_print(f"INITIALIZING MAYA OBJECT WITH: {ext_id}, ", level=2)  # DEBUGGER
-        self.data = self.__dict__
-        super().__init__(ext_id, _type)
-        debug_print(f"INITIALIZED MAYA OBJECT: {self} WITH DATA:", style="SECTION", header="maya object", level=1)
-        self.data['name'] = self.strip_to_name(ext_id) if ext_id and self._exists(ext_id) else None
-        debug_print(f"INITIALIZED MAYA OBJECT: "
-                    f"{_type if _type and _type.lower() == cmds.objectType(ext_id) else cmds.objectType(ext_id)}"
-                    f" WITH DATA:", style="SECTION", header="maya object",)
-        self.data['type'] = _type if _type and _type.lower() == cmds.objectType(ext_id) else cmds.objectType(ext_id)
-        self.data['world_position'] = self.data.get('world_position', parent)
-        self.data['rotation'] = self.data.get('rotation', parent)
-        self.data['scale'] = self.data.get('scale', parent)
-        self.data['children'] = self.data.get('children', parent)
-        self.data['parent'] = self.data.get('parent', parent)
-        debug_print(f"INITIALIZED MAYA OBJECT: {self} WITH DATA:", style="SECTION", header="maya object",
-                    to_format=self.data, level=4)  # DEBUGGER
 
     @staticmethod
-    def strip_to_name(value: str):
-        if '|' in value:
-            return value.split('|')[-1]
-        else:
-            return value
+    def generic_getter(func):
+        def wrapper(self, _object, *args, **kwargs):
+            expected_args = len(inspect.signature(func).parameters)
+            debug_print(f"GETTING: {func} FROM: MayaObject ExPECTS {expected_args} ARGS", level=1)
 
-    @staticmethod
-    def _exists(name):
-        return cmds.objExists(name)
+            # Check if the function expects just one argument, and call accordingly
+            if expected_args == 1:
+                debug_print(f"CALLING: {func} WITH 1 ARG: {_object}", level=1)
+                return func(_object)
+            else:
+                debug_print(f"CALLING: {func} WITH ARGS: {_object}, {args}, {kwargs}", level=1)
+                return func(_object, *args, **kwargs)
 
-    def create(self, _type, name=None):
-        if name is None:
-            name = self.data['name']
-        cmds.createNode(_type, name=name)
+        return wrapper
 
-    def un_parent(self): self.parent = 'world'
+    def get_parent(self, _object):
+        debug_print(f"GETTING PARENT OF: {self.name}", header="MayaObjectTree", level=2)  # DEBUGGER
+        parent = cmds.listRelatives(_object, parent=True)
+        return self.strip_path(parent) if parent else None
 
-    def __repr__(self): return self
+    def get_children(self, _object):
+        debug_print(f"GETTING CHILDREN OF: {self.name}", header="MayaObjectTree", level=2)  # DEBUGGER
+        parent = cmds.listRelatives(_object, children=True)
+        return self.strip_path(parent) if parent else None
 
-    def __str__(self): return (f'{self._type}: "{self.name}" \nWorld Position: {self.world_position}' 
-                               f'\nRotaion: {self.rotation}\nScale: {self.scale}\nParent: {self.parent}\n')
-
-    def __name__(self):
-        return self.name
-
-    def __class__(self):
-        return type(self)
-
-    @property
-    def world_position(self):
-        debug_print(f"GETTING WORLD POSITION OF: {self.name}", level=1)
-        if self.data.get('world_position', None) is None:
-            self.data['world_position'] = cmds.xform(self.name, q=True, ws=True, t=True)
-        debug_info = [str(item) for item in self.data.get('world_position')]
-        debug_print(f"WORLD POSITION OF {self.name}:", to_format=debug_info,
-                    style="CONTAINER", header="MayaObject", level=2)  # DEBUGGER
-        return self.data.get('world_position')
-
-    @world_position.setter
-    def world_position(self, position: tuple[3]):
-        debug_info = [str(item) for item in position]
-        debug_print(f"SETTING WORLD POSITION OF: {self.name} TO:",
-                    to_format=debug_info, style="CONTAINER", header="MayaObject", level=2)  # DEBUGGER
-        self.data['world_position'] = cmds.xform(self.name, ws=True, t=position)
-
-    @property
-    def rotation(self):
-        debug_print(f"GETTING ROTATION OF: {self.name}", level=1)
-        if self.data.get('rotation', None) is None:
-            self.data['rotation'] = cmds.xform(self.name, q=True, ws=True, ro=True)
-        debug_info = [str(item) for item in self.data.get('world_position')]
-        debug_print(f"ROTATION OF {self.name}:",
-                    to_format=debug_info, style="CONTAINER", header="MayaObject", level=2)  # DEBUGGER
-        return self.data.get('rotation')
-
-    @rotation.setter
-    def rotation(self, rotation: tuple[3]):
-        debug_info = [str(item) for item in rotation]
-        debug_print(f"SETTING ROTATION OF: {self.name} TO:",
-                    to_format=debug_info, style="CONTAINER", header="MayaObject", level=2)  # DEBUGGER
-        self.data['rotation'] = cmds.xform(self.name, ws=True, ro=rotation)
-
-    @property
-    def scale(self):
-        debug_print(f"GETTING SCALE OF: {self.name}", level=1)
-        if self.data.get('scale', None) is None:
-            self.data['scale'] = cmds.xform(self.name, q=True, ws=True, scale=True)
-        debug_info = [str(item) for item in self.data.get('scale')]
-        debug_print(f"SCALE OF {self.name}:",
-                    to_format=debug_info, style="CONTAINER", header="MayaObject", level=2)  # DEBUGGER
-        return self.data.get('scale')
-
-    @scale.setter
-    def scale(self, scale: tuple[3]):
-        debug_print(f"SETTING SCALE OF: {self.name} TO: {scale}", level=1)
-        self.data['scale'] = cmds.xform(self.name, ws=True, scale=scale)
-        debug_info = [str(item) for item in scale]
-        debug_print(f"SCALE OF {self.name}:",
-                    to_format=debug_info, style="CONTAINER", header="MayaObject", level=2)  # DEBUGGER
-
-    @property
-    def parent(self):
-        debug_print(f"GETTING PARENT: {self.data.get('parent', None)}", level=1)  # DEBUGGER
-        if self.data.get('parent', None) is None:
-            debug_print(f" PARENT IS {self.data['parent']}, CHECKING MAYA", level=2)  # DEBUGGER
-            parent = cmds.listRelatives(self.name, parent=True)
-            if isinstance(parent, list):
-                if "|" in parent[0]:
-                    parent = parent[0].split('|')[-1]
-                parent = parent[0]
-            self.data['parent'] = self.strip_to_name(parent) if parent else None
-        debug_print(f"PARENT OF {self.name}: {self.data.get('parent', None)}", level=2)  # DEBUGGER
-        return self.data.get('parent')
-
-    @parent.setter
-    def parent(self, parent):
-        debug_print(f"SETTING PARENT: {parent}", level=1)  # DEBUGGER
-        if isinstance(parent, list):
-            if "|" in parent[0]:
-                parent = parent[0].split('|')[-1]
-            parent = parent[0]
-        if parent == 'world':
-            debug_print(f"UNPARENTING: {self.name} SET TO {'WORLD considered None'}", level=2)  # DEBUGGER
-            self.data['parent'] = cmds.parent(self.name, world=True)
-        else:
-            self.data['parent'] = cmds.parent(self.name, parent) if cmds.objExists(
-                parent) else cmds.parent(self.name, world=True)
-            debug_print(f"PARENTING: {self.name} TO: {parent}", level=2)  # DEBUGGER
-
-    @property
-    def children(self):
-        debug_print(f"GETTING CHILDREN OF: {self.name}", level=1)  # DEBUGGER
-        children = '\n'.join([str(child) for child in self.children]) if self.data.get('children', None) else None
-        debug_print(f"CHILDREN OF {self.name}:\n{children}", level=2)  # DEBUGGER
-        return children
-
-    @children.setter
-    def children(self, node):
-        debug_print(f"ADDING CHILD: {node} TO: {self.name}", level=1)  # DEBUGGER
-        self.add_child(node)
-
-    @property
-    def ancestors(self):
-        debug_print(f"GETTING ANCESTORS OF: {self.name}", level=1)  # DEBUGGER
-        if not self.data.get('ancestors', None):
-            ancestors = cmds.listRelatives(self.name, allParents=True)
-            self.data['ancestors'] = ancestors
-        else:
-            ancestors = self.data.get('ancestors')
-        ancestors = '\n'.join([self.strip_to_name(ancestor) for ancestor in ancestors])
-        debug_print(f"ANCESTORS OF {self.name}:\n{ancestors}", level=2)  # DEBUGGER
-        return ancestors
-
-    @property
-    def type(self):
-        debug_print(f"GETTING TYPE OF: {self.name}", level=1)  # DEBUGGER
-        self.data['type'] = self.data.get('type', cmds.objectType(self.name))
-        debug_print(f"TYPE OF {self.name}: {self.data.get('type')}", level=2)  # DEBUGGER
-        return self.data.get('type', cmds.objectType(self.name))
-
-    @property
-    def shape(self):
-        debug_print(f"GETTING SHAPE OF: {self.name}", level=1)  # DEBUGGER
-        self.data['shape'] = self.data.get('shape', cmds.listRelatives(self.name, shapes=True))
-        debug_print(f"SHAPE OF {self.name}: {self.data.get('shape')}", level=2)  # DEBUGGER
-        return self.data['shape']
-
-    @property
-    def shape_type(self):
-        debug_print(f"GETTING SHAPE TYPE OF: {self.name}", level=1)  # DEBUGGER
-        self.data['shape_type'] = self.data.get('shape_type', cmds.objectType(self.shape))
-        debug_print(f"SHAPE TYPE OF {self.name}: {self.data.get('shape_type')}", level=2)  # DEBUGGER
-        return self.data['shape_type']
-
-    @property
-    def bounding_box(self):
-        debug_print(f"GETTING BOUNDING BOX OF: {self.name}", level=1)  # DEBUGGER
-        debug_print(f"BOUNDING BOX OF {self.name}: {self.data.get('bounding_box', None)}", level=2)  # DEBUGGER
-        return self.data.get('bounding_box', cmds.exactWorldBoundingBox(self.name))
-
-    @property
     def center(self):
-        debug_print(f"GETTING CENTER OF: {self.name}", level=1)  # DEBUGGER
-        bbox = self.data.get('center', None) if self.data.get('center') else self.bounding_box
-        debug_print(f"CENTER OF {self.name}: {bbox}", level=2)  # DEBUGGER
+        debug_print(f"GETTING CENTER OF: {self.name}", header="MayaObjectTree", level=1)  # DEBUGGER
+        bbox = self.get("bounding_box")
         return (
             (bbox[0] + bbox[3]) / 2,
             (bbox[1] + bbox[4]) / 2,
             (bbox[2] + bbox[5]) / 2
         )
 
+    setters = {
+        "world_position": generic_getter(lambda _object, xyz: cmds.xform(_object, ws=True, t=xyz)),
+        "rotation": generic_getter(lambda _object: cmds.xform(_object, q=True, ws=True, ro=True)),
+        "scale": generic_getter(lambda _object, _scale: cmds.xform(_object, ws=True, scale=_scale)),
+        "parent": generic_getter(lambda _object, _parent: cmds.parent(_object, _parent)),
+        "unparent": generic_getter(lambda _object: cmds.parent(_object, world=True)),
+    }
+    getters = {
+        "type": generic_getter(lambda _object: cmds.objectType(_object)),
+        "world_position": generic_getter(lambda _object: cmds.xform(_object, ws=True, q=True, t=True)),
+        "rotation": generic_getter(lambda _object: cmds.xform(_object, q=True, ws=True, ro=True)),
+        "scale": generic_getter(lambda _object: cmds.xform(_object, q=True, ws=True, scale=True)),
+        "parent": lambda self, _object: self.get_parent(_object),
+        "children": lambda self, _object: self.get_children(_object),
+        "descendents": lambda _object: cmds.listRelatives(_object, allDescendents=True),
+        "parents": lambda _object: cmds.listRelatives(_object, allParents=True),
+        "shapes": lambda _object: cmds.listRelatives(_object, shapes=True),
+        "object_exists": generic_getter(lambda _object: cmds.objExists(_object)),
+        "bounding_box": lambda _object: cmds.exactWorldBoundingBox(_object),
+        "center": generic_getter(lambda self: self.center()),
+    }
+
+    def __init__(self, name: str, ):
+        if isinstance(name, list):
+            name = self.strip_path(name)
+        super().__init__(name)
+        self.name = name
+        self.type = self.get("type")
+        self.world_position = self.get("world_position")
+        self.rotation = self.get("rotation")
+        self.scale = self.get("scale")
+        self.parent = self.get("parent")
+        self.children = self.get("children")
+
+    def __repr__(self):
+        splitter = "- " * 8
+        return (f'\n{splitter}CLASS INSTANCE: <MayaObject id={id(self)} name={self.name}>\n{splitter}'
+                f'NAME: {self.name}\n{splitter}TYPE: {self.type}\n{splitter}WORLD POSITION: {self.world_position}'
+                f'\n{splitter}ROTATION: {self.rotation}\n{splitter}SCALE: {self.scale}\n{splitter}PARENT: {self.parent}'
+                f'\n{splitter}CHILDREN: {self.children}\n{splitter}CLASS ID: <MayaObject id={id(self)}>\n')
+
+    def __str__(self):
+        return self.name
+
+    def __name__(self):
+        return self.name
+
+    @staticmethod
+    def strip_path(value):
+        return value[0].split("|")[-1]
+
+    def create(self, _type, name=None):
+        if name is None:
+            name = self.name
+        return cmds.createNode(_type, name=name)
+
+    def get(self, function, *args, **kwargs):
+        debug_print(f"GETTING: {function} FROM: {self.name}", level=1)
+        func = self.getters.get(function, None)
+        if func:
+            result = func(self, self.name, *args, **kwargs)
+            debug_print(f"FUNCTION: {function} RETURNED: {result}", level=3)
+            return result
+
+    def set(self, function, *args, **kwargs):
+        debug_print(f"SETTING: {function} FROM: {self.name}", level=1)
+        func = self.setters.get(function, None)
+        if func:
+            result = func(self, self.name, *args, **kwargs)
+            debug_print(f"FUNCTION: {function} RETURNED: {result}", level=3)
+            return result
+
     def select(self, add=False, hierarchy=False, only=False, replace=False):
-        debug_print(f"SELECTING: {self.name}", level=1)  # DEBUGGER
         cmds.select(self.name, add=add, hi=hierarchy, noExpand=only, r=replace)
-        debug_print(f"SELECTED: {cmds.ls(sl=True)}", level=2)  # DEBUGGER
         return cmds.ls(sl=True)
 
     def distance_between(self, other):
-        debug_print(f"GETTING DISTANCE BETWEEN: {self.name} AND {other.name}", level=1)  # DEBUGGER
-        debug_print(f"DISTANCE BETWEEN {self.name} AND {other.name}:"
-                    f" {cmds.distanceDimension(sp=self.center, ep=other.get_center())}", level=2)  # DEBUGGER
         return cmds.distanceDimension(sp=self.center, ep=other.get_center())
 
     def duplicate(self, name: str):
-        debug_print(f"DUPLICATING: {self.name} AS {name}", level=1)  # DEBUGGER
         new_object = MayaObject(name, self._type)
-        new_object.un_parent()
         new_object.world_position = self.world_position
         new_object.rotation = self.rotation
         new_object.scale = self.scale
-        debug_print(f"DUPLICATED: {new_object.name}\n WITH WORLD", level=2)  # DEBUGGER
         return new_object.name
 
 
 class BaseTree:
-    def __init__(self, item_list: any = None, node_class: Type[TreeNode] = None, _type: str = None):
-        debug_print("INITIALIZING TREE", style="SECTION", header="base tree", level=10)  # DEBUGGER
-        self.roots = None
+    def __init__(self, item_list=None, node_class=None, _type=None):
+        debug_print("INITIALIZING TREE", style="SECTION", header="base tree")
+        self.roots = []
+        self.leaves = []
+        self.nodes = {}
         self.node_class = node_class if node_class else TreeNode
-        if item_list:
-            debug_print("ITEM LIST PROVIDED ON BASE TREE INIT, INITIALIZING WITH THE FOLLOWING",
-                        style="CONTAINER", to_format=item_list, header="base tree", level=3)  # DEBUGGER
-            self.initialize_from_list(item_list, _type=_type)
-        debug_print()
+        self.nodes = self.initialize_from_list(item_list) if item_list else None
 
-    def __instance_nodes(self, item_list, _type=None):
-        debug_print("INSTANCING NODES", style="SUBSECTION", header="base tree", level=7)
-        nodes = {}
-        for item in item_list:
-            debug_print(f"CREATING NODE INSTANCE FOR: {item}", level=3)  # DEBUGGER
-            node_instance = self.node_class(item, _type)
-            debug_print(f"NODE INSTANCE CREATED: {node_instance}", level=3)  # DEBUGGER
-            nodes[item] = node_instance
-        debug_print("ALL NODES CREATED:", to_format=nodes, style="CONTAINER",
-                    header="base tree", level=4)  # DEBUGGER
-        return nodes
-
-    def initialize_from_list(self, item_list, _type=None):
-        debug_print("INITIALIZING FROM LIST", style="SUBSECTION", header="base tree", level=7)  # DEBUGGER
-        debug_print("INITIALIZING FROM", style="CONTAINER", to_format=item_list, header="base tree",
-                    level=4)  # DEBUGGER
-        # Step 1: Create node instances and add them to a dictionary
-        name_to_node = self.__instance_nodes(item_list, _type=_type)
-
-        # Step 2: Set up parent-child relationships and heapify
-        for item, node in name_to_node.items():
-            debug_print(f"SETTING UP PARENT-CHILD RELATIONSHIP FOR: {item} OF {node}", level=3)  # DEBUGGER
-            parent = node.parent('parent', None)  # Assumes all data objects have a parent attribute
-            debug_print(f"PARENT OF {node}: {parent}", level=1)  # DEBUGGER
-            if parent in name_to_node:
-                debug_print(f"PARENT FOUND IN DICT", level=1)  # DEBUGGER
-                parent_node = name_to_node[parent]
-                debug_print(f"PARENT NODE: {parent_node}", level=1)  # DEBUGGER
-                parent_node.add_child(node)
-                debug_print(f"CREATED NODE AND ADDED {node} AS CHILD TO {parent}", level=3)  # DEBUGGER
-        debug_print("ALL NODES ADDED TO PARENTS:", to_format=name_to_node, style="CONTAINER",
-                    header="base tree", level=4)
-
-        # Step 3: Identify the root (no parent) and set it
-        for node in name_to_node.values():
-            if node.parent is None:
-                self.root = node
-                break
+    def initialize_from_list(self, item_list):
+        pass
 
     @staticmethod
     def remove_node(node):
@@ -496,9 +371,130 @@ class BaseTree:
 class MayaObjectTree(BaseTree):
     def __init__(self, item_list: any = None, node_class: Type[MayaObject] = None, _type: str = None):
         debug_print("INITIALIZING TREE", style="SECTION", header="MayaObjectTree", level=10)  # DEBUGGER
-        debug_print(f"INITIALIZING TREE WITH THE FOLLOWING: CLASS: {node_class}, TYPE: {_type}, ITEMS:",
-                    style="CONTAINER", to_format=item_list, header="MayaObjectTree", level=3)  # DEBUGGER
+        debug_print(f"INITIALIZING TREE WITH THE FOLLOWING: {node_class}, TYPE: {_type}, ITEMS:",
+                    style="CONTAINER", to_format=item_list, header="MayaObjectTree", level=2)  # DEBUGGER
         super().__init__(item_list, node_class, _type)
+
+    def __instance_nodes(self, name_list):
+        debug_print(f"INSTANCING NODES FROM: {name_list}", style="CONTAINER", header="MayaObjectTree",
+                    level=2)  # DEBUGGER
+        return dict((name, self.node_class(name)) for name in name_list if self.node_class(name).get("object_exists"))
+
+    def __get_node_parent(self, node_name: str):
+        debug_print(f"GETTING PARENT OF: {node_name}", header="MayaObjectTree", level=1)  # DEBUGGER
+        maya_object = self.node_class(node_name).parent if self.node_class(node_name).parent else None
+        debug_print(f"PARENT OF {node_name} IS {maya_object}:\n", header="MayaObjectTree", level=4)  # DEBUGGER
+        return maya_object
+
+    def __get_node_children(self, node_name: str):
+        debug_print(f"GETTING CHILD OF: {node_name}", header="MayaObjectTree", level=1)  # DEBUGGER
+        maya_object = self.node_class(node_name).children if self.node_class(node_name).children else None
+        debug_print(f"CHILD OF {node_name} IS {maya_object}:\n", header="MayaObjectTree", level=2)  # DEBUGGER
+        return maya_object
+
+    def __set_parent_node(self, node_name: str):
+        debug_print(f"GETTING PARENT OF: {node_name}", header="MayaObjectTree", level=1)  # DEBUGGER
+        maya_object = self.node_class(node_name)
+        if maya_object.parent is None:
+            debug_print(f"NODE: {node_name} HAS NO PARENT", header="MayaObjectTree", level=2)  # DEBUGGER
+            return None
+        parent_node = self.node_class(self.__get_node_parent(node_name))
+        if maya_object.parent == parent_node.name:
+            debug_print(f"NODE: {node_name} PARENT IS {parent_node}", header="MayaObjectTree",
+                        level=2)  # DEBUGGER
+            maya_object.add_parent(parent_node)
+            return parent_node
+        else:
+            raise Exception(f"NODE: {node_name} PARENT IS NOT {parent_node}")
+
+    def __set_children_nodes(self, node_name: str):
+        debug_print(f"GETTING CHILDREN OF: {node_name}", header="MayaObjectTree", level=1)  # DEBUGGER
+        maya_object = self.node_class(node_name)
+        if maya_object.children is None:
+            debug_print(f"NODE: {node_name} HAS NO CHILDREN", header="MayaObjectTree", level=2)  # DEBUGGER
+            return None
+        child_node = self.node_class(self.__get_node_children(node_name))
+        if isinstance(child_node, list):
+            for child in child_node:
+                if maya_object.name == child.parent:
+                    debug_print(f"ONE OF NODE: {node_name}'S CHILDREN IS {child}",
+                                header="MayaObjectTree", level=2)  # DEBUGGER
+                    maya_object.add_child(child)
+            return maya_object.children_nodes
+        elif maya_object.name == child_node.parent:
+            maya_object.add_child(child_node)
+            return maya_object.children_nodes
+        raise Exception(f"NODE: {node_name} PARENT IS NOT {child_node}")
+
+    def __find_roots_and_leaf_nodes(self, node_list: str):
+        debug_print(f"FINDING ROOTS AND LEAVES FROM: {node_list}", style="CONTAINER",
+                    header="MayaObjectTree", level=1)  # DEBUGGER
+        for node in node_list:
+            debug_print(f"WORKING ON NODE: {node}", header="MayaObjectTree", level=1)  # DEBUGGER
+            maya_object = self.node_class(node)
+            if maya_object.parent is None:
+                debug_print(f"NODE: {node} PARENT IS THE WORLD/NONE SETTING AS A ROOT",
+                            header="MayaObjectTree", level=2)  # DEBUGGER
+                self.roots.append(maya_object)
+            elif maya_object.children is None:
+                debug_print(f"NODE: {node} HAS NO CHILDREN SETTING AS A LEAF", header="MayaObjectTree",
+                            level=2)  # DEBUGGER
+                self.leaves.append(maya_object)
+            else:
+                debug_print(f"NODE: {node} IS NOT A ROOT OR LEAF", header="MayaObjectTree", level=2)
+                continue
+        debug_print(f"SEARCH COMPLETE\nROOTS: {self.roots}", style="CONTAINER", header="MayaObjectTree",
+                    level=2)  # DEBUGGER
+        debug_print(f"LEAVES: {self.leaves}", style="CONTAINER", header="MayaObjectTree",
+                    level=2)  # DEBUGGER
+
+    def __clean_final_return(self, return_dict):
+        debug_print(f"CLEANING RETURN: {return_dict}", style="CONTAINER", header="MayaObjectTree",
+                    level=2)  # DEBUGGER
+        result = {"NODES": {}, "ENDS": {"LEAVES": None, "ROOTS": None}}
+        for key, value in return_dict.items():
+            result["NODES"] = {key: self.node_class(key)}
+        #     result["DATA"]{key: 'parent'} = self.node_class(value).parent_node.name if value.parent_node else None
+        #     result["DATA"]{key: 'children'} = [child for child in self.node_class(key).children_nodes]
+        #     result["DATA"]{key: 'type'} = value.type
+        #     result["DATA"]{key: 'world_position'} = value.world_position
+        #     result["DATA"]{key: 'rotation'} = value.rotation
+        #     result["DATA"]{key: 'scale'} = value.scale
+        result["ENDS"]["LEAVES"] = "".join([f"\n\t\t\tNAME: {leaf.name}" for leaf in self.leaves])  # noqa
+        result["ENDS"]["ROOTS"] = "".join([f"\n\t\t\tNAME: {root.name}" for root in self.roots])  # noqa
+        debug_print(f"CLEANED RETURN: {result}", style="CONTAINER", header="MayaObjectTree",
+                    level=2)
+        return result
+
+    def initialize_from_list(self, item_list):
+        instances = self.__instance_nodes(item_list)
+        debug_print(f"INSTANCES: {instances}", style="CONTAINER", header="MayaObjectTree", level=2)  # DEBUGGER
+
+        for item_name, node in instances.items():
+            try:
+                debug_print(f"WORKING ON ITEM: {item_name} AND NODE: {node}", style="CONTAINER",
+                            header="MayaObjectTree", level=4)  # DEBUGGER
+                self.__set_parent_node(item_name)
+                self.__set_children_nodes(item_name)
+            except Exception as e:
+                debug_print(f"Error while processing item: {item_name}. Error: {str(e)}", header="MayaObjectTree",
+                            level=8)  # DEBUGGER
+
+        self.__find_roots_and_leaf_nodes(item_list)
+        instances = self.__clean_final_return(instances)
+        if self.nodes is None:
+            debug_print(f"SETTING TREE TO: {instances}", style="CONTAINER", header="MayaObjectTree",
+                        level=2)  # DEBUGGER
+            debug_print("END OF INITIALIZING TREE", style="END-SECTION", header="MayaObjectTree",
+                        level=10)  # DEBUGGER
+            self.nodes = instances
+        else:
+            debug_print(f"ADDING TO TREE: {instances}", style="CONTAINER", header="MayaObjectTree",
+                        level=2)  # DEBUGGER
+
+            debug_print("END OF INITIALIZING TREE", style="END-SECTION", header="MayaObjectTree",
+                        level=10)  # DEBUGGER
+            return instances
 
 
 if __name__ == "__main__":
