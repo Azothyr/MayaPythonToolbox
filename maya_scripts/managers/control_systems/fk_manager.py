@@ -98,17 +98,18 @@ class BrokenFkConstraintFactory:
 
             # Create constraints
             translate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                         name=f'{leader}_Constraining_TRANSLATION_'
+                                                         name=f'{leader}_Constraining_{follower_grp}_TRANSLATION_'
                                                               f'via_parent_constraint', mo=True,
                                                          skipRotate=["x", "y", "z"], weight=1)[0]
 
             rotate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                      name=f'{leader}_Constraining_ROTATION_via_parent_constraint',
-                                                      mo=True, skipTranslate=["x", "y", "z"], weight=1)[0]
+                                                      name=f'{leader}_Constraining_{follower_grp}_ROTATION_'
+                                                           f'via_parent_constraint', mo=True,
+                                                      skipTranslate=["x", "y", "z"], weight=1)[0]
 
             scale_constraint = cmds.scaleConstraint(leader, follower_grp,  # noqa
-                                                    name=f'{leader}_Constraining_SCALE_via_parent_constraint',
-                                                    weight=1)[0]
+                                                    name=f'{leader}_Constraining_{follower_grp}_SCALE_via'
+                                                         f'_parent_constraint', weight=1)[0]
 
             # Create attributes on the child if not already there
             if not cmds.attributeQuery('FollowTranslate', node=follower, exists=True):
@@ -126,7 +127,7 @@ class BrokenFkConstraintFactory:
 
 
 class BrokenFkManager:
-    def __init__(self, _sort_method=NoSort()):
+    def __init__(self, _sort_method: SortMethod = NoSort()):
         self.sort_method = _sort_method
         self.unsorted_selection = cmds.ls(sl=True)
         self.constraint_order_manager = ConstraintOrder()
@@ -150,7 +151,7 @@ class BrokenFkManager:
 
 
 if __name__ == "_main_":
-    broken_fk = BrokenFkManager(outliner_sort())
+    broken_fk = BrokenFkManager(OutlinerSort())
     sort_method = NoSort()
     fk_manager = BrokenFkManager(NoSort())
     fk_manager.run()

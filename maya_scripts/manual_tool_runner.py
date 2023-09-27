@@ -1,11 +1,10 @@
 from collections import deque
-
 import maya.cmds as cmds
 import traceback
 from typing import Type
 import inspect
 
-debug_level = 0  # 0 - 10
+debug_level = 5  # 0 - 10
 style_presets = {
     "SECTION": {'div': ("|" + "~~" * 50 + "|\n"), 'add_div': True, 'header_function': True, 'section': True},
     "SECTION-END": {'div': ("\n|" + "/\\" * 50 + "|\n|" + "\\/" * 50 + "|"), 'add_end_div': True,
@@ -100,11 +99,14 @@ def debug_print(message, style=None, **kwargs):
 
 
 class IkManager:
-    def __init__(self, _selection=None):
+    def __init__(self, _selection=None, root_name="Joints", excluded_types=None, included_types=None,
+                 root_type=None, _type=None, _all=False):
         debug_print("START OF IK MANAGER INITIALIZATION", style="SECTION", header="IkManager",
                     level=10)  # DEBUGGER
         self.selection = MayaSelectionOperator().selection
-        self.mapped_selection = MayaSelectionOperator().map_hierarchy(self.selection)
+        self.mapped_selection = MayaSelectionOperator(excluded_types=excluded_types,
+                                                      included_types=included_types,
+                                                      root=root_name,).map_hierarchy(self.selection)
         debug_print("IK MANAGER GETTING SELECTION IN MAYA SCENE", to_format=self.mapped_selection,
                     style="CONTAINER", header="IkManager", level=10)  # DEBUGGER
         self.tree = MayaObjectTree(self.mapped_selection, MayaObject)
@@ -113,13 +115,88 @@ class IkManager:
         debug_print("END OF IK MANAGER INITIALIZATION", style="SECTION", header="IkManager",
                     level=10)  # DEBUGGER
 
+    def operation_data(self):
+        debug_print("START OF OPERATION DATA", style="SECTION", header="IkManager",
+                    level=10)
+        # Get the selected objects
+        # determine their type, and if they are valid
+
+        # determine what joints will be the start and end of the ik chain
+        # determine if they are in direct hierarchy of each other
+        # if they are, set the start and end of the ik chain
+        # if they are not, determine if they are 2 degrees of separation from each other
+        # if they are set the start and end of the ik chain
+        # if they are not, determine if they are 3 degrees of separation from each other
+        # if they are in the parent direction but not the child direction, set the start and end of the ik chain
+        # IK chain will always go away from the root
+
+        # set them in a dictionary with the start and end of the ik chain
+        # change their names to <prefix> + <name> + <suffix> IE:
+
+
+class NameParser:
+    def __init__(self, item: str):
+        self.item = item
+
+    def parse_string(self, split_symbol: str = "_", join_symbol: str = None, index: int = 0):
+        parts = self.item.split(split_symbol)
+        if len(parts) == 1:
+            return parts[0]
+        if index > len(parts):
+            raise Exception(f"Index {index} is out of range for {self.item}")
+        if index == 0 or join_symbol is None:
+            return parts[index]
+        else:
+            return join_symbol.join(parts[index:]) if index == -1 else join_symbol.join(parts[index:])
+
+
+class IkCreator:
+    def __init__(self, name: str, base_joint: object, tip_joint: object, ik_type: str):
+        self.name = name
+        self.base = base_joint
+        self.tip = tip_joint
+        self.ik_type = ik_type
+
+    def create_ik(self):
+        match self.ik_type:
+            case "ik":
+                self.create_ik_handle()
+            case "pole":
+                self.create_pole_vector()
+            case "spring":
+                self.create_spring_ik()
+            case "stretchy":
+                self.create_stretchy_ik()
+            case "stretchy_spline":
+                self.create_stretchy_spline_ik()
+            case _:
+                pass
+
+    def create_ik_handle(self):
+        cmds.ikHandle(startJoint=self.base, endEffector=self.tip)
+
+    def create_pole_vector(self):
+        pass
+
+    def create_spring_ik(self):
+        pass
+
+    def create_stretchy_ik(self):
+        pass
+
+    def create_stretchy_spline_ik(self):
+        pass
+
 
 class MayaSelectionOperator:
     selection = cmds.ls(sl=True)
 
-    def __init__(self):
+    def __init__(self, excluded_types=None, included_types=None, _type=None, _all=False, **kwargs):
         debug_print("INITIALIZING SELECTION OPERATOR", style="SECTION", header="MayaSelectionOperator",
                     level=10)
+        self.excluded_types = excluded_types
+        self.include_types = included_types
+        self.forced_root = kwargs.get("root", None)
 
     @staticmethod
     def generic_getter(func):
@@ -194,7 +271,9 @@ class MayaSelectionOperator:
                     level=5)
 
         def find_top_parent(_node: str):
-            if _node is None:
+            if (_node is None or not cmds.objExists(_node) or cmds.objectType(_node) in self.excluded_types or
+                    self.forced_root and _node == self.forced_root):
+                debug_print(f"RETURNING: {_node} AS ROOT", header="MayaSelectionOperator", level=5)
                 return None
             parent = cmds.listRelatives(_node, parent=True)
             return _node if parent is None else find_top_parent(self.strip_path(parent[0]))
@@ -207,8 +286,17 @@ class MayaSelectionOperator:
             while queue:
                 current, parent_dict = queue.popleft()
                 children = cmds.listRelatives(current, children=True) or []
+                debug_print(f"CHILDREN OF: {current} ARE: {children}\n{current}'S PARENT IS",
+                            style="CONTAINER", to_format=parent_dict, header="MayaSelectionOperator", level=5)
                 parent_dict[current] = child_dict = {}
                 for child in children:
+                    if child is None or not cmds.objExists(child):
+                        debug_print(f"SKIPPING: {child} BECAUSE IT DOES NOT EXIST", level=5)
+                        continue
+                    if self.excluded_types:
+                        if cmds.objectType(child) in self.excluded_types:
+                            debug_print(f"SKIPPING: {child} BECAUSE IT IS IN EXCLUDED TYPES", level=5)
+                            continue
                     queue.append((child, child_dict))
             debug_print(f"HIERARCHY OF: {_root} IS: {_hierarchy}", style="CONTAINER",
                         header="MayaSelectionOperator", level=5)
@@ -483,7 +571,7 @@ class MayaObjectTree(BaseTree):
             else:
                 current_node = self.node_class(node_name)
                 if parent_node and current_node.get("object_exists"):
-                    debug_print(f"NODE: {node_name} HAS PARENT: {parent_node}",  header="MayaObjectTree",
+                    debug_print(f"NODE: {node_name} HAS PARENT: {parent_node}", header="MayaObjectTree",
                                 level=1)  # DEBUGGER
                     parent_node.add_child(current_node)
 
@@ -549,6 +637,7 @@ class MayaObjectTree(BaseTree):
     def __find_roots_and_leaf_nodes(self, node_list: list):
         debug_print(f"FINDING ROOTS AND LEAVES FROM: {node_list}", style="CONTAINER",
                     header="MayaObjectTree", level=1)  # DEBUGGER
+        container_of_root_groups = ["Joints", "Controls", "Meshes", "Curves", "Transforms", "Geometry"]
 
         for node in node_list:
             debug_print(f"WORKING ON NODE: {node}", header="MayaObjectTree", level=1)  # DEBUGGER
@@ -632,9 +721,10 @@ class MayaObjectTree(BaseTree):
 
 
 if __name__ == "__main__":
+    type_to_exclude = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint",
+                       "ikHandle", "ikEffector", "ikSolver", "ikRPsolver", "ikSCsolver", "ikSplineSolver",]
     selection = MayaSelectionOperator().selection
-    ik = IkManager(selection)
+    ik = IkManager(selection, excluded_types=type_to_exclude)
 
     # joint_list = MayaSelectionOperator().get(_type="joint", _all=True)
     # ik = IkManager(joint_list)
-    # ik.create_ik()
