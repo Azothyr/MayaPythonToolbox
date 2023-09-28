@@ -1,8 +1,15 @@
 from collections import deque
-import maya.cmds as cmds
 import traceback
 from typing import Type
 import inspect
+from maya import cmds
+import math
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtCore import QTimer
+from PySide2 import QtWidgets, QtCore
+import random
+
+global wall_gen_ui
 
 debug_level = 5  # 0 - 10
 style_presets = {
@@ -106,7 +113,7 @@ class IkManager:
         self.selection = MayaSelectionOperator().selection
         self.mapped_selection = MayaSelectionOperator(excluded_types=excluded_types,
                                                       included_types=included_types,
-                                                      root=root_name,).map_hierarchy(self.selection)
+                                                      root=root_name, ).map_hierarchy(self.selection)
         debug_print("IK MANAGER GETTING SELECTION IN MAYA SCENE", to_format=self.mapped_selection,
                     style="CONTAINER", header="IkManager", level=10)  # DEBUGGER
         self.tree = MayaObjectTree(self.mapped_selection, MayaObject)
@@ -720,11 +727,228 @@ class MayaObjectTree(BaseTree):
             return instances
 
 
+def create_wall(params):
+    x = params['x']
+    y = params['y']
+    z = params['z']
+    wall_width = params['wall_width']
+    wall_height = params['wall_height']
+    brick_width = params['brick_width']
+    brick_height = params['brick_height']
+    brick_depth = params['brick_depth']
+    h_offset = params['h_offset']
+    v_offset = params['v_offset']
+    d_offset = params['d_offset']
+    curve_intensity = params['curve_intensity']
+    size_variation = params['size_variation']
+    dynamic_fill = params['dynamic_fill']
+
+    # Delete existing 'wall_group' if it exists
+    if cmds.objExists("wall_group"):
+        cmds.delete("wall_group")
+
+    # Create a new empty transform group
+    wall_group = cmds.group(em=True, name="wall_group")
+
+    current_wall_width = 0
+    current_wall_height = 0
+
+    while current_wall_height < wall_height:
+        first_brick_in_row = True  # Flag to check if it's the first brick in the row
+        while current_wall_width < wall_width:
+            # Apply size variation
+            varied_width = brick_width + random.uniform(-size_variation, size_variation)
+            varied_height = brick_height + random.uniform(-size_variation, size_variation)
+
+            # Create brick
+            brick = cmds.polyCube(w=varied_width, h=varied_height, d=brick_depth)[0]
+
+            # Parent the brick to the wall_group
+            cmds.parent(brick, wall_group)
+
+            if first_brick_in_row:
+                x[0] = -wall_width / 2
+                first_brick_in_row = False
+
+            # Calculate percentage of how far from the center of the wall this brick is
+            pct_from_center = (x[0] + wall_width / 2) / (wall_width / 2)
+
+            # Check before the sqrt calculation
+            z_curve = math.sqrt(max(curve_intensity ** 2 - x[0] ** 2, 0))
+
+            # Flip the rotation calculation logic, so edge bricks face the opposite end
+            y_rotation = -math.degrees(math.atan2(z_curve, x[0])) if x[0] != 0 else 0  # Avoid division by zero
+
+            cmds.setAttr(f"{brick}.translateX", x[0])
+            cmds.setAttr(f"{brick}.translateY", y[0])
+            cmds.setAttr(f"{brick}.translateZ", z[0] + z_curve)
+            cmds.setAttr(f"{brick}.rotateY", y_rotation)
+
+            x[0] += varied_width + h_offset
+            current_wall_width += varied_width + h_offset
+
+            # Dynamic fill
+            if dynamic_fill and current_wall_width > wall_width:
+                cmds.setAttr(brick + ".scaleX", wall_width - (current_wall_width - varied_width))
+
+        x[0] = -wall_width / 2
+        z[0] += d_offset
+        current_wall_width = 0
+        y[0] += varied_height + v_offset
+        current_wall_height += varied_height + v_offset
+
+
+class WallGeneratorUI(QtWidgets.QWidget):
+    def __init__(self):
+        super(WallGeneratorUI, self).__init__()
+        self.dynamic_fill_checkbox = None
+        self.auto_update_checkbox = None
+        self.setWindowTitle("Brick Wall Generator")
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.generate_wall)
+
+        self.build_ui()
+
+    def build_ui(self):
+        layout = QGridLayout()
+
+        self.add_coordinate_control("X:", 0, layout, 6, 2)
+        self.add_coordinate_control("Y:", 0, layout, 6, 3)
+        self.add_coordinate_control("Z:", 0, layout, 6, 4)
+        self.add_feature_control("Brick Width:", 1, 100, 25, layout, 0, 0)
+        self.add_feature_control("Brick Height:", 1, 100, 25, layout, 0, 1)
+        self.add_feature_control("Brick Depth:", 1, 100, 15, layout, 2, 0)
+        self.add_feature_control("Size Variation:", 0, 50, 0, layout, 2, 1)
+        self.add_feature_control("Wall Width:", 1, 50, 20, layout, 3, 0)
+        self.add_feature_control("Wall Height:", 1, 30, 7.5, layout, 3, 1)
+        self.add_feature_control("Vertical Offset:", 0, 100, 1, layout, 4, 0)
+        self.add_feature_control("Horizontal Offset:", 0, 100, 1, layout, 4, 1)
+        self.add_feature_control("Depth Offset:", 0, 50, 1, layout, 5, 0)
+        self.add_feature_control("Curve Intensity:", 0, 100, 0, layout, 5, 1)
+
+        self.auto_update_checkbox = QtWidgets.QCheckBox("Enable Auto Update")
+        layout.addWidget(self.auto_update_checkbox, 6, 0)
+
+        self.dynamic_fill_checkbox = QtWidgets.QCheckBox("Enable Dynamic Fill")
+        layout.addWidget(self.dynamic_fill_checkbox, 6, 1)
+
+        generate_button = QtWidgets.QPushButton("Generate Wall")
+        layout.addWidget(generate_button, 7, 0, 1, 7)
+        generate_button.clicked.connect(self.generate_wall)
+
+        self.setLayout(layout)
+
+    def add_feature_control(self, label, min_val, max_val, default_val, layout, row, col, widget_type="slider"):
+        if widget_type == "slider":
+            # Create Label
+            lbl = QtWidgets.QLabel(label)
+            lbl.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)  # Add size policy if needed
+
+            # Create Slider
+            slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+            slider.setRange(min_val, max_val)
+            slider.setValue(default_val)
+            slider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)  # Add size policy if needed
+
+            # Create SpinBox
+            spinbox = QtWidgets.QDoubleSpinBox()
+            spinbox.setRange(min_val, max_val)
+            spinbox.setValue(default_val)
+            spinbox.setSingleStep(0.01)
+            spinbox.setDecimals(2)
+            spinbox.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)  # Add size policy if needed
+
+            # Connect Slider and SpinBox
+            slider.valueChanged.connect(spinbox.setValue)
+            spinbox.valueChanged.connect(slider.setValue)
+
+            # Connect to the generation function
+            slider.valueChanged.connect(self.delayed_generate_wall)
+            spinbox.valueChanged.connect(self.delayed_generate_wall)
+
+            # Add widgets to layout
+            layout.addWidget(lbl, row, col * 3)  # Labels take up one column
+            layout.addWidget(slider, row, col * 3 + 1)  # Sliders take up one column
+            layout.addWidget(spinbox, row, col * 3 + 2)  # Spinboxes take up one column
+
+            # Store references to these widgets for later use
+            attribute_name = label.replace(" ", "_").replace(":", "").lower()
+            setattr(self, attribute_name + "_slider", slider)
+            setattr(self, attribute_name + "_spinbox", spinbox)
+
+    def add_coordinate_control(self, label, default_val, layout, row, col):
+        line_edit = QtWidgets.QLineEdit()
+        line_edit.setText(str(default_val))
+        line_edit.setFixedWidth(40)
+        line_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
+
+        label_widget = QtWidgets.QLabel(label)
+        label_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        layout.addWidget(label_widget, row, col, alignment=QtCore.Qt.AlignRight)
+        layout.addWidget(line_edit, row, col + 1, 1, 1, alignment=QtCore.Qt.AlignLeft)
+
+        attribute_name = label.replace(" ", "_").replace(":", "").lower()
+        setattr(self, attribute_name + "_line_edit", line_edit)
+
+    def delayed_generate_wall(self):
+        if self.auto_update_checkbox.isChecked():
+            self.timer.stop()
+            self.timer.start(2000)  # 2000 ms delay
+
+    def generate_wall(self):
+        x = [float(self.x_line_edit.text())]
+        y = [float(self.y_line_edit.text())]
+        z = [float(self.z_line_edit.text())]
+        params = {
+            "x": x,
+            "y": y,
+            "z": z,
+            "brick_width": self.brick_width_slider.value() / 50,
+            "brick_height": self.brick_height_slider.value() / 50,
+            "brick_depth": self.brick_depth_slider.value() / 50,
+            "wall_width": self.wall_width_slider.value(),
+            "wall_height": self.wall_height_slider.value(),
+            "h_offset": self.horizontal_offset_slider.value() / 50,
+            "v_offset": self.vertical_offset_slider.value() / 50,
+            "d_offset": self.depth_offset_spinbox.value() / 50,
+            "curve_intensity": self.curve_intensity_slider.value(),
+            "size_variation": self.size_variation_slider.value() / 50,
+            "dynamic_fill": self.dynamic_fill_checkbox.isChecked(),
+        }
+
+        create_wall(params)
+
+
+def start_wall_ui():
+    global wall_gen_ui  # Declare as global so we can access and modify it
+
+    # Check if QApplication instance exists
+    app = QtWidgets.QApplication.instance()
+    if app is None:
+        app = QtWidgets.QApplication([])
+
+    # Destroy the existing UI if it already exists
+    try:
+        wall_gen_ui.close()
+    except:
+        pass
+
+    # Create and show a new UI instance
+    wall_gen_ui = WallGeneratorUI()
+    wall_gen_ui.show()
+
+
 if __name__ == "__main__":
-    type_to_exclude = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint",
-                       "ikHandle", "ikEffector", "ikSolver", "ikRPsolver", "ikSCsolver", "ikSplineSolver",]
-    selection = MayaSelectionOperator().selection
-    ik = IkManager(selection, excluded_types=type_to_exclude)
+    # type_to_exclude = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint",
+    #                    "ikHandle", "ikEffector", "ikSolver", "ikRPsolver", "ikSCsolver", "ikSplineSolver",]
+    # selection = MayaSelectionOperator().selection
+    # ik = IkManager(selection, excluded_types=type_to_exclude)
 
     # joint_list = MayaSelectionOperator().get(_type="joint", _all=True)
     # ik = IkManager(joint_list)
+
+    start_wall_ui()
