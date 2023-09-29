@@ -727,219 +727,176 @@ class MayaObjectTree(BaseTree):
             return instances
 
 
-def create_wall(params):
-    x = params['x']
-    y = params['y']
-    z = params['z']
-    wall_width = params['wall_width']
-    wall_height = params['wall_height']
-    brick_width = params['brick_width']
-    brick_height = params['brick_height']
-    brick_depth = params['brick_depth']
-    h_offset = params['h_offset']
-    v_offset = params['v_offset']
-    d_offset = params['d_offset']
-    curve_intensity = params['curve_intensity']
-    size_variation = params['size_variation']
-    dynamic_fill = params['dynamic_fill']
-
-    # Delete existing 'wall_group' if it exists
-    if cmds.objExists("wall_group"):
-        cmds.delete("wall_group")
-
-    # Create a new empty transform group
-    wall_group = cmds.group(em=True, name="wall_group")
-
-    current_wall_width = 0
-    current_wall_height = 0
-
-    while current_wall_height < wall_height:
-        first_brick_in_row = True  # Flag to check if it's the first brick in the row
-        while current_wall_width < wall_width:
-            # Apply size variation
-            varied_width = brick_width + random.uniform(-size_variation, size_variation)
-            varied_height = brick_height + random.uniform(-size_variation, size_variation)
-
-            # Create brick
-            brick = cmds.polyCube(w=varied_width, h=varied_height, d=brick_depth)[0]
-
-            # Parent the brick to the wall_group
-            cmds.parent(brick, wall_group)
-
-            if first_brick_in_row:
-                x[0] = -wall_width / 2
-                first_brick_in_row = False
-
-            # Calculate percentage of how far from the center of the wall this brick is
-            pct_from_center = (x[0] + wall_width / 2) / (wall_width / 2)
-
-            # Check before the sqrt calculation
-            z_curve = math.sqrt(max(curve_intensity ** 2 - x[0] ** 2, 0))
-
-            # Flip the rotation calculation logic, so edge bricks face the opposite end
-            y_rotation = -math.degrees(math.atan2(z_curve, x[0])) if x[0] != 0 else 0  # Avoid division by zero
-
-            cmds.setAttr(f"{brick}.translateX", x[0])
-            cmds.setAttr(f"{brick}.translateY", y[0])
-            cmds.setAttr(f"{brick}.translateZ", z[0] + z_curve)
-            cmds.setAttr(f"{brick}.rotateY", y_rotation)
-
-            x[0] += varied_width + h_offset
-            current_wall_width += varied_width + h_offset
-
-            # Dynamic fill
-            if dynamic_fill and current_wall_width > wall_width:
-                cmds.setAttr(brick + ".scaleX", wall_width - (current_wall_width - varied_width))
-
-        x[0] = -wall_width / 2
-        z[0] += d_offset
-        current_wall_width = 0
-        y[0] += varied_height + v_offset
-        current_wall_height += varied_height + v_offset
-
-
-class WallGeneratorUI(QtWidgets.QWidget):
+class ChannelBox:
     def __init__(self):
-        super(WallGeneratorUI, self).__init__()
-        self.dynamic_fill_checkbox = None
-        self.auto_update_checkbox = None
-        self.setWindowTitle("Brick Wall Generator")
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.world_fields = []
+        self.rotation_fields = []
+        self.scale_fields = []
+    
+    # Get coordinates for the selected object
+    @staticmethod
+    def get_coordinates(object_name):
+        if ".vtx[" in object_name:
+            world_coords = cmds.pointPosition(object_name, w=True)
+        else:
+            world_coords = cmds.xform(object_name, query=True, worldSpace=True, translation=True)
+        return world_coords
 
-        self.timer = QTimer()
-        self.timer.setSingleShot(True)
-        self.timer.timeout.connect(self.generate_wall)
+    # Set a single coordinate for the selected object
+    @staticmethod
+    def set_single_coordinate(object_name, index, value):
+        if ".vtx[" in object_name:
+            current_coords = cmds.pointPosition(object_name, w=True)
+            current_coords[index] = value
+            cmds.xform(object_name, ws=True, t=current_coords)
+        else:
+            current_coords = list(cmds.getAttr(f"{object_name}.translate")[0])
+            current_coords[index] = value
+            cmds.xform(object_name, ws=True, t=current_coords)
 
-        self.build_ui()
+    @staticmethod
+    def get_rotation(object_name):
+        return cmds.xform(object_name, query=True, worldSpace=True, rotation=True)
 
-    def build_ui(self):
-        layout = QGridLayout()
+    @staticmethod
+    def set_single_rotation(object_name, index, value):
+        current_rotation = list(cmds.getAttr(f"{object_name}.rotate")[0])
+        current_rotation[index] = value
+        cmds.xform(object_name, ws=True, ro=current_rotation)
 
-        self.add_coordinate_control("X:", 0, layout, 6, 2)
-        self.add_coordinate_control("Y:", 0, layout, 6, 3)
-        self.add_coordinate_control("Z:", 0, layout, 6, 4)
-        self.add_feature_control("Brick Width:", 1, 100, 25, layout, 0, 0)
-        self.add_feature_control("Brick Height:", 1, 100, 25, layout, 0, 1)
-        self.add_feature_control("Brick Depth:", 1, 100, 15, layout, 2, 0)
-        self.add_feature_control("Size Variation:", 0, 50, 0, layout, 2, 1)
-        self.add_feature_control("Wall Width:", 1, 50, 20, layout, 3, 0)
-        self.add_feature_control("Wall Height:", 1, 30, 7.5, layout, 3, 1)
-        self.add_feature_control("Vertical Offset:", 0, 100, 1, layout, 4, 0)
-        self.add_feature_control("Horizontal Offset:", 0, 100, 1, layout, 4, 1)
-        self.add_feature_control("Depth Offset:", 0, 50, 1, layout, 5, 0)
-        self.add_feature_control("Curve Intensity:", 0, 100, 0, layout, 5, 1)
+    @staticmethod
+    def get_scale(object_name):
+        return cmds.xform(object_name, query=True, worldSpace=True, scale=True)
 
-        self.auto_update_checkbox = QtWidgets.QCheckBox("Enable Auto Update")
-        layout.addWidget(self.auto_update_checkbox, 6, 0)
+    @staticmethod
+    def set_single_scale(object_name, index, value):
+        current_scale = list(cmds.getAttr(f"{object_name}.scale")[0])
+        current_scale[index] = value
+        cmds.xform(object_name, ws=True, s=current_scale)
 
-        self.dynamic_fill_checkbox = QtWidgets.QCheckBox("Enable Dynamic Fill")
-        layout.addWidget(self.dynamic_fill_checkbox, 6, 1)
+    # Update UI with coordinates of the selected object
+    def update_ui(self, *args):
+        selected_objects = cmds.ls(selection=True, long=True)
+        if not selected_objects:
+            return
+        object_name = selected_objects[0]
+        world_coords = self.get_coordinates(object_name)
+        for i in range(3):
+            cmds.floatField(self.world_fields[i], edit=True, value=world_coords[i])
 
-        generate_button = QtWidgets.QPushButton("Generate Wall")
-        layout.addWidget(generate_button, 7, 0, 1, 7)
-        generate_button.clicked.connect(self.generate_wall)
+        selected_objects = cmds.ls(selection=True, long=True)
+        if not selected_objects:
+            return
+        object_name = selected_objects[0]
+        rotation_coords = self.get_rotation(object_name)
+        for i in range(3):
+            cmds.floatField(self.rotation_fields[i], edit=True, value=rotation_coords[i])
 
-        self.setLayout(layout)
+        scale_coords = self.get_scale(object_name)
+        for i in range(3):
+            cmds.floatField(self.scale_fields[i], edit=True, value=scale_coords[i])
 
-    def add_feature_control(self, label, min_val, max_val, default_val, layout, row, col, widget_type="slider"):
-        if widget_type == "slider":
-            # Create Label
-            lbl = QtWidgets.QLabel(label)
-            lbl.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)  # Add size policy if needed
+    # Apply changes to X, Y, and Z coordinates
+    def apply_x_coordinate(self, *args):
+        self.apply_single_coordinate(0)
 
-            # Create Slider
-            slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-            slider.setRange(min_val, max_val)
-            slider.setValue(default_val)
-            slider.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)  # Add size policy if needed
+    def apply_y_coordinate(self, *args):
+        self.apply_single_coordinate(1)
 
-            # Create SpinBox
-            spinbox = QtWidgets.QDoubleSpinBox()
-            spinbox.setRange(min_val, max_val)
-            spinbox.setValue(default_val)
-            spinbox.setSingleStep(0.01)
-            spinbox.setDecimals(2)
-            spinbox.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)  # Add size policy if needed
+    def apply_z_coordinate(self, *args):
+        self.apply_single_coordinate(2)
 
-            # Connect Slider and SpinBox
-            slider.valueChanged.connect(spinbox.setValue)
-            spinbox.valueChanged.connect(slider.setValue)
+    def apply_single_coordinate(self, index):
+        selected_objects = cmds.ls(selection=True, long=True)
+        if not selected_objects:
+            return
+        object_name = selected_objects[0]
+        value = cmds.floatField(self.world_fields[index], query=True, value=True)
+        self.set_single_coordinate(object_name, index, value)
 
-            # Connect to the generation function
-            slider.valueChanged.connect(self.delayed_generate_wall)
-            spinbox.valueChanged.connect(self.delayed_generate_wall)
+        # Apply changes to X, Y, and Z for rotation
+    def apply_rotation_x(self, *args):
+        self.apply_single_rotation(0)
 
-            # Add widgets to layout
-            layout.addWidget(lbl, row, col * 3)  # Labels take up one column
-            layout.addWidget(slider, row, col * 3 + 1)  # Sliders take up one column
-            layout.addWidget(spinbox, row, col * 3 + 2)  # Spinboxes take up one column
+    def apply_rotation_y(self, *args):
+        self.apply_single_rotation(1)
 
-            # Store references to these widgets for later use
-            attribute_name = label.replace(" ", "_").replace(":", "").lower()
-            setattr(self, attribute_name + "_slider", slider)
-            setattr(self, attribute_name + "_spinbox", spinbox)
+    def apply_rotation_z(self, *args):
+        self.apply_single_rotation(2)
 
-    def add_coordinate_control(self, label, default_val, layout, row, col):
-        line_edit = QtWidgets.QLineEdit()
-        line_edit.setText(str(default_val))
-        line_edit.setFixedWidth(40)
-        line_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
+    def apply_single_rotation(self, index):
+        selected_objects = cmds.ls(selection=True, long=True)
+        if not selected_objects:
+            return
+        object_name = selected_objects[0]
+        value = cmds.floatField(self.rotation_fields[index], query=True, value=True)
+        self.set_single_rotation(object_name, index, value)
 
-        label_widget = QtWidgets.QLabel(label)
-        label_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+    # Apply changes to X, Y, and Z for scale
+    def apply_scale_x(self, *args):
+        self.apply_single_scale(0)
 
-        layout.addWidget(label_widget, row, col, alignment=QtCore.Qt.AlignRight)
-        layout.addWidget(line_edit, row, col + 1, 1, 1, alignment=QtCore.Qt.AlignLeft)
+    def apply_scale_y(self, *args):
+        self.apply_single_scale(1)
 
-        attribute_name = label.replace(" ", "_").replace(":", "").lower()
-        setattr(self, attribute_name + "_line_edit", line_edit)
+    def apply_scale_z(self, *args):
+        self.apply_single_scale(2)
 
-    def delayed_generate_wall(self):
-        if self.auto_update_checkbox.isChecked():
-            self.timer.stop()
-            self.timer.start(2000)  # 2000 ms delay
+    def apply_single_scale(self, index):
+        selected_objects = cmds.ls(selection=True, long=True)
+        if not selected_objects:
+            return
+        object_name = selected_objects[0]
+        value = cmds.floatField(self.scale_fields[index], query=True, value=True)
+        self.set_single_scale(object_name, index, value)
 
-    def generate_wall(self):
-        x = [float(self.x_line_edit.text())]
-        y = [float(self.y_line_edit.text())]
-        z = [float(self.z_line_edit.text())]
-        params = {
-            "x": x,
-            "y": y,
-            "z": z,
-            "brick_width": self.brick_width_slider.value() / 50,
-            "brick_height": self.brick_height_slider.value() / 50,
-            "brick_depth": self.brick_depth_slider.value() / 50,
-            "wall_width": self.wall_width_slider.value(),
-            "wall_height": self.wall_height_slider.value(),
-            "h_offset": self.horizontal_offset_slider.value() / 50,
-            "v_offset": self.vertical_offset_slider.value() / 50,
-            "d_offset": self.depth_offset_spinbox.value() / 50,
-            "curve_intensity": self.curve_intensity_slider.value(),
-            "size_variation": self.size_variation_slider.value() / 50,
-            "dynamic_fill": self.dynamic_fill_checkbox.isChecked(),
-        }
+    def create_coor_ui(self):
+        # Create UI window
+        if cmds.window("CoordinateWindow", exists=True):
+            cmds.deleteUI("CoordinateWindow", window=True)
+    
+        coordinate_window = cmds.window("CoordinateWindow", title="Coordinate UI Tool", w=300, h=200)
+        cmds.columnLayout(adjustableColumn=True)
+    
+        self.world_fields = []
+    
+        # Row layout for World Coordinates
+        cmds.rowLayout(numberOfColumns=4)
+        cmds.text(label="World Coords")
+        self.world_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                 changeCommand=self.apply_x_coordinate, precision=8))
+        self.world_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                 changeCommand=self.apply_y_coordinate, precision=8))
+        self.world_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                 changeCommand=self.apply_z_coordinate, precision=8))
+        cmds.setParent("..")  # To break out of the rowLayout
 
-        create_wall(params)
+        # Row layout for Rotation
+        cmds.rowLayout(numberOfColumns=4)
+        cmds.text(label="Rotation Coords")
+        self.rotation_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                    changeCommand=self.apply_rotation_x, precision=8))
+        self.rotation_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                    changeCommand=self.apply_rotation_y, precision=8))
+        self.rotation_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                    changeCommand=self.apply_rotation_z, precision=8))
+        cmds.setParent("..")  # To break out of the rowLayout
 
+        # Row layout for Scale
+        cmds.rowLayout(numberOfColumns=4)
+        cmds.text(label="Scale Coords")
+        self.scale_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                 changeCommand=self.apply_scale_x, precision=8))
+        self.scale_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                 changeCommand=self.apply_scale_y, precision=8))
+        self.scale_fields.append(cmds.floatField(width=75, showTrailingZeros=False,
+                                                 changeCommand=self.apply_scale_z, precision=8))
+        cmds.setParent("..")  # To break out of the rowLayout
 
-def start_wall_ui():
-    global wall_gen_ui  # Declare as global so we can access and modify it
-
-    # Check if QApplication instance exists
-    app = QtWidgets.QApplication.instance()
-    if app is None:
-        app = QtWidgets.QApplication([])
-
-    # Destroy the existing UI if it already exists
-    try:
-        wall_gen_ui.close()
-    except:
-        pass
-
-    # Create and show a new UI instance
-    wall_gen_ui = WallGeneratorUI()
-    wall_gen_ui.show()
+        # Event to update UI whenever an object is selected
+        cmds.scriptJob(event=["SelectionChanged", self.update_ui], protected=True)
+    
+        cmds.showWindow(coordinate_window)
 
 
 if __name__ == "__main__":
@@ -950,5 +907,4 @@ if __name__ == "__main__":
 
     # joint_list = MayaSelectionOperator().get(_type="joint", _all=True)
     # ik = IkManager(joint_list)
-
-    start_wall_ui()
+    ChannelBox().create_coor_ui()
