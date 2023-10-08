@@ -89,41 +89,67 @@ class NoSort(SortMethod):
 
 
 class BrokenFkConstraintFactory:
-    @staticmethod
-    def create_constraints(constraint_order):
+    def create_constraints(self, constraint_order, **kwargs):
+        if not constraint_order:
+            raise ValueError(f"WARNING: constraint_order is empty.")
+
+        joint_constraints = kwargs.get("joint", True)
+        control_constraints = kwargs.get("control", True)
+
         for keys, values in constraint_order.items():
-            leader = values["leading_control"]
-            follower_grp = values["follower_group"]
-            follower = values["follower_control"]
+            if not joint_constraints and not control_constraints:
+                print(f"WARNING: constraints were not allowed to be created.")
+                return
+            else:
+                _leader = values["leading_control"]
+            if control_constraints:
+                _follower_grp = values["follower_group"]
+                _follower = values["follower_control"]
+                self.create_control_to_group_constraints(_leader, _follower_grp, _follower)
+            if joint_constraints:
+                _joint = _leader.replace("_Ctrl", "_Jnt")
+                self.create_control_to_joint_constraints(_leader, _joint)
 
-            # Create constraints
-            translate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                         name=f'{leader}_Constraining_{follower_grp}_TRANSLATION_'
-                                                              f'via_parent_constraint', mo=True,
-                                                         skipRotate=["x", "y", "z"], weight=1)[0]
+    @staticmethod
+    def create_control_to_group_constraints(leader, follower_grp, follower):
+        # Create constraints
+        translate_constraint = cmds.parentConstraint(leader, follower_grp,
+                                                     name=f'{leader}_Constraining_{follower_grp}_TRANSLATION_'
+                                                          f'via_parent_constraint', mo=True,
+                                                     skipRotate=["x", "y", "z"], weight=1)[0]
 
-            rotate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                      name=f'{leader}_Constraining_{follower_grp}_ROTATION_'
-                                                           f'via_parent_constraint', mo=True,
-                                                      skipTranslate=["x", "y", "z"], weight=1)[0]
+        rotate_constraint = cmds.parentConstraint(leader, follower_grp,
+                                                  name=f'{leader}_Constraining_{follower_grp}_ROTATION_'
+                                                       f'via_parent_constraint', mo=True,
+                                                  skipTranslate=["x", "y", "z"], weight=1)[0]
 
-            scale_constraint = cmds.scaleConstraint(leader, follower_grp,  # noqa
-                                                    name=f'{leader}_Constraining_{follower_grp}_SCALE_via'
-                                                         f'_parent_constraint', weight=1)[0]
+        scale_constraint = cmds.scaleConstraint(leader, follower_grp,  # noqa
+                                                name=f'{leader}_Constraining_{follower_grp}_SCALE_via'
+                                                     f'_parent_constraint', weight=1)[0]
 
-            # Create attributes on the child if not already there
-            if not cmds.attributeQuery('FollowTranslate', node=follower, exists=True):
-                cmds.addAttr(follower, ln='FollowTranslate', at='double', min=0, max=1, dv=1)
-                cmds.setAttr('%s.FollowTranslate' % follower, e=True, keyable=True)
+        # Create attributes on the child if not already there
+        if not cmds.attributeQuery('FollowTranslate', node=follower, exists=True):
+            cmds.addAttr(follower, ln='FollowTranslate', at='double', min=0, max=1, dv=1)
+            cmds.setAttr('%s.FollowTranslate' % follower, e=True, keyable=True)
 
-            if not cmds.attributeQuery('FollowRotate', node=follower, exists=True):
-                cmds.addAttr(follower, ln='FollowRotate', at='double', min=0, max=1, dv=1)
-                cmds.setAttr('%s.FollowRotate' % follower, e=True, keyable=True)
+        if not cmds.attributeQuery('FollowRotate', node=follower, exists=True):
+            cmds.addAttr(follower, ln='FollowRotate', at='double', min=0, max=1, dv=1)
+            cmds.setAttr('%s.FollowRotate' % follower, e=True, keyable=True)
 
-            # Connect the child's attribute to the rotate constraint weight 0
-            cmds.connectAttr('%s.FollowTranslate' % follower, '%s.w0' % translate_constraint, f=True)
-            # Connect the attribute to the translation constraint weight 0
-            cmds.connectAttr('%s.FollowRotate' % follower, '%s.w0' % rotate_constraint, f=True)
+        # Connect the child's attribute to the rotate constraint weight 0
+        cmds.connectAttr('%s.FollowTranslate' % follower, '%s.w0' % translate_constraint, f=True)
+        # Connect the attribute to the translation constraint weight 0
+        cmds.connectAttr('%s.FollowRotate' % follower, '%s.w0' % rotate_constraint, f=True)
+
+    @staticmethod
+    def create_control_to_joint_constraints(control, joint):
+        if not cmds.objExists(joint):
+            print(f"WARNING: {joint} does not exist.")
+            return
+
+        # Create constraints for the joint
+        cmds.parentConstraint(control, joint, mo=True, weight=1)
+        cmds.scaleConstraint(control, joint, weight=1)
 
 
 class BrokenFkManager:
@@ -132,7 +158,7 @@ class BrokenFkManager:
         self.unsorted_selection = cmds.ls(sl=True)
         self.constraint_order_manager = ConstraintOrder()
 
-    def run(self):
+    def run(self, **kwargs):
         # Remove existing constraints before applying new ones
         for control_group in self.constraint_order_manager.constraint_order.keys():
             ConstraintRemoval.remove_from_control_leader(control_group)
@@ -144,17 +170,19 @@ class BrokenFkManager:
 
         control_groups = [ControlGroup(control) for control in sorted_controls]
         self.constraint_order_manager.recursively_set_relationship(control_groups)
-        self.create_constraints()
+        self.create_constraints(do_control=kwargs.get("controls", True), do_joint=kwargs.get("joints", True))
 
-    def create_constraints(self):
-        BrokenFkConstraintFactory.create_constraints(self.constraint_order_manager.constraint_order)
+    def create_constraints(self, do_control=True, do_joint=True):
+        BrokenFkConstraintFactory().create_constraints(self.constraint_order_manager.constraint_order,
+                                                       control=do_control, joint=do_joint)
 
 
-if __name__ == "_main_":
+if __name__ == "__main__":
+    print("Running Broken FK Constraint Manager")
     broken_fk = BrokenFkManager(OutlinerSort())
     sort_method = NoSort()
     fk_manager = BrokenFkManager(NoSort())
-    fk_manager.run()
+    fk_manager.run(controls=True, joints=True)
 
     """def constraint_removal(selection=None):
         if selection is None:
