@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 
 
-if __name__ == "__main__":
+def brute_ik_to_fk_key():
     selection = cmds.ls(sl=True)
     ctrl = None
     constraint = []
@@ -61,3 +61,6 @@ if __name__ == "__main__":
 
         print(f"{i} of {len(driven_attr)}-------------{cmds.getAttr(f'{ctrl}.Follow', asString=True)}")
 
+
+if __name__ == "__main__":
+    brute_ik_to_fk_key()
