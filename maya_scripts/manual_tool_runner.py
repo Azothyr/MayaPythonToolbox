@@ -106,248 +106,209 @@ class StretchyIkFactory:
                 f"{self.part}_Upper_Length_PMA": {
                     "create": partial(self.create_node, node_type="plusMinusAverage", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_Upper_Length_PMA", attr="operation",
-                                value=1),
-                        partial(self.set_attributes, host=f"{self.part}_Upper_Length_PMA", attr="input1D[0]",
+                        partial(self.set_attributes, attr="operation", value=1),
+                        partial(self.set_attributes, attr="input1D[0]",
                                 value=cmds.getAttr(f"{self.pv_joint}.translateX")),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
-                                from_attr="output1D", destination=f"{self.part}_Length_Denominator_PMA",
-                                to_attr="input1D[0]"),
-                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
-                                from_attr="output1D", destination=f"{self.part}_Joint_Length_MD",
-                                to_attr="input1X"),
-                        ],
+                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA", from_attr="output1D",
+                                destination=f"{self.part}_Length_Denominator_PMA", to_attr="input1D[0]"),
+                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA", from_attr="output1D",
+                                destination=f"{self.part}_Joint_Length_MD", to_attr="input1X"),
+                    ],
                     "purpose": "Calculate the distance between the base and the PV joint",
                 },
                 f"{self.part}_Lower_Length_PMA": {
                     "create": partial(self.create_node, node_type="plusMinusAverage", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_Lower_Length_PMA", attr="operation",
-                                value=1),
-                        partial(self.set_attributes, host=f"{self.part}_Lower_Length_PMA", attr="input1D[0]",
+                        partial(self.set_attributes, attr="operation", value=1),
+                        partial(self.set_attributes, attr="input1D[0]",
                                 value=cmds.getAttr(f"{self.tip_joint}.translateX")),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
-                                from_attr="output1D", destination=f"{self.part}_Length_Denominator_PMA",
-                                to_attr="input1D[1]"),
-                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
-                                from_attr="output1D", destination=f"{self.part}_Joint_Length_MD",
-                                to_attr="input1Y"),
-                        ],
+                        partial(self.connect_attributes, to_attr="input1D[1]", from_attr="output1D",
+                                destination=f"{self.part}_Length_Denominator_PMA", ),
+                        partial(self.connect_attributes, to_attr="input1Y", from_attr="output1D",
+                                destination=f"{self.part}_Joint_Length_MD"),
+                    ],
                     "purpose": "Calculate the distance between the PV and the tip joint",
                 },
                 f"{self.part}_Length_Denominator_PMA": {
                     "create": partial(self.create_node, node_type="plusMinusAverage", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_Length_Denominator_PMA",
-                                attr="operation", value=1),
+                        partial(self.set_attributes, attr="operation", value=1),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_Length_Denominator_PMA",
-                                from_attr="output1D", destination=f"{self.part}_IK_Stretch_Scalar_MD",
-                                to_attr="input1X"),
-                        ],
+                        partial(self.connect_attributes, to_attr="input1X", from_attr="output1D",
+                                destination=f"{self.part}_IK_Stretch_Scalar_MD"),
+                    ],
                     "purpose": "Take the total length of the joint chain and divide it by the sum of the upper and "
                                "lower to get the stretch scalar factor",
                 },
                 f"{self.part}_IK_Distance": {
                     "create": partial(self.create_node, node_type="distanceBetween", asUtility=True),
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Distance",
-                                from_attr="distance", destination=f"{self.part}_Stretch_Global_Scale_MD",
-                                to_attr="input1X"),
-                        ],
+                        partial(self.connect_attributes, to_attr="input1X", from_attr="distance",
+                                destination=f"{self.part}_Stretch_Global_Scale_MD"),
+                    ],
                     "purpose": "Get the distance between the base and the tip locators, which the stretchy IK will "
                                "attempt to match",
                 },
                 f"{self.part}_IK_Stretch_Scalar_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_IK_Stretch_Scalar_MD",
-                                attr="operation", value=2),
+                        partial(self.set_attributes, attr="operation", value=2),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Scalar_MD",
-                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Clamp",
-                                to_attr="inputR"),
-                        ],
+                        partial(self.connect_attributes, to_attr="inputR", from_attr="outputX",
+                                destination=f"{self.part}_IK_Stretch_Clamp"),
+                    ],
                     "reversed_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Scalar_MD",
-                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Negative_MD",
-                                to_attr="input1X"),
-                        ],
+                        partial(self.connect_attributes, to_attr="input1X", from_attr="outputX",
+                                destination=f"{self.part}_IK_Stretch_Negative_MD", ),
+                    ],
                     "purpose": "To scale the distance between the base and the tip locators to match the length of "
                                "the joint chain",
                 },
                 f"{self.part}_Stretch_Switch_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_Stretch_Switch_MD",
-                                attr="operation", value=1),
+                        partial(self.set_attributes, attr="operation", value=1),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_Stretch_Switch_MD",
-                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Scalar_MD",
-                                to_attr="input1X"),
-                        ],
+                        partial(self.connect_attributes, to_attr="input1X", from_attr="outputX",
+                                destination=f"{self.part}_IK_Stretch_Scalar_MD"),
+                    ],
                     "purpose": "",
                 },
                 f"{self.part}_Joint_Length_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_Joint_Length_MD",
-                                attr="operation", value=1),
+                        partial(self.set_attributes, attr="operation", value=1),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_Joint_Length_MD",
-                                from_attr="outputX", destination=f"{self.pv_joint}",
-                                to_attr="translateX"),
-                        partial(self.connect_attributes, source=f"{self.part}_Joint_Length_MD",
-                                from_attr="outputY", destination=f"{self.tip_joint}",
-                                to_attr="translateX"),
-                        ],
+                        partial(self.connect_attributes, from_attr="outputX", to_attr="translateX",
+                                destination=f"{self.pv_joint}"),
+                        partial(self.connect_attributes, from_attr="outputY", to_attr="translateX",
+                                destination=f"{self.tip_joint}"),
+                    ],
+
                     "purpose": "",
                 },
                 f"{self.part}_Segment_Scalar_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
-                                attr="operation", value=2),
-                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
-                                attr="input2X", value=10),
-                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
-                                attr="input2Y", value=10),
-                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
-                                attr="input2Z", value=10),
+                        partial(self.set_attributes, attr="operation", value=2),
+                        partial(self.set_attributes, attr="input2X", value=10),
+                        partial(self.set_attributes, attr="input2Y", value=10),
+                        partial(self.set_attributes, attr="input2Z", value=10),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
-                                from_attr="outputX", destination=f"{self.part}_IK_Length_Combined_MD",
-                                to_attr="input1X"),
-                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
-                                from_attr="outputX", destination=f"{self.part}_IK_Length_Combined_MD",
-                                to_attr="input1Y"),
-                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
-                                from_attr="outputY", destination=f"{self.part}_IK_Length_Combined_MD",
-                                to_attr="input2X"),
-                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
-                                from_attr="outputZ", destination=f"{self.part}_IK_Length_Combined_MD",
-                                to_attr="input2Y"),
-                        ],
+                        partial(self.connect_attributes, to_attr="input1X", from_attr="outputX",
+                                destination=f"{self.part}_IK_Length_Combined_MD"),
+                        partial(self.connect_attributes, to_attr="input1Y", from_attr="outputX",
+                                destination=f"{self.part}_IK_Length_Combined_MD"),
+                        partial(self.connect_attributes, to_attr="input2X", from_attr="outputY",
+                                destination=f"{self.part}_IK_Length_Combined_MD"),
+                        partial(self.connect_attributes, to_attr="input2Y", from_attr="outputZ",
+                                destination=f"{self.part}_IK_Length_Combined_MD"),
+                    ],
                     "purpose": "",
                 },
                 f"{self.part}_IK_Length_Combined_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_IK_Length_Combined_MD"
-                                , attr="operation", value=1),
+                        partial(self.set_attributes, attr="operation", value=1),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Length_Combined_MD",
-                                from_attr="outputX", destination=f"{self.part}_IK_Joint_Length_Ref_MD",
-                                to_attr="input2X"),
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Length_Combined_MD",
-                                from_attr="outputY", destination=f"{self.part}_IK_Joint_Length_Ref_MD",
-                                to_attr="input2Y"),
-                        ],
+                        partial(self.connect_attributes, from_attr="outputX", to_attr="input2X",
+                                destination=f"{self.part}_IK_Joint_Length_Ref_MD"),
+                        partial(self.connect_attributes, from_attr="outputY", to_attr="input2Y",
+                                destination=f"{self.part}_IK_Joint_Length_Ref_MD"),
+                    ],
                     "purpose": "",
                 },
                 f"{self.part}_IK_Joint_Length_Ref_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_IK_Joint_Length_Ref_MD",
-                                attr="operation", value=1),
-                        partial(self.set_attributes, host=f"{self.part}_IK_Joint_Length_Ref_MD",
-                                attr="input1X", value=cmds.getAttr(f"{self.pv_joint}.translateX")),
-                        partial(self.set_attributes, host=f"{self.part}_IK_Joint_Length_Ref_MD",
-                                attr="input1Y", value=cmds.getAttr(f"{self.tip_joint}.translateX")),
+                        partial(self.set_attributes, attr="operation", value=1),
+                        partial(self.set_attributes, attr="input1X", value=cmds.getAttr(f"{self.pv_joint}.translateX")),
+                        partial(self.set_attributes, attr="input1Y", value=cmds.getAttr(f"{self.tip_joint}.translateX"))
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Joint_Length_Ref_MD",
-                                from_attr="outputX", destination=f"{self.part}_Upper_Length_PMA",
-                                to_attr="input1D[1]"),
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Joint_Length_Ref_MD",
-                                from_attr="outputY", destination=f"{self.part}_Lower_Length_PMA",
-                                to_attr="input1D[1]"),
-                        ],
+                        partial(self.connect_attributes, from_attr="outputX",
+                                destination=f"{self.part}_Upper_Length_PMA", to_attr="input1D[1]"),
+                        partial(self.connect_attributes, from_attr="outputY",
+                                destination=f"{self.part}_Lower_Length_PMA", to_attr="input1D[1]"),
+                    ],
                     "purpose": "",
                 },
                 f"{self.part}_Stretch_Global_Scale_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_Stretch_Global_Scale_MD",
-                                attr="operation", value=2),
+                        partial(self.set_attributes, attr="operation", value=2),
                     ],
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_Stretch_Global_Scale_MD",
-                                from_attr="outputX", destination=f"{self.part}_Stretch_Switch_MD",
-                                to_attr="input1X"),
-                        ],
+                        partial(self.connect_attributes, from_attr="outputX",
+                                destination=f"{self.part}_Stretch_Switch_MD", to_attr="input1X"),
+                    ],
                     "purpose": "",
                 },
                 f"{self.part}_IK_Stretch_Clamp": {
                     "create": partial(self.create_node, node_type="clamp", asUtility=True),
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Clamp",
-                                from_attr="outputR", destination=f"{self.part}_Joint_Length_MD",
-                                to_attr="input2X"),
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Clamp",
-                                from_attr="outputR", destination=f"{self.part}_Joint_Length_MD",
-                                to_attr="input2Y"),
-                        ],
+                        partial(self.connect_attributes, from_attr="outputR",
+                                destination=f"{self.part}_Joint_Length_MD", to_attr="input2X"),
+                        partial(self.connect_attributes, from_attr="outputR",
+                                destination=f"{self.part}_Joint_Length_MD", to_attr="input2Y"),
+                    ],
                     "purpose": "Set a clamp to prevent the stretch to go beyond Max and below Min",
                 },
                 f"{self.part}_IK_Dist_Base_Loc": {
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Dist_Base_Loc",
-                                from_attr="worldMatrix", destination=f"{self.part}_IK_Distance",
-                                to_attr="inMatrix1"),
-                        ],
+                        partial(self.connect_attributes, from_attr="worldMatrix",
+                                destination=f"{self.part}_IK_Distance", to_attr="inMatrix1"),
+                    ],
                 },
                 f"{self.part}_IK_Dist_Tip_Loc": {
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Dist_Tip_Loc",
-                                from_attr="worldMatrix", destination=f"{self.part}_IK_Distance",
-                                to_attr="inMatrix2"),
-                        ],
+                        partial(self.connect_attributes, from_attr="worldMatrix",
+                                destination=f"{self.part}_IK_Distance", to_attr="inMatrix2"),
+                    ],
                 },
                 f"{self.tip_ctrl}": {
                     "primary_connection": [
-                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
-                                from_attr="StretchSwitch", destination=f"{self.part}_Stretch_Switch_MD",
-                                to_attr="input2X"),
-                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
-                                from_attr="MaxStretch", destination=f"{self.part}_IK_Stretch_Clamp",
-                                to_attr="maxR"),
-                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
-                                from_attr="TotalStretch", destination=f"{self.part}_Segment_Scalar_MD",
-                                to_attr="input1X"),
-                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
-                                from_attr="UpperStretch", destination=f"{self.part}_Segment_Scalar_MD",
-                                to_attr="input1Y"),
-                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
-                                from_attr="LowerStretch", destination=f"{self.part}_Segment_Scalar_MD",
-                                to_attr="input1Z"),
-                        ],
+                        partial(self.connect_attributes, from_attr="StretchSwitch",
+                                destination=f"{self.part}_Stretch_Switch_MD", to_attr="input2X"),
+                        partial(self.connect_attributes, from_attr="MaxStretch",
+                                destination=f"{self.part}_IK_Stretch_Clamp", to_attr="maxR"),
+                        partial(self.connect_attributes, from_attr="TotalStretch",
+                                destination=f"{self.part}_Segment_Scalar_MD", to_attr="input1X"),
+                        partial(self.connect_attributes, from_attr="UpperStretch",
+                                destination=f"{self.part}_Segment_Scalar_MD", to_attr="input1Y"),
+                        partial(self.connect_attributes, from_attr="LowerStretch",
+                                destination=f"{self.part}_Segment_Scalar_MD", to_attr="input1Z"),
+                    ],
+                },
+                "Transform_Ctrl": {
+                    "primary_connection": [
+                        partial(self.connect_attributes, from_attr="MasterScale",
+                                destination=f"{self.part}_Stretch_Global_Scale_MD", to_attr="input2X"),
+                    ],
                 },
             },
             "reversed_nodes": {
                 f"{self.part}_IK_Stretch_Negative_MD": {
                     "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
                     "set": [
-                        partial(self.set_attributes, host=f"{self.part}_IK_Stretch_Negative_MD",
-                                attr="operation", value=1),
-                        partial(self.set_attributes, host=f"{self.part}_IK_Stretch_Negative_MD",
-                                attr="input2X", value=-1),
+                        partial(self.set_attributes, attr="operation", value=1),
+                        partial(self.set_attributes, attr="input2X", value=-1),
                     ],
                     "reversed_connection": [
                         partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Negative_MD",
                                 from_attr="outputX", destination=f"{self.part}_IK_Stretch_Clamp",
                                 to_attr="inputR"),
-                        ],
+                    ],
                     "purpose": "Reverse the stretch scalar factor for the reverse side",
                 },
             }
@@ -481,6 +442,7 @@ class StretchyIkFactory:
         self.include_reverse = self.reverse_side in self.part
 
         def node_loop(pass_type, nodes, include_reverse=False):
+            print(f"RUNNNING PASS TYPE: {pass_type}")
             for node_type, hosts in nodes.items():
                 if not include_reverse and node_type == "reversed_nodes":
                     continue
@@ -489,12 +451,16 @@ class StretchyIkFactory:
                         details['create'](name=host)
                     elif pass_type == 'set' and details.get('set'):
                         for func in details.get('set'):
-                            func()
+                            func(host=host)
                     elif pass_type == 'connect':
-                        connection_type = 'reversed_connection' if include_reverse and details.get('reversed_connection')\
+                        connection_type = 'reversed_connection' if include_reverse and details.get(
+                            'reversed_connection') \
                             else 'primary_connection'
+                        print(f"CONNECTING {host} with {connection_type}")
                         for func in details.get(connection_type, []):
-                            func()
+                            if connection_type == 'reversed_connection':
+                                print(f"CONNECTING {host} with {connection_type}")
+                            func(source=host)
 
         # First pass: Create nodes
         node_loop('create', _nodes)
@@ -523,13 +489,6 @@ class StretchyIkFactory:
 
 
 if __name__ == '__main__':
-    # types = ['multiplyDivide', 'plusMinusAverage', 'distanceBetween', 'clamp']
-    # nodes = []
-    # for t in types:
-    #     nodes.extend(cmds.ls(type=t))
-    #
-    # print(nodes)
-    # exit()
     if cmds.objExists("Joints") and not cmds.objExists("Skeleton"):
         cmds.rename("Joints", "Skeleton")
 
