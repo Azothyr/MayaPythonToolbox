@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 from collections import defaultdict
-import re  # Regular expression library
+from functools import partial
+import re
 
 
 class JointManager:
@@ -56,199 +57,497 @@ class JointManager:
         return count_dict
 
 
-class RkManager:
-    def __init__(self, controller='Transform_Ctrl'):
-        if not cmds.objExists(controller):
-            raise ValueError(f"ERROR: The CONTROLLER of the RK system {controller} does not exist.")
-        self.controller = controller
-        self.joint_manager = JointManager(combine=True, get='rk')
-        self.rk_joints = self.joint_manager.data['RK'].items()
+class StretchyIkFactory:
 
-    def run(self):
-        for part, data in self.rk_joints:
-            if 'Foot' in part:
-                self.create_attributes(f"{part[0]}_Leg")
-            else:
-                self.create_attributes(part)
-            # print(f"Creating constraints for {part}")
-            for rk_joint in data['joints']:
-                fk_joint = rk_joint.replace("_RK", "_FK")
-                ik_joint = rk_joint.replace("_RK", "_IK")
-                # print(f"Confirming {rk_joint}, {fk_joint}, and {ik_joint} Exist.")
-                if not cmds.objExists(fk_joint) or not cmds.objExists(ik_joint):
-                    raise ValueError(f"WARNING: {fk_joint} or {ik_joint} does not exist.")
-                else:
-                    constraints = self.create_constraints(fk_joint, ik_joint, rk_joint)
-                    self.connect_attributes(part, constraints)
+    def __init__(self, primary_side="L", reverse_side="R"):
+        self.joint_manager = JointManager(combine=True, get='ik')
+        self.ik_joints = self.joint_manager.data['IK'].items()
+        self.primary_side = primary_side
+        self.reverse_side = reverse_side
+        self.include_reverse = False
+        self.top_group = self._find_top_group()
+        self.nodes = None
+        self.part = None
+        self.base_joint = None
+        self.pv_joint = None
+        self.tip_joint = None
+        self.tip_ctrl = None
+        # attribute_to_create = self.CREATE_ON_INIT['attributes']['StretchSwitch']['create']
+        # host_name = self.CREATE_ON_INIT['attributes']['StretchSwitch']['host'].format(self.part) if {} in\
+        #     self.CREATE_ON_INIT['attributes']['StretchSwitch']['host'] else \
+        #     self.CREATE_ON_INIT['attributes']['StretchSwitch']['host']
+        # attribute_to_create(host=host_name)
 
-    def create_attributes(self, part):
-        attr = f"{part}_IKFK"
-        # print(f"Creating attribute {attr} to RK CONTROLLER {self.controller}")
+        self.run()
+        if cmds.getAttr("IK_Dist_Loc_Grp.visibility") == 1:
+            cmds.setAttr("IK_Dist_Loc_Grp.visibility", 0)
+        print("-----__________------__________------__________COMPLETE__________------__________------__________-----")
 
-        # Create attributes on the RK controller if not already there
-        if not cmds.attributeQuery(attr, node=self.controller, exists=True):
-            cmds.addAttr(self.controller, ln=attr, at='float', min=0, max=1, dv=1)
-            cmds.setAttr('%s.%s' % (self.controller, attr), e=True, keyable=True)
-
-        else:
-            print(f"WARNING: {attr} already exists on {self.controller}")
+    def __repr__(self):
+        return f"StretchyIkFactory(\n\t{self.joint_manager}\n)"
 
     @staticmethod
-    def create_constraints(fk_leader, ik_leader, constrained_rk):
-        if not cmds.objExists(fk_leader):
-            raise ValueError(f"WARNING: {fk_leader} or {ik_leader} does not exist.")
-        name = constrained_rk.split('_RK')[0]
-        # print(f"Creating constraints for LEADER {fk_leader}, {ik_leader} to FOLLOWER {constrained_rk}")
-        parent_constraint = cmds.parentConstraint(fk_leader, ik_leader, constrained_rk,
-                                                  name=f'{name}_IKFK_Constraining_{constrained_rk}_TRANSLATION'
-                                                       f'_ROTATION__parent_constraint', mo=False, weight=1)[0]
+    def create_node(node_type, name, **kwargs):
+        cmds.shadingNode(node_type, name=name, **kwargs)
 
-        scale_constraint = cmds.scaleConstraint(fk_leader, ik_leader, constrained_rk,  # noqa
-                                                name=f'{name}_IKFK_Constraining_{constrained_rk}_SCALE_'
-                                                     f'_parent_constraint', weight=1)[0]
-        # print(f"Created constraints: {fk_parent_constraint}\n{fk_scale_constraint}\n{ik_parent_constraint}\n"
-        #       f"{ik_scale_constraint}")
+    @staticmethod
+    def connect_attributes(source, from_attr, destination, to_attr, **kwargs):
+        if not cmds.isConnected(f"{source}.{from_attr}", f"{destination}.{to_attr}"):
+            cmds.connectAttr(f"{source}.{from_attr}", f"{destination}.{to_attr}", force=True, **kwargs)
 
-        return parent_constraint, parent_constraint
+    @staticmethod
+    def set_attributes(host, attr, value, **kwargs):
+        if cmds.attributeQuery(attr, node=host, exists=True):
+            cmds.setAttr(f"{host}.{attr}", value, edit=True, keyable=True, **kwargs)
 
-    def connect_attributes(self, part, constraints):
-        if 'Foot' in part:
-            attr = f"{part[0]}_Leg_IKFK"
-        else:
-            attr = f"{part}_IKFK"
-        if not cmds.objExists(f"{attr}_Rev"):
-            rev_node = cmds.shadingNode('reverse', name=f"{attr}_Rev", asUtility=True)
-        else:
-            rev_node = f"{attr}_Rev"
-        # print(f"Connecting attributes {attr} on {self.controller} to {constraints}")
+    def generate_nodes(self):
+        nodes = {
+            "primary_nodes": {
+                f"{self.part}_Upper_Length_PMA": {
+                    "create": partial(self.create_node, node_type="plusMinusAverage", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_Upper_Length_PMA", attr="operation",
+                                value=1),
+                        partial(self.set_attributes, host=f"{self.part}_Upper_Length_PMA", attr="input1D[0]",
+                                value=cmds.getAttr(f"{self.pv_joint}.translateX")),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
+                                from_attr="output1D", destination=f"{self.part}_Length_Denominator_PMA",
+                                to_attr="input1D[0]"),
+                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
+                                from_attr="output1D", destination=f"{self.part}_Joint_Length_MD",
+                                to_attr="input1X"),
+                        ],
+                    "purpose": "Calculate the distance between the base and the PV joint",
+                },
+                f"{self.part}_Lower_Length_PMA": {
+                    "create": partial(self.create_node, node_type="plusMinusAverage", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_Lower_Length_PMA", attr="operation",
+                                value=1),
+                        partial(self.set_attributes, host=f"{self.part}_Lower_Length_PMA", attr="input1D[0]",
+                                value=cmds.getAttr(f"{self.tip_joint}.translateX")),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
+                                from_attr="output1D", destination=f"{self.part}_Length_Denominator_PMA",
+                                to_attr="input1D[1]"),
+                        partial(self.connect_attributes, source=f"{self.part}_Upper_Length_PMA",
+                                from_attr="output1D", destination=f"{self.part}_Joint_Length_MD",
+                                to_attr="input1Y"),
+                        ],
+                    "purpose": "Calculate the distance between the PV and the tip joint",
+                },
+                f"{self.part}_Length_Denominator_PMA": {
+                    "create": partial(self.create_node, node_type="plusMinusAverage", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_Length_Denominator_PMA",
+                                attr="operation", value=1),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_Length_Denominator_PMA",
+                                from_attr="output1D", destination=f"{self.part}_IK_Stretch_Scalar_MD",
+                                to_attr="input1X"),
+                        ],
+                    "purpose": "Take the total length of the joint chain and divide it by the sum of the upper and "
+                               "lower to get the stretch scalar factor",
+                },
+                f"{self.part}_IK_Distance": {
+                    "create": partial(self.create_node, node_type="distanceBetween", asUtility=True),
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Distance",
+                                from_attr="distance", destination=f"{self.part}_Stretch_Global_Scale_MD",
+                                to_attr="input1X"),
+                        ],
+                    "purpose": "Get the distance between the base and the tip locators, which the stretchy IK will "
+                               "attempt to match",
+                },
+                f"{self.part}_IK_Stretch_Scalar_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_IK_Stretch_Scalar_MD",
+                                attr="operation", value=2),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Scalar_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Clamp",
+                                to_attr="inputR"),
+                        ],
+                    "reversed_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Scalar_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Negative_MD",
+                                to_attr="input1X"),
+                        ],
+                    "purpose": "To scale the distance between the base and the tip locators to match the length of "
+                               "the joint chain",
+                },
+                f"{self.part}_Stretch_Switch_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_Stretch_Switch_MD",
+                                attr="operation", value=1),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_Stretch_Switch_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Scalar_MD",
+                                to_attr="input1X"),
+                        ],
+                    "purpose": "",
+                },
+                f"{self.part}_Joint_Length_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_Joint_Length_MD",
+                                attr="operation", value=1),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_Joint_Length_MD",
+                                from_attr="outputX", destination=f"{self.pv_joint}",
+                                to_attr="translateX"),
+                        partial(self.connect_attributes, source=f"{self.part}_Joint_Length_MD",
+                                from_attr="outputY", destination=f"{self.tip_joint}",
+                                to_attr="translateX"),
+                        ],
+                    "purpose": "",
+                },
+                f"{self.part}_Segment_Scalar_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
+                                attr="operation", value=2),
+                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
+                                attr="input2X", value=10),
+                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
+                                attr="input2Y", value=10),
+                        partial(self.set_attributes, host=f"{self.part}_Segment_Scalar_MD",
+                                attr="input2Z", value=10),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Length_Combined_MD",
+                                to_attr="input1X"),
+                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Length_Combined_MD",
+                                to_attr="input1Y"),
+                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
+                                from_attr="outputY", destination=f"{self.part}_IK_Length_Combined_MD",
+                                to_attr="input2X"),
+                        partial(self.connect_attributes, source=f"{self.part}_Segment_Scalar_MD",
+                                from_attr="outputZ", destination=f"{self.part}_IK_Length_Combined_MD",
+                                to_attr="input2Y"),
+                        ],
+                    "purpose": "",
+                },
+                f"{self.part}_IK_Length_Combined_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_IK_Length_Combined_MD"
+                                , attr="operation", value=1),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Length_Combined_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Joint_Length_Ref_MD",
+                                to_attr="input2X"),
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Length_Combined_MD",
+                                from_attr="outputY", destination=f"{self.part}_IK_Joint_Length_Ref_MD",
+                                to_attr="input2Y"),
+                        ],
+                    "purpose": "",
+                },
+                f"{self.part}_IK_Joint_Length_Ref_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_IK_Joint_Length_Ref_MD",
+                                attr="operation", value=1),
+                        partial(self.set_attributes, host=f"{self.part}_IK_Joint_Length_Ref_MD",
+                                attr="input1X", value=cmds.getAttr(f"{self.pv_joint}.translateX")),
+                        partial(self.set_attributes, host=f"{self.part}_IK_Joint_Length_Ref_MD",
+                                attr="input1Y", value=cmds.getAttr(f"{self.tip_joint}.translateX")),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Joint_Length_Ref_MD",
+                                from_attr="outputX", destination=f"{self.part}_Upper_Length_PMA",
+                                to_attr="input1D[1]"),
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Joint_Length_Ref_MD",
+                                from_attr="outputY", destination=f"{self.part}_Lower_Length_PMA",
+                                to_attr="input1D[1]"),
+                        ],
+                    "purpose": "",
+                },
+                f"{self.part}_Stretch_Global_Scale_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_Stretch_Global_Scale_MD",
+                                attr="operation", value=2),
+                    ],
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_Stretch_Global_Scale_MD",
+                                from_attr="outputX", destination=f"{self.part}_Stretch_Switch_MD",
+                                to_attr="input1X"),
+                        ],
+                    "purpose": "",
+                },
+                f"{self.part}_IK_Stretch_Clamp": {
+                    "create": partial(self.create_node, node_type="clamp", asUtility=True),
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Clamp",
+                                from_attr="outputR", destination=f"{self.part}_Joint_Length_MD",
+                                to_attr="input2X"),
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Clamp",
+                                from_attr="outputR", destination=f"{self.part}_Joint_Length_MD",
+                                to_attr="input2Y"),
+                        ],
+                    "purpose": "Set a clamp to prevent the stretch to go beyond Max and below Min",
+                },
+                f"{self.part}_IK_Dist_Base_Loc": {
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Dist_Base_Loc",
+                                from_attr="worldMatrix", destination=f"{self.part}_IK_Distance",
+                                to_attr="inMatrix1"),
+                        ],
+                },
+                f"{self.part}_IK_Dist_Tip_Loc": {
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Dist_Tip_Loc",
+                                from_attr="worldMatrix", destination=f"{self.part}_IK_Distance",
+                                to_attr="inMatrix2"),
+                        ],
+                },
+                f"{self.tip_ctrl}": {
+                    "primary_connection": [
+                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
+                                from_attr="StretchSwitch", destination=f"{self.part}_Stretch_Switch_MD",
+                                to_attr="input2X"),
+                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
+                                from_attr="MaxStretch", destination=f"{self.part}_IK_Stretch_Clamp",
+                                to_attr="maxR"),
+                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
+                                from_attr="TotalStretch", destination=f"{self.part}_Segment_Scalar_MD",
+                                to_attr="input1X"),
+                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
+                                from_attr="UpperStretch", destination=f"{self.part}_Segment_Scalar_MD",
+                                to_attr="input1Y"),
+                        partial(self.connect_attributes, source=f"{self.tip_ctrl}",
+                                from_attr="LowerStretch", destination=f"{self.part}_Segment_Scalar_MD",
+                                to_attr="input1Z"),
+                        ],
+                },
+            },
+            "reversed_nodes": {
+                f"{self.part}_IK_Stretch_Negative_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, host=f"{self.part}_IK_Stretch_Negative_MD",
+                                attr="operation", value=1),
+                        partial(self.set_attributes, host=f"{self.part}_IK_Stretch_Negative_MD",
+                                attr="input2X", value=-1),
+                    ],
+                    "reversed_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Negative_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Clamp",
+                                to_attr="inputR"),
+                        ],
+                    "purpose": "Reverse the stretch scalar factor for the reverse side",
+                },
+            }
+        }
+        return nodes
 
-        for constraint in constraints:
-            # print(cmds.listAttr(constraint))
-            print(f"Connecting {attr} to {constraint}")
+    @staticmethod
+    def create_attributes(host, attr, attribute_type, **kwargs):
+        if not cmds.attributeQuery(attr, node=host, exists=True):
+            cmds.addAttr(host, longName=attr, attributeType=attribute_type, **kwargs)
 
-            if not cmds.isConnected('%s.%s' % (self.controller, attr), '%s.w0' % constraint):
-                cmds.connectAttr('%s.%s' % (self.controller, attr), '%s.w0' % constraint, f=True)
+    def generate_attributes(self):
+        attributes = {
+            "attributes": {
+                "StretchSwitch": {
+                    "create": partial(self.create_attributes, host=self.tip_ctrl, attr="StretchSwitch",
+                                      attribute_type="float", min=0, max=1, defaultValue=0, readable=True,
+                                      writable=True, keyable=True)
+                },
+                "MaxStretch": {
+                    "create": partial(self.create_attributes, host=self.tip_ctrl, attr="MaxStretch",
+                                      attribute_type="float", min=1, max=10, defaultValue=3, readable=True,
+                                      writable=True, keyable=True)
+                },
+                "TotalStretch": {
+                    "create": partial(self.create_attributes, host=self.tip_ctrl, attr="TotalStretch",
+                                      attribute_type="float", min=-9.9, max=20, defaultValue=0, readable=True,
+                                      writable=True, keyable=True)
+                },
+                "UpperStretch": {
+                    "create": partial(self.create_attributes, host=self.tip_ctrl, attr="UpperStretch",
+                                      attribute_type="float", min=-9.9, max=20, defaultValue=0, readable=True,
+                                      writable=True, keyable=True)
+                },
+                "LowerStretch": {
+                    "create": partial(self.create_attributes, host=self.tip_ctrl, attr="LowerStretch",
+                                      attribute_type="float", min=-9.9, max=20, defaultValue=0, readable=True,
+                                      writable=True, keyable=True)
+                },
+                "MasterScale": {
+                    "create": partial(self.create_attributes, host="Transform_Ctrl", attr="MasterScale",
+                                      attribute_type="float", defaultValue=1, readable=True, writable=True,
+                                      keyable=True)
+                },
+            }
+        }
+        return attributes
 
-            if not cmds.isConnected('%s.%s' % (self.controller, attr), '%s.inputX' % rev_node):
-                cmds.connectAttr('%s.%s' % (self.controller, attr), '%s.inputX' % rev_node, f=True)
+    @staticmethod
+    def _find_top_group():
+        sel = cmds.ls(type="joint")[0]
+        while cmds.listRelatives(sel, parent=True):
+            sel = cmds.listRelatives(sel, parent=True)[0]
+        return sel
 
-            if not cmds.isConnected('%s.outputX' % rev_node, '%s.w1' % constraint):
-                cmds.connectAttr('%s.outputX' % rev_node, '%s.w1' % constraint, f=True)
-            if 'Foot' in part:
+    def create_dist_locators(self, base_position, tip_position):
+        if not cmds.objExists("Deformers") or "Deformers" not in cmds.listRelatives(self.top_group, children=True):
+            cmds.group(em=True, name="Deformers")
+            cmds.parent("Deformers", self.top_group)
+            cmds.group(em=True, name="IK_Dist_Loc_Grp")
+            cmds.parent("IK_Dist_Loc_Grp", "Deformers")
+        if "IK_Dist_Loc_Grp" not in cmds.listRelatives("Deformers", children=True):
+            cmds.group(em=True, name="IK_Dist_Loc_Grp")
+            cmds.parent("IK_Dist_Loc_Grp", "Deformers")
+        base_locator = cmds.spaceLocator(name=f"{self.part}_IK_Dist_Base_Loc")
+        tip_locator = cmds.spaceLocator(name=f"{self.part}_IK_Dist_Tip_Loc")
+        cmds.xform(base_locator, translation=base_position, worldSpace=True)
+        cmds.xform(tip_locator, translation=tip_position, worldSpace=True)
+        cmds.parentConstraint(self.base_joint, base_locator, mo=True, name=f'{self.base_joint}_to_{base_locator}'
+                                                                           f'_TRANSLATION_ROTATION__parent_constraint')
+        cmds.parentConstraint(self.tip_joint, tip_locator, mo=True, name=f'{self.tip_joint}_to_{tip_locator}'
+                                                                         f'_TRANSLATION_ROTATION__parent_constraint')
+        cmds.parent(base_locator, tip_locator, "IK_Dist_Loc_Grp")
+        return base_locator, tip_locator
+
+    def run(self):
+        for part, data in self.ik_joints:
+            if "Foot" in part:
                 continue
+            self.part = part
+            self.tip_ctrl = f"{self.part}_IK_Tip_Ctrl"
+            self.include_reverse = False
+            if self.reverse_side in self.part:
+                self.include_reverse = True
+            found_01 = False
+            found_02 = False
+            found_03 = False
+            for ik_joint in data['joints']:
+                if not cmds.objExists(ik_joint):
+                    raise ValueError(f"WARNING: {ik_joint} does not exist.")
+                if not found_01 and not found_02 and not found_03:
+                    self.base_joint = None
+                    self.pv_joint = None
+                    self.tip_joint = None
+                if "01" in ik_joint:
+                    self.base_joint = ik_joint
+                    found_01 = True
+                if "02" in ik_joint:
+                    self.pv_joint = ik_joint
+                    found_02 = True
+                if "03" in ik_joint:
+                    self.tip_joint = ik_joint
+                    found_03 = True
 
-            if not cmds.isConnected('%s.%s' % (self.controller, attr), '%s.visibility' % f'{part}_FK_Ctrl_Grp'):
-                cmds.connectAttr('%s.%s' % (self.controller, attr), '%s.visibility' % f'{part}_FK_Ctrl_Grp', f=True)
+            if self.base_joint and self.pv_joint and self.tip_joint:
+                if self.pv_joint not in cmds.listRelatives(self.base_joint, children=True):
+                    raise ValueError(f"WARNING: {self.pv_joint} is not a child of {self.base_joint}.")
+                if self.tip_joint not in cmds.listRelatives(self.pv_joint, children=True):
+                    raise ValueError(f"WARNING: {self.tip_joint} is not a child of {self.pv_joint}.")
 
-            if not cmds.isConnected('%s.outputX' % rev_node, '%s.visibility' % f'{part}_IK_Ctrl_Grp'):
-                cmds.connectAttr('%s.outputX' % rev_node, '%s.visibility' % f'{part}_IK_Ctrl_Grp', f=True)
+            else:
+                raise NotImplementedError(f"WARNING: {self.part} does not have all the required joints.")
+            # print(f"CONFIRMED JOINTS OF {self.part} proceeding to create stretchy IK")
+
+            self.create_dist_locators(cmds.xform(self.base_joint, query=True, translation=True, worldSpace=True),
+                                      cmds.xform(self.tip_joint, query=True, translation=True, worldSpace=True))
+
+            self.perform_attr_creation()
+
+            self.perform_node_operations()
+
+    def perform_attr_creation(self):
+        attrs = self.generate_attributes()
+
+        for attr in attrs:
+            for host in attrs[attr]:
+                attrs[attr][host]['create']()
+
+    def perform_node_operations(self):
+        _nodes = self.generate_nodes()
+        self.include_reverse = self.reverse_side in self.part
+
+        def node_loop(pass_type, nodes, include_reverse=False):
+            for node_type, hosts in nodes.items():
+                if not include_reverse and node_type == "reversed_nodes":
+                    continue
+                for host, details in hosts.items():
+                    if pass_type == 'create' and details.get('create'):
+                        details['create'](name=host)
+                    elif pass_type == 'set' and details.get('set'):
+                        for func in details.get('set'):
+                            func()
+                    elif pass_type == 'connect':
+                        connection_type = 'reversed_connection' if include_reverse and details.get('reversed_connection')\
+                            else 'primary_connection'
+                        for func in details.get(connection_type, []):
+                            func()
+
+        # First pass: Create nodes
+        node_loop('create', _nodes)
+
+        # Second pass: Set attributes
+        node_loop('set', _nodes)
+
+        # Third pass: Make connections
+        node_loop('connect', _nodes, self.include_reverse)
+
+        # for node in _nodes:
+        #     if not self.include_reverse and node == "reversed_nodes":
+        #         continue
+        #     for host in _nodes[node]:
+        #         _nodes[node][host]['create'](name=host)
+        #         if _nodes[node][host].get('set'):
+        #             for func in _nodes[node][host]['set']:
+        #                 func()
+        #         if self.include_reverse and _nodes[node][host].get('reversed_connection'):
+        #             for func in _nodes[node][host]['reversed_connection']:
+        #                 func()
+        #         else:
+        #             if _nodes[node][host].get('primary_connection'):
+        #                 for func in _nodes[node][host]['primary_connection']:
+        #                     func()
 
 
 if __name__ == '__main__':
-    # sel = cmds.ls(allPaths=True)
-    # for item in sel:
-    #     if "IKFK" in item:
-    #         cmds.delete(item)
+    # types = ['multiplyDivide', 'plusMinusAverage', 'distanceBetween', 'clamp']
+    # nodes = []
+    # for t in types:
+    #     nodes.extend(cmds.ls(type=t))
+    #
+    # print(nodes)
+    # exit()
+    if cmds.objExists("Joints") and not cmds.objExists("Skeleton"):
+        cmds.rename("Joints", "Skeleton")
 
-    # cmds.parent("R_Foot_01_IK_Jnt", "R_Leg_03_IK_Jnt")
-    # cmds.parent("L_Foot_01_IK_Jnt", "L_Leg_03_IK_Jnt")
-    # cmds.parent("R_Leg_01_IK_Jnt", "R_Leg_Clav_FK_Jnt")
-    # cmds.parent("L_Leg_01_IK_Jnt", "L_Leg_Clav_FK_Jnt")
-    # cmds.parent("R_Arm_01_IK_Jnt", "R_Clav_FK_Jnt")
-    # cmds.parent("L_Arm_01_IK_Jnt", "L_Clav_FK_Jnt")
-    #
-    # def remove_constraints_from_object(object_name):
-    #     # List all the constraints on the object
-    #     constraints = cmds.listRelatives(object_name, type='constraint')
-    #
-    #     # If no constraints found, print a message and return
-    #     if constraints is None:
-    #         print(f"No constraints found on object {object_name}.")
-    #         return
-    #
-    #     # Delete each constraint
-    #     for constraint in constraints:
-    #         cmds.delete(constraint)
-    #         print(f"Deleted constraint: {constraint}")
-    #
-    # def recursive_joint_clean_till_parameter(node, until):
-    #     finished = False
-    #     children = cmds.listRelatives(node, children=True, path=True)
-    #     if children is not None:
-    #         for child in children:
-    #             if until == child.split("|")[-1][1::]:
-    #                 print(f"DELETING {child}")
-    #                 cmds.select(child)
-    #                 cmds.delete()
-    #                 finished = True
-    #             elif cmds.nodeType(child) != "joint":
-    #                 # print(f"DELETING {child}")
-    #                 cmds.delete(child)
-    #             else:
-    #                 name = child.split("|")[-1]
-    #                 new_name = name.replace("_FK", "_RK")
-    #                 cmds.select(child)
-    #                 child = cmds.rename(new_name)
-    #                 if finished:
-    #                     return
-    #                 recursive_joint_clean_till_parameter(child, until)
-    #
-    # processing = []
-    # joints = cmds.ls(type="joint")
-    # for joint in joints:
-    #     joint = joint.split("|")[-1]
-    #     if "Arm_01_FK_Jnt" in joint or "Leg_01_FK_Jnt" in joint:
-    #         processing.append(joint)
-    # # print(f"PROCESSING-------{processing}")
-    #
-    # for joint in processing:
-    #     # print(f"WORKING ON {joint}")
-    #     rk_joint = joint.replace("_FK", "_RK")
-    #     cmds.duplicate(joint, name=rk_joint)
-    #     recursive_joint_clean_till_parameter(rk_joint, "_Hand_FK_Jnt")
-    #     cmds.select(clear=True)
-    #
-    # remove_constraints_from_object("L_Hand_FK_Ctrl_Grp")
-    # remove_constraints_from_object("R_Hand_FK_Ctrl_Grp")
-    #
-    # cmds.parent("L_Hand_FK_Jnt", "L_Arm_03_RK_Jnt")
-    # cmds.parent("R_Hand_FK_Jnt", "R_Arm_03_RK_Jnt")
-    # cmds.parent("L_Foot_Ctrl_Grp", "L_Leg_FK_Ctrl_Grp")
-    # cmds.parent("R_Foot_Ctrl_Grp", "R_Leg_FK_Ctrl_Grp")
-    #
-    # cmds.parentConstraint( "L_Arm_03_RK_Jnt", "L_Hand_FK_Ctrl_Grp", mo=True, weight=1)
-    # cmds.scaleConstraint("L_Arm_03_RK_Jnt", "L_Hand_FK_Ctrl_Grp", weight=1)
-    #
-    # cmds.parentConstraint("R_Arm_03_RK_Jnt", "R_Hand_FK_Ctrl_Grp", mo=True, weight=1)
-    # cmds.scaleConstraint("R_Arm_03_RK_Jnt", "R_Hand_FK_Ctrl_Grp", weight=1)
-    #
-    # cmds.orientConstraint("L_Arm_IK_Tip_Ctrl", "L_Arm_03_IK_Jnt", mo=True, weight=1)
-    # cmds.orientConstraint("R_Arm_IK_Tip_Ctrl", "R_Arm_03_IK_Jnt", mo=True, weight=1)
-    #
-    # cmds.orientConstraint("L_Leg_IK_Tip_Ctrl", "L_Leg_03_IK_Jnt", mo=True, weight=1)
-    # cmds.orientConstraint("R_Leg_IK_Tip_Ctrl", "R_Leg_03_IK_Jnt", mo=True, weight=1)
-    #
-    # cmds.parentConstraint("R_Arm_03_FK_Ctrl", "R_Arm_03_FK_Jnt", mo=True, weight=1)
-    # cmds.scaleConstraint("R_Arm_03_FK_Ctrl", "R_Arm_03_FK_Jnt", weight=1)
+    if not cmds.attributeQuery("MasterScale", node="Transform_Ctrl", exists=True):
+        cmds.addAttr("Transform_Ctrl", ln="MasterScale", at='float', dv=1)
+        cmds.setAttr('Transform_Ctrl.MasterScale', e=True, keyable=True)
+        cmds.connectAttr('Transform_Ctrl.MasterScale', "Transform_Ctrl.scaleX", force=True)
+        cmds.connectAttr('Transform_Ctrl.MasterScale', "Transform_Ctrl.scaleY", force=True)
+        cmds.connectAttr('Transform_Ctrl.MasterScale', "Transform_Ctrl.scaleZ", force=True)
+        cmds.setAttr("Transform_Ctrl.scaleX", lock=True, keyable=False, channelBox=False)
+        cmds.setAttr("Transform_Ctrl.scaleY", lock=True, keyable=False, channelBox=False)
+        cmds.setAttr("Transform_Ctrl.scaleZ", lock=True, keyable=False, channelBox=False)
+        cmds.scaleConstraint("Transform_Ctrl", "Skeleton", mo=True,
+                             name='Transform_Ctrl_to_Skeleton_SCALE__scale_constraint', weight=1)
 
-    # sel = cmds.ls(type="shape")
-    # controls = []
-    # for item in sel:
-    #     if "CtrlShape" in item:
-    #         controls.append(item)
-    # cmds.select(clear=True)
-    # cmds.select(controls)
-    # cmds.pickWalk(direction="up")
-    # controls = cmds.ls(selection=True)
-    # cmds.select(clear=True)
-    # for control in controls:
-    #     cmds.setAttr(f"{control}.v", lock=True, keyable=False, channelBox=False)
-    #     # print(f"CONTROL: {control}\n\tLOCKING AND HIDING ATTRIBUTES")
-    # RkManager().run()
+    joints = cmds.ls(type="joint")
 
-    parent_constraints = cmds.ls(type="parentConstraint")
-    for constraint in parent_constraints:
-        cmds.setAttr(f"{constraint}.interpType", 2)
-        print(f"{constraint} set to {cmds.getAttr(f'{constraint}.interpType')}")
-    print("---------_____COMPLETE_____---------")
+    for joint in joints:
+        cmds.setAttr(f"{joint}.segmentScaleCompensate", 0)
 
+    StretchyIkFactory()
