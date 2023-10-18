@@ -102,6 +102,21 @@ class StretchyIkFactory:
 
     def generate_nodes(self):
         nodes = {
+            "reversed_nodes": {
+                f"{self.part}_IK_Stretch_Negative_MD": {
+                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
+                    "set": [
+                        partial(self.set_attributes, attr="operation", value=1),
+                        partial(self.set_attributes, attr="input2X", value=-1),
+                    ],
+                    "reversed_connection": [
+                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Negative_MD",
+                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Clamp",
+                                to_attr="inputR"),
+                    ],
+                    "purpose": "Reverse the stretch scalar factor for the reverse side",
+                },
+            },
             "primary_nodes": {
                 f"{self.part}_Upper_Length_PMA": {
                     "create": partial(self.create_node, node_type="plusMinusAverage", asUtility=True),
@@ -297,21 +312,6 @@ class StretchyIkFactory:
                     ],
                 },
             },
-            "reversed_nodes": {
-                f"{self.part}_IK_Stretch_Negative_MD": {
-                    "create": partial(self.create_node, node_type="multiplyDivide", asUtility=True),
-                    "set": [
-                        partial(self.set_attributes, attr="operation", value=1),
-                        partial(self.set_attributes, attr="input2X", value=-1),
-                    ],
-                    "reversed_connection": [
-                        partial(self.connect_attributes, source=f"{self.part}_IK_Stretch_Negative_MD",
-                                from_attr="outputX", destination=f"{self.part}_IK_Stretch_Clamp",
-                                to_attr="inputR"),
-                    ],
-                    "purpose": "Reverse the stretch scalar factor for the reverse side",
-                },
-            }
         }
         return nodes
 
@@ -390,9 +390,7 @@ class StretchyIkFactory:
                 continue
             self.part = part
             self.tip_ctrl = f"{self.part}_IK_Tip_Ctrl"
-            self.include_reverse = False
-            if self.reverse_side in self.part:
-                self.include_reverse = True
+            self.include_reverse = self.reverse_side in self.part
             found_01 = False
             found_02 = False
             found_03 = False
@@ -439,15 +437,19 @@ class StretchyIkFactory:
 
     def perform_node_operations(self):
         _nodes = self.generate_nodes()
-        self.include_reverse = self.reverse_side in self.part
 
         def node_loop(pass_type, nodes, include_reverse=False):
             print(f"RUNNNING PASS TYPE: {pass_type}")
+            working_on = None
             for node_type, hosts in nodes.items():
+                if working_on != node_type:
+                    print(f"WORKING ON {node_type} and reverse is {include_reverse} with global as {self.include_reverse}-----part is {self.part}")
+                    working_on = node_type
                 if not include_reverse and node_type == "reversed_nodes":
                     continue
                 for host, details in hosts.items():
                     if pass_type == 'create' and details.get('create'):
+                        # print(f"CREATING {host} by {details['create']}")
                         details['create'](name=host)
                     elif pass_type == 'set' and details.get('set'):
                         for func in details.get('set'):
@@ -456,17 +458,17 @@ class StretchyIkFactory:
                         connection_type = 'reversed_connection' if include_reverse and details.get(
                             'reversed_connection') \
                             else 'primary_connection'
-                        print(f"CONNECTING {host} with {connection_type}")
+                        # print(f"CONNECTING {host} with {connection_type}")
                         for func in details.get(connection_type, []):
-                            if connection_type == 'reversed_connection':
-                                print(f"CONNECTING {host} with {connection_type}")
+                            # if connection_type == 'reversed_connection':
+                                # print(f"CONNECTING {host} with {connection_type} by {func}")
                             func(source=host)
 
         # First pass: Create nodes
-        node_loop('create', _nodes)
+        node_loop('create', _nodes, self.include_reverse)
 
         # Second pass: Set attributes
-        node_loop('set', _nodes)
+        node_loop('set', _nodes, self.include_reverse)
 
         # Third pass: Make connections
         node_loop('connect', _nodes, self.include_reverse)
