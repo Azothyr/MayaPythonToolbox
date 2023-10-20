@@ -417,10 +417,10 @@ if __name__ == "__main__":
 
     for key in to_set:
         for attr_name, attr_info in attributes.items():
-            # print(f"Creating {attr_name} for {driver}")
-            # print(f"Info: {attr_info}")
-            # print(f"Type: {attr_info.get('attributeType', None)}")
-            # print(f"Value: {attr_info.get('defaultValue', None)}")
+            print(f"Creating {attr_name} for {key}")
+            print(f"Info: {attr_info}")
+            print(f"Type: {attr_info["creation_kwargs"].get('attributeType', None)}")
+            print(f"Value: {attr_info["creation_kwargs"].get('defaultValue', None)}")
             create_driver_attr(key, attr_name, attr_info, force_recreate=False)
 
     hard_code_reverse_foot(to_set, attributes)
