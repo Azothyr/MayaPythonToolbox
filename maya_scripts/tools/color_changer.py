@@ -10,7 +10,7 @@ def change_color(_color, obj_lyst):
         color_index = library.get_color_from_index(_color)
 
     for obj in obj_lyst:
-        connected_layer = cmds.listConnections(f"{obj}.drawOverride", s=True, d=False)
+        connected_layer = cmds.listConnections(f"{obj}.drawOverride", destination=False)
         if connected_layer:
             for layer in connected_layer:
                 print(f"Disconnecting drawInfo of {layer} from {obj}.drawOverride.")
@@ -24,7 +24,12 @@ def change_color(_color, obj_lyst):
 
         else:
             shapes = cmds.listRelatives(obj, children=True, shapes=True)
+            connected_layer = cmds.listConnections(f"{shapes}.drawOverride", shapes=True, destination=False)
             for shape in shapes:
+                if connected_layer:
+                    for layer in connected_layer:
+                        print(f"Disconnecting drawInfo of {layer} from {obj}.drawOverride.")
+                cmds.disconnectAttr(f"{layer}.drawInfo", f"{obj}.drawOverride")
                 cmds.setAttr(f"{shape}.overrideEnabled", lock=False)
                 cmds.setAttr(f"{shape}.overrideColor", lock=False)
                 cmds.setAttr(f"{shape}.overrideEnabled", 1)

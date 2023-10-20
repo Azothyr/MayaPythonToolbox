@@ -111,7 +111,7 @@ class StretchyIkFactory:
         cmds.shadingNode(node_type, name=name, **kwargs)
 
     @staticmethod
-    def connect_attributes(source, from_attr, destination, to_attr, **kwargs):
+    def connect_attributes(source, from_attr, to_attr, destination, **kwargs):
         if not cmds.isConnected(f"{source}.{from_attr}", f"{destination}.{to_attr}"):
             cmds.connectAttr(f"{source}.{from_attr}", f"{destination}.{to_attr}", force=True, **kwargs)
 
@@ -240,9 +240,9 @@ class StretchyIkFactory:
                     ],
                     "primary_connection": [
                         partial(self.connect_attributes, from_attr="outputX", to_attr="translateX",
-                                destination=f"{self.tip_joint}"),
-                        partial(self.connect_attributes, from_attr="outputY", to_attr="translateX",
                                 destination=f"{self.pv_joint}"),
+                        partial(self.connect_attributes, from_attr="outputY", to_attr="translateX",
+                                destination=f"{self.tip_joint}"),
                     ],
                     "purpose": "Calculates the final stretch length of the upper and lower segments by multiplying "
                                "scaled length of each by the clamped stretch value. Then sets the translateX of the "
