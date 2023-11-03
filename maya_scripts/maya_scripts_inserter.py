@@ -44,7 +44,7 @@ def main():
     os.makedirs(maya_scripts_folder, exist_ok=True)
 
     clear_directory(maya_scripts_folder)
-    _exceptions = ["maya_scripts_inserter.py", "manual_tool_runner.py", "Scratch.py"]
+    _exceptions = ["maya_scripts_inserter.py", "manual_tool_runner.py", "weight_paint_time_scratch.py"]
 
     transfer_py_dir_in_current(repo, maya_scripts_folder, _exceptions)
 
