@@ -233,7 +233,7 @@ def create_ui_window(manual_run=False):
     joint_ui_window = "joint_ui_window"
     if cmds.window(joint_ui_window, ex=True):
         cmds.deleteUI(joint_ui_window)
-    cmds.window(joint_ui_window, t="Joint Toolbox", wh=(100, 50), mxb=False, mnb=True, rtf=True, nde=True)
+    cmds.window(joint_ui_window, t="Joint Tools", wh=(100, 50), mxb=False, mnb=True, rtf=True, nde=True)
     tabs_ui = cmds.tabLayout('tabs_ui', innerMarginWidth=5, innerMarginHeight=5)
 
     joint_tab = _ui_setup(tabs_ui, 'joint')

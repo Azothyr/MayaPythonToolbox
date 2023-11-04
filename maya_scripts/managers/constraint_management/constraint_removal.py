@@ -3,7 +3,7 @@ import maya.cmds as cmds
 
 
 # class ConstraintRemoval(metaclass=PluginRegistryMeta):
-class ConstraintRemoval():
+class ConstraintRemoval:
     @staticmethod
     def remove_from_hierarchy(selection=None):
         if selection is None:
@@ -29,3 +29,8 @@ class ConstraintRemoval():
         if constraints:
             for constraint in constraints:
                 cmds.delete(constraint)
+
+    @staticmethod
+    def remove_all_constraints():
+        for constraint in cmds.ls(type='constraint'):
+            cmds.delete(constraint)

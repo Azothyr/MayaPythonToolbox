@@ -39,7 +39,7 @@ def _ui_setup(parent_ui, tool):
 
 
 def create_ui_window():
-    win = Window("color creator",
+    win = Window("Color Tools",
                  wh=[200, 100],
                  maximizeButton=True,
                  minimizeButton=True,

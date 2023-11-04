@@ -121,7 +121,7 @@ def _setup_ui(_parent_ui):
 
 def create_ui_window(manual_run=False):
     win = Window('utility_ui_window',
-                 title="utility Creator",
+                 title="utility Tools",
                  widthHeight=(350, 500),
                  maximizeButton=False,
                  minimizeButton=True,

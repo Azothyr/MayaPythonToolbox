@@ -1,5 +1,13 @@
+import sys
+
+# if 'C:\\Users\\Demon\\Documents\\custom_scripts' in sys.path:
+#     sys.path.remove('C:\\Users\\Demon\\Documents\\custom_scripts')
+if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
+    sys.path.append('C:/GitRepos/MayaPythonToolbox/maya_scripts')
+# print("\n".join([path for path in sys.path]), "\n")
 import maya.cmds as cmds
-from maya_scripts.managers.constraint_management.constraint_removal import ConstraintRemoval
+from managers.constraint_management.constraint_removal import ConstraintRemoval
+from managers.base_maya_objects.joint_manager import JointManager
 
 
 class ControlGroup:
@@ -81,9 +89,13 @@ class OutlinerSort(SortMethod):
         object_indices = {obj: short_all_objects.index(obj) for obj in unsorted_selection}
         return sorted(unsorted_selection, key=lambda x: object_indices[x])
 
+class SortByJointHierarchy(SortMethod):
+    def sort(self, unsorted_selection):
+        pass
+
 
 # No sort
-class NoSort(SortMethod):
+class BasicSort(SortMethod):
     def sort(self, unsorted_selection):
         return unsorted_selection
 
@@ -112,20 +124,21 @@ class BrokenFkConstraintFactory:
 
     @staticmethod
     def create_control_to_group_constraints(leader, follower_grp, follower):
+
         # Create constraints
         translate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                     name=f'{leader}_Constraining_{follower_grp}_TRANSLATION_'
+                                                     name=f'{leader}_Constraining_TRANSLATION_'
                                                           f'via_parent_constraint', mo=True,
                                                      skipRotate=["x", "y", "z"], weight=1)[0]
 
         rotate_constraint = cmds.parentConstraint(leader, follower_grp,
-                                                  name=f'{leader}_Constraining_{follower_grp}_ROTATION_'
-                                                       f'via_parent_constraint', mo=True,
+                                                  name=f'{leader}_Constraining_ROTATION'
+                                                       f'_via_parent_constraint', mo=True,
                                                   skipTranslate=["x", "y", "z"], weight=1)[0]
 
         scale_constraint = cmds.scaleConstraint(leader, follower_grp,  # noqa
-                                                name=f'{leader}_Constraining_{follower_grp}_SCALE_via'
-                                                     f'_parent_constraint', weight=1)[0]
+                                                name=f'{leader}_Constraining_SCALE'
+                                                     f'_via_parent_constraint', weight=1)[0]
 
         # Create attributes on the child if not already there
         if not cmds.attributeQuery('FollowTranslate', node=follower, exists=True):
@@ -148,14 +161,22 @@ class BrokenFkConstraintFactory:
             return
 
         # Create constraints for the joint
-        cmds.parentConstraint(control, joint, mo=True, weight=1)
-        cmds.scaleConstraint(control, joint, weight=1)
+        cmds.parentConstraint(control, joint,
+                              name=f'{control}_Constraining_TRANSLATE_ROTATION_via_parent_constraint', mo=True,
+                              weight=1)
+        cmds.scaleConstraint(control, joint,
+                             name=f'{control}_Constraining_SCALE_via_parent_constraint', weight=1)
 
 
 class BrokenFkManager:
-    def __init__(self, _sort_method: SortMethod = NoSort()):
+    def __init__(self, _sort_method: SortMethod = OutlinerSort(), **kwargs):
+        selection = cmds.ls(sl=True) if cmds.ls(sl=True) != [] else [x for x in cmds.ls(type="transform") if
+                                                                     x.lower().endswith("_grp") or
+                                                                     x.lower().endswith("_ctrl")]
+        if kwargs.get("clean_joints", False):
+            joint_cleaner = JointManager(clean=True, debug=False)
         self.sort_method = _sort_method
-        self.unsorted_selection = cmds.ls(sl=True)
+        self.unsorted_selection = selection
         self.constraint_order_manager = ConstraintOrder()
 
     def run(self, **kwargs):
@@ -178,11 +199,12 @@ class BrokenFkManager:
 
 
 if __name__ == "__main__":
-    print("Running Broken FK Constraint Manager")
-    broken_fk = BrokenFkManager(OutlinerSort())
-    sort_method = NoSort()
-    fk_manager = BrokenFkManager(NoSort())
+    print(f"{'-' * 10 + '|' + ' ' * 4} Running Broken FK Constraint Manager {' ' * 4 + '|' + '-' * 10}")
+    cmds.select(clear=True)
+    sort_method = HierarchicalSort()
+    fk_manager = BrokenFkManager(sort_method, clean_joints=True)
     fk_manager.run(controls=True, joints=True)
+    print(f"{'-' * 25 + '|' + ' ' * 4} Complete {' ' * 4 + '|' + '-' * 25}")
 
     """def constraint_removal(selection=None):
         if selection is None:

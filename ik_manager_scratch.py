@@ -4,9 +4,8 @@ from typing import Type
 import inspect
 from maya import cmds
 
-global wall_gen_ui
 
-debug_level = 11  # 0 - 10
+debug_level = 0  # 0 - 10
 style_presets = {
     "SECTION": {'div': ("|" + "~~" * 50 + "|\n"), 'add_div': True, 'header_function': True, 'section': True},
     "SECTION-END": {'div': ("\n|" + "/\\" * 50 + "|\n|" + "\\/" * 50 + "|"), 'add_end_div': True,
@@ -870,9 +869,9 @@ class MayaObjectTree(BaseTree):
 if __name__ == "__main__":
     type_to_exclude = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint",
                        "ikHandle", "ikEffector", "ikSolver", "ikRPsolver", "ikSCsolver", "ikSplineSolver"]
-    selection = MayaSelectionOperator().selection
-    ik = IkManager(selection, excluded_types=type_to_exclude)
+    # selection = MayaSelectionOperator().selection
+    # ik = IkManager(selection, excluded_types=type_to_exclude)
 
-    # joint_list = MayaSelectionOperator().get(_type="joint", _all=True)
-    # ik = IkManager(joint_list)
+    joint_list = MayaSelectionOperator().get(_type="joint", _all=True)
+    ik = IkManager(joint_list)
     # ChannelBox().create_coor_ui()

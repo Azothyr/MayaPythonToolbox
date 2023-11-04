@@ -47,7 +47,7 @@ def _ui_setup(parent_ui, tool):
 
 
 def create_ui_window(manual_run=False):
-    win = Window('Control Creator',
+    win = Window('Control Tools',
                  widthHeight=(200, 100),
                  maximizeButton=True,
                  minimizeButton=True,
