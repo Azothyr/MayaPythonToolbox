@@ -71,11 +71,41 @@ class JointManager:
 
         return base_part
 
+    @staticmethod
+    def recursive_joint_clean_till_parameter(node, until):
+        finished = False
+        children = cmds.listRelatives(node, children=True, path=True)
+        if children is not None:
+            for child in children:
+                if until == child.split("|")[-1][1::]:
+                    print(f"DELETING {child}")
+                    cmds.select(child)
+                    cmds.delete()
+                    finished = True
+                elif cmds.nodeType(child) != "joint":
+                    # print(f"DELETING {child}")
+                    cmds.delete(child)
+                else:
+                    name = child.split("|")[-1]
+                    new_name = name.replace("_FK", "_RK")
+                    cmds.select(child)
+                    child = cmds.rename(new_name)
+                    if finished:
+                        return
+                    node.recursive_joint_clean_till_parameter(child, until)
+
 
 if __name__ == "__main__":
-    print(f"{'-' * 23 + '|' + ' ' * 4} Joint Manager {' ' * 4 + '|' + '-' * 22}")
+    def module_name():
+        import inspect
+        import os
+        # Get the current frame and find the file name of the script
+        frame = inspect.currentframe()
+        filename = inspect.getfile(frame)
+        return os.path.basename(filename).split('.')[0]
+    print(f"{'-' * 10 + '|' + ' ' * 4} RUNNING {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 10}")
     # Example usage:
     joints = JointManager(combine=True)
     print(joints)
 
-    print(f"{'-' * 25 + '|' + ' ' * 4} Complete {' ' * 4 + '|' + '-' * 25}")
+    print(f"{'-' * 25 + '|' + ' ' * 4} COMPLETED {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 25}")

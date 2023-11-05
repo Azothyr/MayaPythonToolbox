@@ -87,7 +87,7 @@ class BrokenFkConstraintFactory:
                                                   skipTranslate=["x", "y", "z"], weight=1)[0]
 
         scale_constraint = cmds.scaleConstraint(leader, follower_grp,  # noqa
-                                                name=f'{leader}__SCALE__parentConstraint', weight=1)[0]
+                                                name=f'{leader}__FULL__scaleConstraint', weight=1)[0]
 
         # Create attributes on the child if not already there
         if not cmds.attributeQuery('FollowTranslate', node=follower, exists=True):
@@ -113,10 +113,10 @@ class BrokenFkConstraintFactory:
 
         # Create constraints for the joint
         cmds.parentConstraint(control, joint,
-                              name=f'{control}__TRANSLATE_ROTATION__parentConstraint', mo=True,
+                              name=f'{control}__FULL__parentConstraint', mo=True,
                               weight=1)
         cmds.scaleConstraint(control, joint,
-                             name=f'{control}__SCALE_parentConstraint', weight=1)
+                             name=f'{control}__FULL__scaleConstraint', weight=1)
 
 
 class BrokenFkManager:
@@ -190,8 +190,9 @@ class BrokenFkManager:
                 if joint:
                     BrokenFkConstraintFactory.create_control_to_joint_constraints(control, joint)
 
-    def run(self, controls=True, joints=True):
-        ConstraintRemoval.remove_all_constraints()
+    def run(self, clean=False, controls=True, joints=True):
+        if clean:
+            ConstraintRemoval.remove_all_constraints()
         sorted_controls = [ControlGroup(control) for control in self.unsorted_selection]
         constraint_order = self.create_constraint_order(sorted_controls)
         control_map = {cg.control: cg for cg in sorted_controls}
@@ -199,8 +200,16 @@ class BrokenFkManager:
 
 
 if __name__ == "__main__":
-    print(f"{'-' * 10 + '|' + ' ' * 4} Running Broken FK Constraint Manager {' ' * 4 + '|' + '-' * 10}")
+    def module_name():
+        import inspect
+        import os
+        # Get the current frame and find the file name of the script
+        frame = inspect.currentframe()
+        filename = inspect.getfile(frame)
+        return os.path.basename(filename).split('.')[0]
+    print(f"{'-' * 10 + '|' + ' ' * 4} RUNNING {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 10}")
     cmds.select(clear=True)
     broken_fk = BrokenFkManager()
-    broken_fk.run(controls=True, joints=True)
-    print(f"{'-' * 25 + '|' + ' ' * 4} Complete {' ' * 4 + '|' + '-' * 25}")
+    broken_fk.run(clean=False, controls=True, joints=True)
+
+    print(f"{'-' * 25 + '|' + ' ' * 4} COMPLETED {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 25}")

@@ -5,12 +5,11 @@ import maya.cmds as cmds
 # class ConstraintRemoval(metaclass=PluginRegistryMeta):
 class ConstraintRemoval:
     @staticmethod
-    def remove_attrs(ctrl):
-        if cmds.attributeQuery('FollowTranslate', node=ctrl, exists=True):
-            cmds.deleteAttr(ctrl + '.FollowTranslate')
-
-        if cmds.attributeQuery('FollowRotate', node=ctrl, exists=True):
-            cmds.deleteAttr(ctrl + '.FollowRotate')
+    def remove_attrs(obj, attrs: list = None):
+        clean_attrs = ['FollowTranslate', 'FollowRotate'] if attrs is None else attrs
+        for attr in clean_attrs:
+            if cmds.attributeQuery(attr, node=obj, exists=True):
+                cmds.deleteAttr(obj + '.' + attr)
 
     @staticmethod
     def remove_from_all_ctrls():
@@ -44,3 +43,21 @@ class ConstraintRemoval:
         for constraint in cmds.ls(type='constraint'):
             cmds.delete(constraint)
         ConstraintRemoval.remove_from_all_ctrls()
+
+    @staticmethod
+    def remove_constraints_from_object(object_name, attrs=None):
+        # Clean attributes from the object
+        ConstraintRemoval.remove_attrs(object_name, attrs)
+
+        # List all the constraints on the object
+        constraints = cmds.listRelatives(object_name, type='constraint')
+
+        # If no constraints found, print a message and return
+        if constraints is None:
+            print(f"No constraints found on object {object_name}.")
+            return
+
+        # Delete each constraint
+        for constraint in constraints:
+            cmds.delete(constraint)
+            print(f"Deleted constraint: {constraint}")
