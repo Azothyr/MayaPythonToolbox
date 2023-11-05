@@ -1,51 +1,117 @@
 import maya.cmds as cmds
 
 
+class UtilityNodeManager:
+    @staticmethod
+    def create_utility_node(node_type, name, **kwargs):
+        if not cmds.objExists(name):
+            return cmds.shadingNode(node_type, name=name, asUtility=True, **kwargs)
+        return name
+
+    @staticmethod
+    def set_node_attribute(node, attr, value):
+        if cmds.attributeQuery(attr, node=node, exists=True):
+            cmds.setAttr(f"{node}.{attr}", value)
+
+    @staticmethod
+    def connect_to_utility_node(source, utility_node, utility_input, utility_output, destination):
+        cmds.connectAttr(source, f"{utility_node}.{utility_input}", f=True)
+        cmds.connectAttr(f"{utility_node}.{utility_output}", destination, f=True)
+
+    @staticmethod
+    def create_and_configure_node(node_type, name, initial_attrs=None):
+        node = UtilityNodeManager.create_utility_node(node_type, name)
+        if initial_attrs and isinstance(initial_attrs, dict):
+            for attr, value in initial_attrs.items():
+                UtilityNodeManager.set_node_attribute(node, attr, value)
+        return node
+
+    @staticmethod
+    def disconnect_attribute(source, destination):
+        if cmds.isConnected(source, destination):
+            cmds.disconnectAttr(source, destination)
+
+    @staticmethod
+    def get_connected_nodes(attr):
+        return cmds.listConnections(attr, destination=True, source=False) or []
+
+
 class ConnectionManager:
     def __init__(self, input_src_attr=None, input_dest_attr=None):
-        src_obj = input_src_attr.split('.')[0]
-        src_attr = input_src_attr.split('.')[1]
-        dest_obj = input_dest_attr.split('.')[0]
-        dest_attr = input_dest_attr.split('.')[1]
-        
-        try:
-            if not cmds.objExists(src_obj):
-                err = ValueError(f"ERROR: {src_obj} does not exist.")
-                raise err
-            if not cmds.objExists(dest_obj):
-                err = ValueError(f"ERROR: {dest_obj} does not exist.")
-                raise err
-            if not cmds.attributeQuery(src_attr, node=src_obj, exists=True):
-                err = ValueError(f"ERROR: {input_src_attr} is not connected to {input_dest_attr}")
-            if not cmds.attributeQuery(src_attr, node=src_obj, exists=True):
-                err = ValueError(f"ERROR: {input_src_attr} is not connected to {input_dest_attr}")
-            if not cmds.isConnected(input_src_attr, input_dest_attr):
-                err = ValueError(f"ERROR: {source} is not connected to {destination}")
-                raise err
-        except ValueError as err:
-            raise err
-        
+        self.validate_and_connect(input_src_attr, input_dest_attr)
+
+    def validate_and_connect(self, src_attr, dest_attr):
+        src_obj, src_attr_name = self.split_attribute(src_attr)
+        dest_obj, dest_attr_name = self.split_attribute(dest_attr)
+
+        self.validate_object(src_obj)
+        self.validate_object(dest_obj)
+        self.validate_or_create_attribute(src_obj, src_attr_name)
+        self.validate_or_create_attribute(dest_obj, dest_attr_name)
+        self.establish_connection(src_attr, dest_attr)
+
     @staticmethod
-    def create_attribute(obj, attr, **kwargs):
+    def split_attribute(attr):
+        obj, attr_name = attr.split('.')
+        return obj, attr_name
+
+    @staticmethod
+    def validate_object(obj):
+        if not cmds.objExists(obj):
+            raise ValueError(f"ERROR: {obj} does not exist.")
+
+    def validate_or_create_attribute(self, obj, attr):
         if not cmds.attributeQuery(attr, node=obj, exists=True):
-            cmds.addAttr(obj, ln=attr, **kwargs)
-            cmds.setAttr(f"{obj}.{attr}", e=True, keyable=True)
-
-        if cmds.attributeQuery(attr, node=obj, exists=True):
-            print(f"CONFIRMED: --|  {attr}  |-- is on --|  {obj}  |--")
-            return True
-        return False
+            self.create_attribute(obj, attr)
 
     @staticmethod
-    def connect_attributes(source, destination):
-        if not cmds.isConnected(source, destination):
-            cmds.connectAttr(source, destination, f=True)
-        
-        if cmds.isConnected(source, destination):
-            print(f"CONFIRMED: --|  {source}  |-- is connected to --|  {destination}  |--")
-            return True
-        return False
+    def create_attribute(obj, attr, attr_type, **kwargs):
+        if not cmds.attributeQuery(attr, node=obj, exists=True):
+            cmds.addAttr(obj, longName=attr, attributeType=attr_type, **kwargs)
+            cmds.setAttr(f"{obj}.{attr}", e=True, keyable=True)
+            print(f"CREATED: --|  {attr}  |-- on --|  {obj}  |--")
 
+    @staticmethod
+    def get_attribute_value(obj, attr):
+        if cmds.attributeQuery(attr, node=obj, exists=True):
+            return cmds.getAttr(f"{obj}.{attr}")
+        return None
+
+    @staticmethod
+    def set_attribute_value(obj, attr, value):
+        if cmds.attributeQuery(attr, node=obj, exists=True):
+            cmds.setAttr(f"{obj}.{attr}", value)
+
+    @staticmethod
+    def establish_connection(src, dest):
+        if not cmds.isConnected(src, dest):
+            cmds.connectAttr(src, dest, f=True)
+            print(f"CONNECTED: --|  {src}  |-- to --|  {dest}  |--")
+        else:
+            print(f"CONFIRMED: --|  {src}  |-- is already on --|  {dest}  |--")
+
+    @staticmethod
+    def establish_connection_with_utility(src, dest, utility_type, utility_name, util_in_attr, util_out_attr):
+        utility_node = UtilityNodeManager.create_utility_node(utility_type, utility_name)
+        UtilityNodeManager.connect_to_utility_node(src, utility_node, util_in_attr, util_out_attr, dest)
+        print(f"Connected {src} through {utility_node} to {dest}")
+
+    @staticmethod
+    def conditional_connect(source, condition, true_dest, false_dest=None):
+        if condition:
+            ConnectionManager.establish_connection(source, true_dest)
+        elif false_dest:
+            ConnectionManager.establish_connection(source, false_dest)
+
+    @staticmethod
+    def set_multiple_attributes(obj, attr_values):
+        for attr, value in attr_values.items():
+            ConnectionManager.set_attribute_value(obj, attr, value)
+
+    @staticmethod
+    def connect_multiple_sources(sources, destination):
+        for src in sources:
+            ConnectionManager.establish_connection(src, destination)
 
 # class ConnectionManager:
 #     def __init__(self, controller='Transform_Ctrl', attr=None):
