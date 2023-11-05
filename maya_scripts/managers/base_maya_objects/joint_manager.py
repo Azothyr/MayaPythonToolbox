@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from pprint import pprint, pformat
+from pprint import pprint
 from collections import defaultdict
 import re
 
@@ -28,10 +28,9 @@ class JointManager:
 
     def __repr__(self):
         output = []
-        for joint_type, sub_dict in self.data.items():
+        for joint_type, info in self.data.items():
             output.append(f"For {joint_type} Joint Type:")
-            for part, info in sub_dict.items():
-                output.append(f"|\n|--->  {part} appears {info['count']} times.\n|------->  Joints: {info['joints']}")
+            output.append(f"|\n|--->  {joint_type} Joints appear {info['count']} times.\n|------->  Joints: {info['joints']}")
             output.append("\n")
         return "\n".join(output)
 
@@ -48,24 +47,29 @@ class JointManager:
         return None, None
 
     def joint_count(self):
-        # Initialize a defaultdict of defaultdicts
-        count_dict = defaultdict(lambda: defaultdict(lambda: {'count': 0, 'joints': []}))
+        # Initialize a defaultdict for joint types
+        count_dict = defaultdict(lambda: {'count': 0, 'joints': []})
         if self.combine:
             pattern = re.compile(r'_[0-9]+$')  # Regular expression to remove numerical suffix
 
         for string in self.selection:
-            part, joint_type = self._split(string)
-            if part is None:
-                part = string.split('_')[0]
+            _, joint_type = self._split(string)
+            if joint_type is None:
                 joint_type = "Unknown"
 
             if self.combine:
-                part = pattern.sub('', part)
+                string = pattern.sub('', string)
 
-            count_dict[joint_type][part]['count'] += 1
-            count_dict[joint_type][part]['joints'].append(string)
+            count_dict[joint_type]['count'] += 1
+            count_dict[joint_type]['joints'].append(string)
 
         return count_dict
+
+    def get_part_names(self):
+        exclude = ['HELPER', 'Unknown']
+        base_part = [x for x in self.data.keys() if x not in exclude]
+
+        return base_part
 
 
 if __name__ == "__main__":

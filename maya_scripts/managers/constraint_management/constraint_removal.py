@@ -5,9 +5,25 @@ import maya.cmds as cmds
 # class ConstraintRemoval(metaclass=PluginRegistryMeta):
 class ConstraintRemoval:
     @staticmethod
+    def remove_attrs(ctrl):
+        if cmds.attributeQuery('FollowTranslate', node=ctrl, exists=True):
+            cmds.deleteAttr(ctrl + '.FollowTranslate')
+
+        if cmds.attributeQuery('FollowRotate', node=ctrl, exists=True):
+            cmds.deleteAttr(ctrl + '.FollowRotate')
+
+    @staticmethod
+    def remove_from_all_ctrls():
+        controls = [x for x in cmds.ls(type="transform") if x.lower().endswith("_ctrl")]
+        for ctrl in controls:
+            ConstraintRemoval.remove_attrs(ctrl)
+            ConstraintRemoval.remove_from_hierarchy([ctrl])
+
+    @staticmethod
     def remove_from_hierarchy(selection=None):
         if selection is None:
-            selection = cmds.ls(sl=True)
+            selection = cmds.ls(sl=True) if cmds.ls(sl=True) else\
+                [x for x in cmds.ls(type="transform") if x.lower().endswith("_ctrl")]
         for node in selection:
             ConstraintRemoval._recursive_removal_from_hierarchy(node)
 
@@ -24,13 +40,7 @@ class ConstraintRemoval:
                 ConstraintRemoval._recursive_removal_from_hierarchy(child)
 
     @staticmethod
-    def remove_from_control_leader(control_leader_group):
-        constraints = cmds.listRelatives(control_leader_group, type='constraint')
-        if constraints:
-            for constraint in constraints:
-                cmds.delete(constraint)
-
-    @staticmethod
     def remove_all_constraints():
         for constraint in cmds.ls(type='constraint'):
             cmds.delete(constraint)
+        ConstraintRemoval.remove_from_all_ctrls()
