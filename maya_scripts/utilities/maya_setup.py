@@ -27,7 +27,37 @@ def refresh_tools():
     main_win_tab.create_tools_menu()
 
 
+def get_substance_plugin_working():
+    # Houdini Path holds the plugin hostage and makes it, so it will never work
+    # Reordering the path fixes the issue, performing below
+    print('reorder substance path')
+    import os
+    path = os.getenv('PATH')
+    path_items = path.split(';')
+    houdini_path = ''
+    substance_path = ''
+    for string in path_items:
+        if 'Substance' in string:
+            substance_path = string
+            continue
+        if 'Houdini' in string:
+            houdini_path = string
+            continue
+
+    if substance_path:
+        path_items.remove(substance_path)
+    if houdini_path:
+        path_items.remove(houdini_path)
+
+    path_items.append(substance_path)
+    path_items.append(houdini_path)
+
+    path_reorder = ';'.join(path_items)
+    os.environ["PATH"] = path_reorder
+
+
 def set_maya_on_start():
+    get_substance_plugin_working()
     set_maya_command_port()
     push_scripts_to_sys()
     set_tool_tab_on_start()
