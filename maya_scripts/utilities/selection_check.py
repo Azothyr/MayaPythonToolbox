@@ -1,5 +1,4 @@
 import maya.cmds as cmds
-from script_tools.components.custom_exception import CustomException
 
 
 def check_selection(_selection=None, **kwargs):
@@ -11,7 +10,7 @@ def check_selection(_selection=None, **kwargs):
     }
     
     if not _selection:
-        raise CustomException("No objects selected in Maya!")
+        raise ValueError("No objects selected in Maya!")
     if kwargs:
         for key, value in kwargs.items():
             if value:

@@ -1,6 +1,7 @@
 import textwrap
 import os
 import importlib.util
+from pathlib import Path
 from script_tools.utils.file_ops.file_basic_ops import write_to_file
 from script_tools.utils.file_ops.file_path_ops import get_file_path_from_lib as get_path
 
@@ -104,7 +105,8 @@ def translate_for_kwargs(arg_map, kwargs):
 
 def refresh_arg_lib():
     print("preparing to refresh Arg Library")
-    arg_lib_path, arg_maps = get_path(maya_arg_lib=True, arg_maps=True)
+    arg_lib_path = Path
+    arg_maps = Path.read_text(Path.home() / "Documents" / "custom_scripts" / "arg_maps" / "arg_maps.txt")
     lines_to_write = ["import os",
                       "from azothyr_tools.functions.file_tools import get_file_path_from_lib as get_path\n",
                       f"base_path = get_path(maya_info=True)",
@@ -113,7 +115,7 @@ def refresh_arg_lib():
         lines_to_write.append(f"\t'{key}': {value},")
     lines_to_write.append("}")
 
-    write_to_file(arg_lib_path, "\n".join(lines_to_write))
+    Path.write_text("\n".join(lines_to_write)
     return "Completed library refresh"
 
 

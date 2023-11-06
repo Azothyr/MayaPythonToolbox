@@ -1,7 +1,6 @@
 import os
-from utils.file_ops import get_file_path_from_lib as get_path
 
-base_path = get_path(maya_info=True)
+base_path = os.path.expanduser('~/Documents/custom_scripts/maya_scripts/config')
 arg_lib = {
     'button': os.path.join(base_path, 'button_arg_map.py'),
     'columnLayout': os.path.join(base_path, 'columnLayout_arg_map.py'),
