@@ -18,10 +18,10 @@ def parent_scale_constrain(obj_lyst):
         cmds.select(parent_objs[i], toggle=True)
 
         parent_const = cmds.parentConstraint(mo=True, weight=1)
-        cmds.rename(parent_const[0], "{}_parentConstraint".format(child_objs[i]))
+        cmds.rename(parent_const[0], f"{child_objs[i]}_parentConstraint")
 
         scale_const = cmds.scaleConstraint(offset=(1, 1, 1), weight=1)
-        cmds.rename(scale_const[0], "{}_scaleConstraint".format(child_objs[i]))
+        cmds.rename(scale_const[0], f"{child_objs[i]}_scaleConstraint")
 
         # Set override display on constraints
         attrs = ["targetWeight{}".format(j) for j in range(1, len(parent_objs) + 1)]

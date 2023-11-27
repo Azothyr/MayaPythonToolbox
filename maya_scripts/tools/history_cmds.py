@@ -5,7 +5,7 @@ def _freeze_transformations(obj):
     """
     Freezes the transformations of the specified object.
     """
-    cmds.makeIdentity(obj, apply=True, translate=1, rotate=1, scale=1, n=0)
+    cmds.makeIdentity(obj, apply=True, translate=1, rotate=1, scale=1, normal=0)
     print(f"{obj}'s transformation frozen")
 
 

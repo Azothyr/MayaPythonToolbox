@@ -1,8 +1,8 @@
 import sys
 if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' in sys.path:
-    sys.path.remove('C:/GitRepos/MayaPythonToolbox/maya_scripts')
+    sys.path.remove('/')
 if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
-    sys.path.append('C:/GitRepos/MayaPythonToolbox/maya_scripts')
+    sys.path.append('/')
 import maya.cmds as cmds
 from managers.constraint_management.constraint_removal import ConstraintRemoval
 
