@@ -1,143 +1,222 @@
+import math
 import maya.cmds as cmds
-from tools.select_cmds import selection_check
+from typing import Union
+
+class XformHandler:
+    def __init__(self, obj, threshold=1e-5):
+        self.obj = obj
+        self.threshold = threshold
+        self.valid_attributes = self.get_all_transform_attributes()
+
+    def __repr__(self):
+        return self.get_world_space_position()
+
+    def __str__(self):
+        return (f"<XformHandler for {self.obj}>"
+                f"\nPosition: {self.get_world_space_position()}")
 
 
-def xform_attributes():
-    attributes = {
-        'rotation': (False, {'x': None, 'y': None, 'z': None}),
-        'translation':  (False, {'x': None, 'y': None, 'z': None}),
-        'joint_orient':  (False, {'x': None, 'y': None, 'z': None}),
-        'scale':  (False, {'x': None, 'y': None, 'z': None})
-    }
-    return attributes
+    def _is_valid_attribute(self, attribute):
+        if attribute == 'rotation':
+            attribute = 'rotate'
+        elif attribute == 'translation':
+            attribute = 'translate'
+        if attribute not in self.valid_attributes:
+            raise ValueError(f"Attribute '{attribute}' is not a valid transformation attribute for '{self.obj}'.")
+        return True
 
+    def confirm_xform_flag(self, flag):
+        if flag == 'rotate':
+            flag = 'rotation'
+        elif flag == 'translate':
+            flag = 'translation'
+        self._is_valid_attribute(flag)
+        return flag
 
-def apply_threshold(value, threshold=1e-5):
-    """
-    Apply a threshold to a value to consider very small values as zero.
+    def confirm_attribute_flag(self, flag):
+        if flag == 'rotation':
+            flag = 'rotate'
+        elif flag == 'translation':
+            flag = 'translate'
+        self._is_valid_attribute(flag)
+        return flag
 
-    :param value: The value to check against the threshold.
-    :param threshold: The threshold below which values are considered as zero.
-    :return: The original value if above the threshold, otherwise zero.
-    """
-    if abs(value) > threshold:
-        return value
-    return 0
+    def _apply_threshold(self, value):
+        return value if abs(value) > self.threshold else 0
 
+    def get_all_transform_attributes(self):
+        transform_attrs = ['translate', 'rotate', 'scale', 'jointOrient']
+        return [attr for attr in cmds.listAttr(self.obj) if any(t_attr in attr for t_attr in transform_attrs)]
 
-def check_strange_values():
-    objs = selection_check.check_selection()
-    check = {
-        'rotation': 'rotate',
-        'translation': 'translate',
-        'joint': 'jointOrient'
-    }
-    strange_count = 0
-    for obj in objs:
-        for key, value in check.items():
-            for axis in 'XYZ':
-                if 0 < cmds.getAttr(f"{obj}.{value}{axis}") < 0.01 or 0 > cmds.getAttr(f"{obj}.{value}{axis}") < -0.01:
-                    cmds.setAttr(f"{obj}.{value}{axis}", 0)
-                    strange_count += 1
-    if strange_count:
-        cmds.warning(f"Fixed {strange_count} strange values.")
-    else:
-        cmds.warning("No strange values found.")
+    def set_attribute_x(self, attribute, value):
+        self.confirm_attribute_flag(attribute)
+        cmds.setAttr(f"{self.obj}.{attribute}X", value)
 
+    def set_attribute_y(self, attribute, value):
+        self.confirm_attribute_flag(attribute)
+        cmds.setAttr(f"{self.obj}.{attribute}Y", value)
 
-def set_xform_values(**kwargs):
-    selected_objects = kwargs.get("objects") if kwargs.get("objects") else selection_check.check_selection()
-    if type(selected_objects) is not list:
-        selected_objects = [selected_objects]
-    if not selected_objects:
-        raise ValueError("No objects selected.")
+    def set_attribute_z(self, attribute, value):
+        self.confirm_attribute_flag(attribute)
+        cmds.setAttr(f"{self.obj}.{attribute}Z", value)
 
-    options = kwargs.get("options") if kwargs.get("options") else xform_attributes()
+    def set_attribute_xyz(self, attribute, value):
+        self.confirm_attribute_flag(attribute)
+        for i, axis in enumerate("XYZ"):
+            if isinstance(value, (int, float)):
+                cmds.setAttr(f"{self.obj}.{attribute}{axis}", value)
+            elif isinstance(value, (tuple, list, set)) and len(value) == 1:
+                cmds.setAttr(f"{self.obj}.{attribute}{axis}", value[0])
+            else:
+                cmds.setAttr(f"{self.obj}.{attribute}{axis}", value[i])
 
-    rotation, translation, joint_orient, scale = options.values()
+    def get_attribute(self, attribute):
+        if attribute.endswith(("X", "Y", "Z")):
+            self.confirm_attribute_flag(attribute[:-1])
+        else:
+            self.confirm_attribute_flag(attribute)
+        return cmds.getAttr(f"{self.obj}.{attribute}")
 
-    for obj in selected_objects:
-        print(f"set_xform_values for loop-----{obj}")
-        if rotation[0]:
-            cmds.setAttr(f"{obj}.rotateX", apply_threshold(rotation[1]['x']))
-            cmds.setAttr(f"{obj}.rotateY", apply_threshold(rotation[1]['y']))
-            cmds.setAttr(f"{obj}.rotateZ", apply_threshold(rotation[1]['z']))
-        if translation[0]:
-            cmds.xform(obj, worldSpace=True, translation=(
-                apply_threshold(translation[1]['x']),
-                apply_threshold(translation[1]['y']),
-                apply_threshold(translation[1]['z'])
-            ))
-        if joint_orient[0]:
-            cmds.setAttr(f"{obj}.jointOrientX", apply_threshold(joint_orient[1]['x']))
-            cmds.setAttr(f"{obj}.jointOrientY", apply_threshold(joint_orient[1]['y']))
-            cmds.setAttr(f"{obj}.jointOrientZ", apply_threshold(joint_orient[1]['z']))
-        if scale[0]:
-            cmds.setAttr(f"{obj}.scaleX", apply_threshold(scale[1]['x']))
-            cmds.setAttr(f"{obj}.scaleY", apply_threshold(scale[1]['y']))
-            cmds.setAttr(f"{obj}.scaleZ", apply_threshold(scale[1]['z']))
+    def set_local_space_position(self, position):
+        cmds.xform(self.obj, translation=position)
 
+    def get_local_space_position(self):
+        return cmds.xform(self.obj, query=True, translation=True)
 
-def get_xform_values(**kwargs):
-    selected_objects = kwargs.get("objects") if kwargs.get("objects") else selection_check.check_selection()
-    if type(selected_objects) is not list:
-        selected_objects = [selected_objects]
-    if not selected_objects:
-        raise ValueError("No objects selected.")
+    def get_world_space_position(self):
+        return cmds.xform(self.obj, query=True, worldSpace=True, translation=True)
 
-    options = kwargs.get("options") if kwargs.get("options") else xform_attributes()
-    rotation, translation, joint_orient, scale = options.values()
+    def set_world_space_position(self, position):
+        cmds.xform(self.obj, worldSpace=True, translation=position)
 
-    for obj in selected_objects:
-        if rotation[0]:
-            world_rot = cmds.xform(obj, query=True, worldSpace=True, rotation=True)
-            rotation[1]['x'] = apply_threshold(world_rot[0]) if world_rot and world_rot[0] is not None else 0
-            rotation[1]['y'] = apply_threshold(world_rot[1]) if world_rot and world_rot[1] is not None else 0
-            rotation[1]['z'] = apply_threshold(world_rot[2]) if world_rot and world_rot[2] is not None else 0
-        if translation[0]:
-            world_trans = cmds.xform(obj, query=True, worldSpace=True, translation=True)
-            translation[1]['x'] = apply_threshold(world_trans[0]) if world_trans and world_trans[0] is not None else 0
-            translation[1]['y'] = apply_threshold(world_trans[1]) if world_trans and world_trans[1] is not None else 0
-            translation[1]['z'] = apply_threshold(world_trans[2]) if world_trans and world_trans[2] is not None else 0
-        if joint_orient[0]:
-            joint_orient[1]['x'] = apply_threshold(cmds.getAttr(f"{obj}.jointOrientX")) if cmds.getAttr(f"{obj}.jointOrientX") is not None else 0
-            joint_orient[1]['y'] = apply_threshold(cmds.getAttr(f"{obj}.jointOrientY")) if cmds.getAttr(f"{obj}.jointOrientY") is not None else 0
-            joint_orient[1]['z'] = apply_threshold(cmds.getAttr(f"{obj}.jointOrientZ")) if cmds.getAttr(f"{obj}.jointOrientZ") is not None else 0
-        if scale[0]:
-            scale[1]['x'] = apply_threshold(cmds.getAttr(f"{obj}.scaleX")) if cmds.getAttr(f"{obj}.scaleX") is not None else 0
-            scale[1]['y'] = apply_threshold(cmds.getAttr(f"{obj}.scaleY")) if cmds.getAttr(f"{obj}.scaleY") is not None else 0
-            scale[1]['z'] = apply_threshold(cmds.getAttr(f"{obj}.scaleZ")) if cmds.getAttr(f"{obj}.scaleZ") is not None else 0
-    if kwargs.get("return_dict"):
-        return options
-    return rotation, translation, joint_orient, scale
+    def get_world_space_rotation(self):
+        return cmds.xform(self.obj, query=True, worldSpace=True, rotation=True)
 
+    def set_world_space_rotation(self, rotation):
+        cmds.xform(self.obj, worldSpace=True, rotation=rotation)
 
-def add_to_xform_values(obj, attribute=None, x=0, y=0, z=0):
-    if not attribute:
-        raise ValueError("No attribute specified.")
-    if not any([x, y, z]):
-        raise ValueError("No values specified.")
-    if attribute not in xform_attributes():
-        raise ValueError(f"Invalid attribute: {attribute}")
+    def add(self, attribute, x:float = 0, y:float = 0, z:float = 0):
+        """
+        Adds the specified values to the x, y, and z components of the given attribute.
 
-    cmds.xform(obj, relative=True, **{attribute: [x, y, z]})
+        :param attribute: The attribute to modify (e.g., 'translate', 'rotate').
+        :param x: The amount to add to the x component.
+        :param y: The amount to add to the y component.
+        :param z: The amount to add to the z component.
+        """
+        attribute = self.confirm_attribute_flag(attribute)
 
+        current_values = [self.get_attribute(f"{attribute}{axis}") for axis in "XYZ"]
+        new_values = [current + delta for current, delta in zip(current_values, [x, y, z])]
+        attribute = self.confirm_xform_flag(attribute)
+        cmds.xform(self.obj, **{attribute: new_values})
 
-def match_xform(match_obj=None, objs_to_match=None, rotation=False, translation=False, joint_orient=False, scale=False):
-    if not match_obj:
-        match_obj = selection_check.check_selection()[0]
-    if not objs_to_match:
-        objs_to_match = selection_check.check_selection()[1:]
+    def calculate_vector(self, other_xform: Union['XformHandler', str]):
+        pos1 = self.get_world_space_position()
+        if isinstance(other_xform, XformHandler):
+            pos2 = other_xform.get_world_space_position()
+        else:
+            pos2 = cmds.xform(other_xform, query=True, worldSpace=True, translation=True)
+        return [pos2[i] - pos1[i] for i in range(3)]
 
+    def calculate_distance(self, other_xform: Union['XformHandler', str]):
+        vector = self.calculate_vector(other_xform)
+        return math.sqrt(sum([v**2 for v in vector]))
 
-    attrs = xform_attributes()
-    if rotation:
-        attrs['rotation'] = (True, {'x': None, 'y': None, 'z': None})
-    if translation:
-        attrs['translation'] = (True, {'x': None, 'y': None, 'z': None})
-    if joint_orient:
-        attrs['joint_orient'] = (True, {'x': None, 'y': None, 'z': None})
-    if scale:
-        attrs['scale'] = (True, {'x': None, 'y': None, 'z': None})
-    values_to_match = get_xform_values(options=attrs, objects=match_obj, return_dict=True)
-    set_xform_values(options=values_to_match, objects=objs_to_match)
+    @staticmethod
+    def normalize_vector(vector):
+        magnitude = math.sqrt(sum([v**2 for v in vector]))
+        if magnitude == 0:
+            raise ValueError("Cannot normalize a vector with magnitude 0.")
+        return [v / magnitude for v in vector]
+
+    def move_relative_to_obj(self, other_xform: Union['XformHandler', str], distance):
+        direction = self.calculate_vector(other_xform)
+        unit_vector = self.normalize_vector(direction)
+        new_pos = [self.get_world_space_position()[i] + distance * unit_vector[i] for i in range(3)]
+        self.set_world_space_position(new_pos)
+
+    def set_xform(self, attrs, values=None, zero_out=False):
+        if isinstance(attrs, str):
+            # Single attribute case
+            if values:
+                if not (isinstance(values, tuple) and len(values) == 3):
+                    raise ValueError("values must be a tuple of three floats.")
+                final_values = values
+            elif zero_out:
+                final_values = (0, 0, 0)
+            else:
+                final_values = (self.get_attribute(f"{self.confirm_attribute_flag(attrs)}{axis}") for axis in 'XYZ')
+
+            attrs = self.confirm_xform_flag(attrs)
+            if attrs == 'translation':
+                cmds.xform(self.obj, ws=True, **{attrs: [self._apply_threshold(v) for v in final_values]})
+            elif attrs == 'rotation':
+                cmds.xform(self.obj, ws=True, **{attrs: [self._apply_threshold(v) for v in final_values]})
+            elif attrs == 'jointOrient':
+                self.set_attribute_xyz(attrs, [self._apply_threshold(v) for v in final_values])
+            else:
+                cmds.xform(self.obj, **{attrs: [self._apply_threshold(v) for v in final_values]})
+        elif isinstance(attrs, dict):
+            # Multiple attributes case
+            for attr, val in attrs.items():
+                attr = self.confirm_xform_flag(attr)
+                if not (isinstance(val, (tuple, list, set)) and len(val) == 3):
+                    raise ValueError(f"values for '{attr}' must be a tuple of three floats.")
+                if attrs == 'translation':
+                    cmds.xform(self.obj, ws=True, **{attr: [self._apply_threshold(v) for v in val]})
+                elif attrs == 'rotation':
+                    cmds.xform(self.obj, ws=True, **{attr: [self._apply_threshold(v) for v in val]})
+                elif attrs == 'jointOrient':
+                    self.set_attribute_xyz(attr, [self._apply_threshold(v) for v in val])
+                else:
+                    cmds.xform(self.obj, **{attr: [self._apply_threshold(v) for v in val]})
+        else:
+            raise ValueError("attrs must be a string or a dictionary.")
+
+    def match_xform(self, src_xform: Union['XformHandler', str], attrs:list[str] | str):
+        if isinstance(attrs, str):
+            attrs = [attrs]
+
+        values_to_match = {}
+        if isinstance(src_xform, XformHandler):
+            for attr in attrs:
+                attr = self.confirm_attribute_flag(attr)
+                if attr == 'translate':
+                    values_to_match.update({self.confirm_xform_flag(attr): src_xform.get_world_space_position()})
+                elif attr == 'rotate':
+                    values_to_match.update({self.confirm_xform_flag(attr): src_xform.get_world_space_rotation()})
+                elif attr == 'jointOrient':
+                    src_xform.set_attribute_xyz(attr, self.get_attribute(self.confirm_attribute_flag(attr)))
+                else:
+                    values_to_match.update({self.confirm_xform_flag(attr): (src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}X"),
+                                                   src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}Y"),
+                                                   src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}Z")) for attr in attrs})
+        else:
+            for attr in attrs:
+                if attr == 'translate':
+                    values_to_match.update({attr: cmds.xform(src_xform, query=True, worldSpace=True,
+                                                             translation=True)})
+                if attr == 'translate':
+                    values_to_match.update({attr: cmds.xform(src_xform, query=True, worldSpace=True,
+                                                             rotation=True)})
+                elif attr == 'jointOrient':
+                    self.set_attribute_xyz(attr, (cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}X"),
+                                                        cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Y"),
+                                                        cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Z")))
+                else:
+                    values_to_match.update({self.confirm_xform_flag(attr):
+                                                (cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}X"),
+                                                 cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Y"),
+                                                 cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Z")) for attr in attrs})
+        self.set_xform(values_to_match)
+
+if __name__ == "__main__":
+    source_xform = XformHandler("pCube1")
+    target_xform = XformHandler("pCube2")
+    target_xform.match_xform(source_xform, ['rotation', 'translation'])
+    target_xform.match_xform(source_xform, 'scale')
+    source_xform.add('rotate', x=45.0, y=30.0, z=45.0)
+    source_xform.add('translate', x=0.1, y=0.1, z=0.1)
+    source_xform.move_relative_to_obj(target_xform, 5.0)
+    source_xform.set_xform({'translate': (0, 0, 0), 'rotate': (55, 55, 55)})
