@@ -58,10 +58,12 @@ class ColorIndex:
 
     def get_color_from_cvalue(self, _num: int):
         assert isinstance(_num, int), "Expected _num to be a integer"
-        return self.color_order[self.cvalue_order.index(str(_num))]
+        return self.color_order[self.cvalue_order.index(_num)]  # noqa
+
 
     def get_cvalue_from_color(self, _color: str):
         assert isinstance(_color, str), "Expected _color to be a string"
+        _color = _color.title()
         return self.cvalue_order[self.color_order.index(_color)]
 
     def get_color_from_index(self, _index: int):
@@ -75,3 +77,15 @@ class ColorIndex:
     def get_rgb_from_index(self, _index: int):
         assert isinstance(_index, int), "Expected _index to be a integer"
         return self.rgb_order[_index]
+
+
+if __name__ == "__main__":
+    library = ColorIndex()
+    print(library)
+    print(library.get_color_from_cvalue(1))
+    print(library.get_cvalue_from_color("Black"))
+    print(library.get_cvalue_from_color("white"))
+    print(library.get_cvalue_from_color("wHiTe"))
+    print(library.get_color_from_index(1))
+    print(library.get_cvalue_from_index(1))
+    print(library.get_rgb_from_index(1))
