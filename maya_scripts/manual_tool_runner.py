@@ -500,7 +500,7 @@ if __name__ == "__main__":
     def toggle_twist_grp_visibility():
         cmds.setAttr("Limb_Twist_Grp.visibility", 1 - cmds.getAttr("Limb_Twist_Grp.visibility"))
 
-    perform_func_call([2, 3])
+    perform_func_call([0, 1])
     # perform_func_call()
     # toggle_twist_grp_visibility()
 
