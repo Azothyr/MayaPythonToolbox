@@ -102,7 +102,7 @@ class LimbTwistManager:
         self.color_twist_system()
         if self.get_limb() == "Arm":
             self.color_helpers()
-        print(f"Twist system created for {self.u_name} and {self.l_name}.")
+        print(f"Twist system created for {self.u_name} and {self.l_name}.\n")
 
     def get_side(self):
         if self.limb_name is None:
@@ -156,7 +156,6 @@ class LimbTwistManager:
         scale = cmds.getAttr(f"{self.rk_bot_jnt}.radius")
         sels = cmds.ls("*_Loc", type="transform")
         locators = [sel for sel in sels if "Loc_Grp" not in sel or "Constraint" not in sel]
-        print(f"setting scale to {scale} for {locators}")
         for loc in locators:
             shape = cmds.listRelatives(loc, shapes=True)[0] if cmds.listRelatives(loc, shapes=True) else None
             if shape:
@@ -183,8 +182,11 @@ class LimbTwistManager:
         if up_dist is None:
             base_dist = self.top_jnt_xform.calculate_distance(self.pivot_jnt_xform)
             up_dist = int(base_dist * 0.9)
+            if "-" in on_axis:
+                up_dist *= -1
+            if self.get_side() == "R":
+                up_dist *= -1
         if "-" in on_axis:
-            up_dist *= -1
             on_axis = on_axis.replace("-", "")
 
         # Setting to joint positions
@@ -199,7 +201,6 @@ class LimbTwistManager:
         self.u_up_xform.add_in_local('translate', **{on_axis: up_dist})
         cmds.parent(self.u_aim, self.u_target, self.u_up, self.u_loc_grp)
 
-        # Creating constraints
         # Locking the position of the group to the top_jnt
         cmds.parentConstraint(self.rk_top_jnt, self.u_loc_grp, maintainOffset=True,
                               name=f'parent_constraint__from_{self.rk_top_jnt}')
@@ -218,8 +219,9 @@ class LimbTwistManager:
         if helper_dist is None:
             base_dist = self.top_jnt_xform.calculate_distance(self.pivot_jnt_xform)
             helper_dist = int(base_dist + (base_dist * 0.1))
+            if "-" in helper_axis:
+                helper_dist *= -1
         if "-" in helper_axis:
-            helper_dist *= -1
             helper_axis = helper_axis.replace("-", "")
 
         # Setting the helper joint1 to the position of the top_jnt
@@ -297,8 +299,11 @@ class LimbTwistManager:
         if up_dist is None:
             base_dist = self.pivot_jnt_xform.calculate_distance(self.bot_jnt_xform)
             up_dist = int(base_dist / 4)
+            if "-" in on_axis:
+                up_dist *= -1
+            if self.get_side() == "R":
+                up_dist *= -1
         if "-" in on_axis:
-            up_dist *= -1
             on_axis = on_axis.replace("-", "")
 
         # Setting to joint positions
@@ -465,7 +470,7 @@ if __name__ == "__main__":
 
     def perform_l_leg(selection, twist_count=1):
         return LimbTwistManager("L_Leg", "L_Upper_Leg", "L_Lower_Leg", selection[0], selection[1], selection[2],
-                                selection[3], twist_count=twist_count, aim_vector=(1, 0, 0), up_vector=(0, -1, 0))
+                                selection[3], twist_count=twist_count, aim_vector=(1, 0, 0), up_vector=(0, 0, 1))
 
     def perform_r_leg(selection, twist_count=1):
         return LimbTwistManager("R_Leg", "R_Upper_Leg", "R_Lower_Leg", selection[0], selection[1], selection[2],
@@ -474,7 +479,7 @@ if __name__ == "__main__":
     def perform_func_call(excluded=None):
         excluded = [] if not excluded else excluded
 
-        run_parameters = {"arm": {'u_up_axis': "-y", 'l_up_axis': "y", 'u_helper_axis': "z", 'correct_percent': 10},
+        run_parameters = {"arm": {'u_up_axis': "-y", 'l_up_axis': "y", 'u_helper_axis': "-z", 'correct_percent': 10},
                           "leg": {'u_up_axis': "y", 'l_up_axis': "z", 'correct_percent': 10}}
 
         functions = [partial(perform_l_arm, ["L_Arm_01_RK_Jnt", "L_Arm_02_RK_Jnt", "L_Arm_03_RK_Jnt", "L_Hand_FK_Jnt"],
