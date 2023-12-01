@@ -4,17 +4,53 @@ from typing import Union
 
 
 class XformHandler:
-    def __init__(self, obj, threshold=1e-5):
+    def __init__(self, obj, threshold=1e-5, precision=3):
         self.obj = obj
         self.threshold = threshold
+        self.precision = precision
         self.valid_attributes = self.get_all_transform_attributes()
+        self.xform_attrs = [f"{self.obj}.{attr}{axis}" for attr in ['translate', 'rotate', 'scale'] for
+                            axis in 'XYZ']
 
     def __repr__(self):
         return self.get_world_space_position()
 
     def __str__(self):
         return (f"<XformHandler for {self.obj}>"
-                f"\nPosition: {self.get_world_space_position()}")
+                f"\nPosition: {self.get_world_space_position()}"
+                f"\nRotation: {self.get_world_space_rotation()}"
+                f"\nScale: {self.get_attribute('scale')}")
+
+    def _apply_threshold(self, value):
+        if isinstance(value, (tuple, list, set)):
+            return type(value)(self._apply_threshold(v) for v in value)
+        else:
+            if abs(value) < self.threshold:
+                return 0
+            else:
+                value = round(value, self.precision)
+                if 0.99 < abs(value) - abs(round(value)) < 0.01:
+                    return int(round(value))
+                return value
+
+    def _fix_attribute_values(self):
+        for attr in self.xform_attrs:
+            value = cmds.getAttr(attr)
+            if isinstance(value, list) or isinstance(value, tuple):
+                fixed_value = [self._apply_threshold(v) for v in value]
+                cmds.setAttr(f"{attr}", *fixed_value)
+            else:
+                fixed_value = self._apply_threshold(value)
+                cmds.setAttr(f"{attr}", fixed_value)
+
+    @staticmethod
+    def apply_threshold_decorator(method):
+        def wrapper(self, *args, **kwargs):
+            result = method(self, *args, **kwargs)
+            self._fix_attribute_values()
+            return result
+
+        return wrapper
 
     def _is_valid_attribute(self, attribute):
         if attribute == 'rotation':
@@ -41,34 +77,39 @@ class XformHandler:
         self._is_valid_attribute(flag)
         return flag
 
-    def _apply_threshold(self, value):
-        return value if abs(value) > self.threshold else 0
-
     def get_all_transform_attributes(self):
         transform_attrs = ['translate', 'rotate', 'scale', 'jointOrient']
         return [attr for attr in cmds.listAttr(self.obj) if any(t_attr in attr for t_attr in transform_attrs)]
 
+    @apply_threshold_decorator
     def set_attribute_x(self, attribute, value):
         self.confirm_attribute_flag(attribute)
-        cmds.setAttr(f"{self.obj}.{attribute}X", value)
+        cmds.setAttr(f"{self.obj}.{attribute}X", self._apply_threshold(value))
 
+    @apply_threshold_decorator
     def set_attribute_y(self, attribute, value):
         self.confirm_attribute_flag(attribute)
-        cmds.setAttr(f"{self.obj}.{attribute}Y", value)
+        cmds.setAttr(f"{self.obj}.{attribute}Y", self._apply_threshold(value))
 
+    @apply_threshold_decorator
     def set_attribute_z(self, attribute, value):
         self.confirm_attribute_flag(attribute)
-        cmds.setAttr(f"{self.obj}.{attribute}Z", value)
+        cmds.setAttr(f"{self.obj}.{attribute}Z", self._apply_threshold(value))
 
+    @apply_threshold_decorator
     def set_attribute_xyz(self, attribute, value):
         self.confirm_attribute_flag(attribute)
-        for i, axis in enumerate("XYZ"):
-            if isinstance(value, (int, float)):
+        if isinstance(value, (int, float)):
+            value = self._apply_threshold(value)
+            for axis in "XYZ":
                 cmds.setAttr(f"{self.obj}.{attribute}{axis}", value)
-            elif isinstance(value, (tuple, list, set)) and len(value) == 1:
-                cmds.setAttr(f"{self.obj}.{attribute}{axis}", value[0])
-            else:
-                cmds.setAttr(f"{self.obj}.{attribute}{axis}", value[i])
+        elif isinstance(value, (tuple, list, set)) and len(value) == 1:
+            single_value = self._apply_threshold(value[0])
+            for axis in "XYZ":
+                cmds.setAttr(f"{self.obj}.{attribute}{axis}", single_value)
+        else:
+            for i, axis in enumerate("XYZ"):
+                cmds.setAttr(f"{self.obj}.{attribute}{axis}", self._apply_threshold(value[i]))
 
     def get_attribute(self, attribute):
         if attribute.endswith(("X", "Y", "Z")):
@@ -77,53 +118,47 @@ class XformHandler:
             self.confirm_attribute_flag(attribute)
         return cmds.getAttr(f"{self.obj}.{attribute}")
 
+    @apply_threshold_decorator
     def set_local_space_position(self, position):
-        cmds.xform(self.obj, translation=position)
+        cmds.xform(self.obj, translation=[self._apply_threshold(v) for v in position])
 
     def get_local_space_position(self):
-        return cmds.xform(self.obj, query=True, translation=True)
+        return [self._apply_threshold(v) for v in cmds.xform(self.obj, query=True, translation=True)]
 
     def get_world_space_position(self):
-        return cmds.xform(self.obj, query=True, worldSpace=True, translation=True)
+        return [self._apply_threshold(v) for v in cmds.xform(self.obj, query=True, worldSpace=True,
+                                                             translation=True)]
 
+    @apply_threshold_decorator
     def set_world_space_position(self, position):
+        position = [self._apply_threshold(coord) for coord in position]
         cmds.xform(self.obj, worldSpace=True, translation=position)
 
     def get_world_space_rotation(self):
-        return cmds.xform(self.obj, query=True, worldSpace=True, rotation=True)
+        return [self._apply_threshold(v) for v in cmds.xform(self.obj, query=True, worldSpace=True,
+                                                             rotation=True)]
 
+    @apply_threshold_decorator
     def set_world_space_rotation(self, rotation):
+        rotation = [self._apply_threshold(angle) for angle in rotation]
         cmds.xform(self.obj, worldSpace=True, rotation=rotation)
 
+    @apply_threshold_decorator
     def add_in_world(self, attribute, x: float = 0, y: float = 0, z: float = 0):
-        """
-        Adds the specified values to the x, y, and z components of the given attribute in world space.
-
-        :param attribute: The attribute to modify (e.g., 'translate', 'rotate').
-        :param x: The amount to add to the x component.
-        :param y: The amount to add to the y component.
-        :param z: The amount to add to the z component.
-        """
         attribute = self.confirm_attribute_flag(attribute)
-
         current_values = [self.get_attribute(f"{attribute}{axis}") for axis in "XYZ"]
-        new_values = [current + delta for current, delta in zip(current_values, [x, y, z])]
+        new_values = [self._apply_threshold(current + delta) for current, delta in zip(current_values, [x, y, z])]
         attribute = self.confirm_xform_flag(attribute)
         cmds.xform(self.obj, **{attribute: new_values})
 
+    @apply_threshold_decorator
     def add_in_local(self, attribute, x: float = 0, y: float = 0, z: float = 0):
-        """
-        Adds the specified values to the x, y, and z components of the given attribute in local space.
-
-        :param attribute: The attribute to modify (e.g., 'translate', 'rotate').
-        :param x: The amount to add to the x component.
-        :param y: The amount to add to the y component.
-        :param z: The amount to add to the z component.
-        """
         attribute = self.confirm_xform_flag(attribute)
-        if attribute == 'translate' or attribute == 'translation':
+        x, y, z = [self._apply_threshold(value) for value in [x, y, z]]
+
+        if attribute in ['translate', 'translation']:
             cmds.move(x, y, z, self.obj, relative=True, worldSpaceDistance=True, objectSpace=True)
-        elif attribute == 'rotate' or attribute == 'rotation':
+        elif attribute in ['rotate', 'rotation']:
             cmds.rotate(x, y, z, self.obj, relative=True, objectSpace=True)
         else:
             cmds.xform(self.obj, relative=True, **{attribute: [x, y, z]})
@@ -134,25 +169,26 @@ class XformHandler:
             pos2 = other_xform.get_world_space_position()
         else:
             pos2 = cmds.xform(other_xform, query=True, worldSpace=True, translation=True)
-        return [pos2[i] - pos1[i] for i in range(3)]
+        return [self._apply_threshold(pos2[i] - pos1[i]) for i in range(3)]
 
     def calculate_distance(self, other_xform: Union['XformHandler', str]):
         vector = self.calculate_vector(other_xform)
         return math.sqrt(sum([v ** 2 for v in vector]))
 
-    @staticmethod
-    def normalize_vector(vector):
-        magnitude = math.sqrt(sum([v ** 2 for v in vector]))
+    def normalize_vector(self, vector):
+        magnitude = math.sqrt(sum([axis ** 2 for axis in vector]))
         if magnitude == 0:
             raise ValueError("Cannot normalize a vector with magnitude 0.")
-        return [v / magnitude for v in vector]
+        return [self._apply_threshold(axis / magnitude) for axis in vector]
 
+    @apply_threshold_decorator
     def move_relative_to_obj(self, other_xform: Union['XformHandler', str], distance):
         direction = self.calculate_vector(other_xform)
         unit_vector = self.normalize_vector(direction)
-        new_pos = [self.get_world_space_position()[i] + distance * unit_vector[i] for i in range(3)]
+        new_pos = [self._apply_threshold(self.get_world_space_position()[i] + distance * unit_vector[i]) for i in range(3)]
         self.set_world_space_position(new_pos)
 
+    @apply_threshold_decorator
     def set_xform(self, attrs, values=None, zero_out=False):
         if isinstance(attrs, str):
             # Single attribute case
@@ -191,6 +227,7 @@ class XformHandler:
         else:
             raise ValueError("attrs must be a string or a dictionary.")
 
+    @apply_threshold_decorator
     def match_xform(self, src_xform: Union['XformHandler', str], attrs: list[str] | str):
         if isinstance(attrs, str):
             attrs = [attrs]
@@ -199,44 +236,48 @@ class XformHandler:
         if isinstance(src_xform, XformHandler):
             for attr in attrs:
                 attr = self.confirm_attribute_flag(attr)
-                if attr == 'translate' or attr == 'translation':
-                    values_to_match.update({self.confirm_xform_flag(attr): src_xform.get_world_space_position()})
-                elif attr == 'rotate' or attr == 'rotation':
-                    values_to_match.update({self.confirm_xform_flag(attr): src_xform.get_world_space_rotation()})
+                if attr in ['translate', 'translation']:
+                    values_to_match.update({self.confirm_xform_flag(attr): [self._apply_threshold(v) for v in
+                                                                            src_xform.get_world_space_position()]})
+                elif attr in ['rotate', 'rotation']:
+                    values_to_match.update({self.confirm_xform_flag(attr): [self._apply_threshold(v) for v in
+                                                                            src_xform.get_world_space_rotation()]})
                 elif attr == 'jointOrient':
                     src_xform.set_attribute_xyz(attr, self.get_attribute(self.confirm_attribute_flag(attr)))
                 else:
                     values_to_match.update({self.confirm_xform_flag(attr): (
-                        src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}X"),
-                        src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}Y"),
-                        src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}Z")) for attr in attrs})
+                        self._apply_threshold(src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}X")),
+                        self._apply_threshold(src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}Y")),
+                        self._apply_threshold(src_xform.get_attribute(f"{self.confirm_attribute_flag(attr)}Z"))
+                    ) for attr in attrs})
         else:
             for attr in attrs:
-                if attr == 'translate' or attr == 'translation':
-                    values_to_match.update({attr: cmds.xform(src_xform, query=True, worldSpace=True,
-                                                             translation=True)})
-                elif attr == 'rotate' or attr == 'rotation':
-                    values_to_match.update({attr: cmds.xform(src_xform, query=True, worldSpace=True,
-                                                             rotation=True)})
+                if attr in ['translate', 'translation']:
+                    values_to_match.update({attr: [self._apply_threshold(v) for v in  cmds.xform(
+                        src_xform, query=True, worldSpace=True, translation=True)]})
+                elif attr in ['rotate', 'rotation']:
+                    values_to_match.update({attr: [self._apply_threshold(v) for v in cmds.xform(
+                        src_xform, query=True, worldSpace=True, rotation=True)]})
                 elif attr == 'jointOrient':
-                    self.set_attribute_xyz(attr, (cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}X"),
-                                                  cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Y"),
-                                                  cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Z")))
+                    self.set_attribute_xyz(attr, (
+                        self._apply_threshold(cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}X")),
+                        self._apply_threshold(cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Y")),
+                        self._apply_threshold(cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Z"))))
                 else:
-                    values_to_match.update({self.confirm_xform_flag(attr):
-                                                (cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}X"),
-                                                 cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Y"),
-                                                 cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Z")) for
-                                            attr in attrs})
+                    values_to_match.update({self.confirm_xform_flag(attr): (
+                        self._apply_threshold(cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}X")),
+                        self._apply_threshold(cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Y")),
+                        self._apply_threshold(cmds.getAttr(f"{src_xform}.{self.confirm_attribute_flag(attr)}Z"))
+                    ) for attr in attrs})
         self.set_xform(values_to_match)
 
 
 if __name__ == "__main__":
     source_xform = XformHandler("pCube1")
     target_xform = XformHandler("pSphere1")
-    source_xform.add('rotate', x=45.0, y=180.0, z=45.0)
+    source_xform.add_in_local('rotate', x=45.0, y=180.0, z=45.0)
     target_xform.match_xform(source_xform, ['rotation', 'translation'])
     target_xform.match_xform(source_xform, 'scale')
-    source_xform.add('translate', x=0.1, y=0.1, z=0.1)
+    source_xform.add_in_world('translate', x=0.1, y=0.1, z=0.1)
     source_xform.move_relative_to_obj(target_xform, 5.0)
     source_xform.set_xform({'translate': (0, 0, 0), 'rotate': (55, 55, 55)})
