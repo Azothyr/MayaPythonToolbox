@@ -4,30 +4,32 @@ from typing import Union
 
 
 class Calculator3dSpace:
-    def __init__(self, source, target=None):
-        self.source = source if isinstance(source, XformHandler) else XformHandler(source)
-        self.target = target if isinstance(target, XformHandler) else XformHandler(target) if target else None
+    def __init__(self, source=None, target=None):
+        self.source = source if isinstance(source, XformHandler) else\
+            XformHandler(source) if source and cmds.objExists(source) else None
+        self.target = target if isinstance(target, XformHandler) else\
+            XformHandler(target) if target and cmds.objExists(target) else None
 
     @staticmethod
     def get_axis_from_vector(vector):
         match vector:
-            case (1, 0, 0): return "x"
-            case (-1, 0, 0): return "-x"
-            case (0, 1, 0): return "y"
-            case (0, -1, 0): return "-y"
-            case (0, 0, 1): return "z"
-            case (0, 0, -1):  return "-z"
+            case (1.0, 0.0, 0.0): return "x"
+            case (-1.0, 0.0, 0.0): return "-x"
+            case (0.0, 1.0, 0.0): return "y"
+            case (0.0, -1.0, 0.0): return "-y"
+            case (0.0, 0.0, 1.0): return "z"
+            case (0.0, 0.0, -1.0):  return "-z"
             case _: raise ValueError(f"Cannot determine axis from vector: {vector}")
 
     @staticmethod
     def get_vector_from_axis(axis):
         match axis:
-            case "x": return 1, 0, 0
-            case "-x": return -1, 0, 0
-            case "y": return 0, 1, 0
-            case "-y": return 0, -1, 0
-            case "z": return 0, 0, 1
-            case "-z": return 0, 0, -1
+            case "x": return 1.0, 0.0, 0.0
+            case "-x": return -1.0, 0.0, 0.0
+            case "y": return 0.0, 1.0, 0.0
+            case "-y": return 0.0, -1.0, 0.0
+            case "z": return 0.0, 0.0, 1.0
+            case "-z": return 0.0, 0.0, -1.0
             case _: raise ValueError(f"Cannot determine vector from axis: {axis}")
 
     def calculate_comparison_vector(self, other_xform: Union['XformHandler', str] = None):
@@ -58,11 +60,11 @@ class Calculator3dSpace:
         # Determine the dominant axis and its direction
         match([abs(axis) for axis in vector].index(max([abs(axis) for axis in vector]))):
             case 0:
-                x, y, z = -1 if vector[0] < 0 else 1, 0, 0
+                x, y, z = -1.0 if vector[0] < 0.0 else 1.0, 0.0, 0.0
             case 1:
-                x, y, z = 0, -1 if vector[1] < 0 else 1, 0
+                x, y, z = 0.0, -1.0 if vector[1] < 0.0 else 1.0, 0.0
             case 2:
-                x, y, z = 0, 0, -1 if vector[2] < 0 else 1
+                x, y, z = 0.0, 0.0, -1.0 if vector[2] < 0.0 else 1.0
             case _:
                 raise ValueError("Cannot determine dominant axis of aim vector.")
 
@@ -93,22 +95,24 @@ class Calculator3dSpace:
         if obj_handler is None:
             obj_handler = self.source
         rotation_matrix = obj_handler.get_world_space_rotation_matrix()
-        world_axes = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-        local_axes = ['x', 'y', 'z']
+        world_axes_vectors = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        world_axes = ['x', 'y', 'z']
         result = {}
 
-        for i, local_axis in enumerate(local_axes):
-            transformed_axis = [sum(rotation_matrix[j][i] * axis[j] for j in range(3)) for axis in world_axes]
-            dot_products = [sum(transformed_axis[k] * world_axes[k][i] for k in range(3)) for i in range(3)]
+        for i, world_axis in enumerate(world_axes):
+            transformed_axis = [sum(rotation_matrix[j][i] * axis[j] for j in range(3)) for axis in world_axes_vectors]
+            dot_products = [sum(transformed_axis[k] * world_axes_vectors[k][i] for k in range(3)) for i in range(3)]
 
-            closest_axis_index = dot_products.index(max(dot_products, key=abs))
-            sign = "-" if dot_products[closest_axis_index] < 0 else ""
+            objs_closest_world_axis_index = dot_products.index(max(dot_products, key=abs))
+            sign = "-" if dot_products[objs_closest_world_axis_index] < 0 else ""
             rev_sign = "-" if sign == "" else ""
-            # print(f"Local {local_axis}-axis is closest to World {sign}{local_axes[closest_axis_index]}-axis")
-            # print(f"Local -{local_axis}-axis is closest to World {rev_sign}{local_axes[closest_axis_index]}-axis")
+            # print(f"Local {world_axis}-axis is closest to World "
+            #       f"{sign}{world_axes[objs_closest_world_axis_index]}-axis")
+            # print(f"Local -{world_axis}-axis is closest to World "
+            #       f"{rev_sign}{world_axes[objs_closest_world_axis_index]}-axis")
 
-            result[f"{local_axis}"] = f"{sign}{local_axes[closest_axis_index]}"
-            result[f"-{local_axis}"] = f"{rev_sign}{local_axes[closest_axis_index]}"
+            result[f"{world_axis}"] = f"{sign}{world_axes[objs_closest_world_axis_index]}"
+            result[f"-{world_axis}"] = f"{rev_sign}{world_axes[objs_closest_world_axis_index]}"
 
         return result
 
