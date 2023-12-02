@@ -13,7 +13,7 @@ from maya_scripts.tools.color_changer import change_color
 
 class LimbTwistManager:
     def __init__(self, limb_name, upper_name, lower_name, rk_top_jnt, rk_pivot_jnt, rk_bot_jnt, rk_bot2_jnt,
-                 twist_count=1, aim_vector=(1, 0, 0), up_vector=(0, 1, 0)):
+                 twist_count=1):
         self.limb_name = limb_name
         self.u_name = upper_name
         self.l_name = lower_name
@@ -77,32 +77,15 @@ class LimbTwistManager:
         self.l_up_xform = XformHandler(self.l_up)
         cmds.select(clear=True)
 
-        if self.get_limb() == "Arm":
-            self.u_aim_vector = aim_vector
-            self.u_up_vector = tuple([up_vector[i] * -1 for i in range(len("xyz"))])
-            self.l_aim_vector = tuple([aim_vector[i] * -1 for i in range(len("xyz"))])
-            self.l_up_vector = up_vector
-        elif self.get_limb() == "Leg":
-            self.u_aim_vector = tuple([up_vector[i] * -1 for i in range(len("xyz"))])
-            self.u_up_vector = up_vector
-            self.l_aim_vector = aim_vector
-            self.l_up_vector = up_vector
-        else:
-            self.u_aim_vector = aim_vector
-            self.u_up_vector = up_vector
-            self.l_aim_vector = aim_vector
-            self.l_up_vector = up_vector
-
-    def run(self, l_up_dist=None, u_up_dist=None, u_up_axis=None, l_up_axis=None, u_helper_dist=None,
-            u_helper_axis=None, correct_percent=None):
-        self.create_lower_twist_system(l_up_dist, l_up_axis)
-        # self.create_upper_twist_system(u_up_dist, u_up_axis, u_helper_dist, u_helper_axis, correct_percent)
-        # self.clean_up()
+    def run(self, correct_percent=None, l_up_dist=None, u_up_dist=None, u_helper_dist=None):
+        self.create_lower_twist_system(l_up_dist)
+        self.create_upper_twist_system(u_up_dist, u_helper_dist, correct_percent)
+        self.clean_up()
         self._set_locator_scale()
-        # self.connect_to_rig()
-        # self.color_twist_system()
-        # if self.get_limb() == "Arm":
-        #     self.color_helpers()
+        self.connect_to_rig()
+        self.color_twist_system()
+        if self.get_limb() == "Arm":
+            self.color_helpers()
         print(f"Twist system created for {self.u_name} and {self.l_name}.\n")
 
     def get_side(self):
@@ -115,12 +98,27 @@ class LimbTwistManager:
             return
         return self.limb_name.split("_")[1].capitalize()
 
+    @staticmethod
+    def get_aim_vector(src_xform: XformHandler, target_xform: XformHandler):
+        return src_xform.calc.calculate_aim_axis_vector(target_xform, True)
+
+    def get_aim_axis(self, src_xform: XformHandler, target_xform: XformHandler):
+        match(self.get_aim_vector(src_xform, target_xform)):
+            case (1, 0, 0): return "x"
+            case (-1, 0, 0): return "-x"
+            case (0, 1, 0): return "y"
+            case (0, -1, 0): return "-y"
+            case (0, 0, 1): return "z"
+            case (0, 0, -1): return "-z"
+            case _:
+                raise ValueError(f"--get_aim_axis()--Could not determine aim axis for {src_xform} and {target_xform}.")
+
     def connect_to_rig(self):
         if self.limb_name is None:
             return
         side = self.get_side()
         limb = self.get_limb()
-        if side not in ["L", "R", "C"]:
+        if side not in ["L", "R"]:
             raise ValueError(f"Invalid limb name: {self.limb_name}.")
         if limb not in ["Arm", "Leg"]:
             raise ValueError(f"Invalid limb name: {self.limb_name}.")
@@ -163,12 +161,11 @@ class LimbTwistManager:
                 for axis in "XYZ":
                     cmds.setAttr(f"{shape}.localScale{axis}", scale)
 
-    def create_upper_twist_system(self, up_dist=None, on_axis=None, helper_dist=None, helper_axis=None,
-                                  correct_percent=None):
-        self.create_upper_twist_base(up_dist=up_dist, on_axis=on_axis)
+    def create_upper_twist_system(self, up_dist=None, helper_dist=None, correct_percent=None):
+        self.create_upper_twist_base(up_dist=up_dist)
         cmds.select(clear=True)
         if self.get_limb() == "Arm":
-            self.create_upper_limb_helpers(helper_dist=helper_dist, helper_axis=helper_axis)
+            self.create_upper_limb_helpers(helper_dist=helper_dist)
         cmds.select(clear=True)
         self.u_twist_locators = self.create_falloff_twist(self.u_name, self.top_jnt_xform, self.u_aim, self.u_target,
                                                           self.u_loc_grp)
@@ -179,18 +176,8 @@ class LimbTwistManager:
         self.create_upper_twist_corrective(correct_percent)
         cmds.select(clear=True)
 
-    def create_upper_twist_base(self, up_dist=None, on_axis="y"):
-        if up_dist is None:
-            base_dist = self.top_jnt_xform.calculate_distance(self.pivot_jnt_xform)
-            up_dist = int(base_dist * 0.9)
-            if "-" in on_axis:
-                up_dist *= -1
-            if self.get_side() == "R":
-                up_dist *= -1
-        if "-" in on_axis:
-            on_axis = on_axis.replace("-", "")
-
-        # Setting to joint positions
+    def create_upper_twist_base(self, up_dist=None):
+        # Setting to locator positions
         for obj in [self.u_loc_grp_xform, self.u_aim_xform]:
             obj.match_xform(self.rk_top_jnt, "translate")
         for obj in [self.u_target_xform, self.u_up_xform]:
@@ -198,8 +185,22 @@ class LimbTwistManager:
         for obj in [self.u_loc_grp_xform, self.u_aim_xform, self.u_target_xform, self.u_up_xform]:
             obj.match_xform(self.rk_top_jnt, "rotate")
 
-        # Moving the aim locator -5 units in the y-axis
-        self.u_up_xform.add_in_local('translate', **{on_axis: up_dist})
+        aim_axis = self.get_aim_axis(self.top_jnt_xform, self.pivot_jnt_xform)
+        aim_vector = self.get_aim_vector(self.top_jnt_xform, self.pivot_jnt_xform)
+        up_axis = "y" if "z" in aim_axis else "z"
+
+        if up_dist is None:
+            base_dist = self.top_jnt_xform.calc.calculate_distance(self.pivot_jnt_xform)
+            up_dist = int(base_dist * 0.9)
+            if "-" in up_axis:
+                up_dist *= -1
+            if self.get_side() == "R":
+                up_dist *= -1
+        if "-" in up_axis:
+            up_axis = up_axis.replace("-", "")
+
+        # Moving the aim locator 'up_dist' units in up_axis
+        self.u_up_xform.add_in_world('translate', **{up_axis: up_dist})
         cmds.parent(self.u_aim, self.u_target, self.u_up, self.u_loc_grp)
 
         # Locking the position of the group to the top_jnt
@@ -209,7 +210,7 @@ class LimbTwistManager:
         cmds.scaleConstraint(self.rk_top_jnt, self.u_loc_grp, maintainOffset=True,
                              name=f"scale_constraint__from_{self.rk_top_jnt}")
         # Creating the locator aim constraint
-        cmds.aimConstraint(self.u_target, self.u_aim, worldUpType="object", worldUpVector=self.u_up_vector, weight=1,
+        cmds.aimConstraint(self.u_target, self.u_aim, worldUpType="object", upVector=self.u_up_vector, weight=1,
                            aimVector=self.u_aim_vector, maintainOffset=False, worldUpObject=self.u_up,
                            name=f'aim_constraint__from_{self.u_target}__up_vector_to_{self.u_up}')
         # Point constraint keeping the target locator on the pivot_jnt
@@ -218,7 +219,7 @@ class LimbTwistManager:
 
     def create_upper_limb_helpers(self, helper_dist=None, helper_axis="z"):
         if helper_dist is None:
-            base_dist = self.top_jnt_xform.calculate_distance(self.pivot_jnt_xform)
+            base_dist = self.top_jnt_xform.calc.calculate_distance(self.pivot_jnt_xform)
             helper_dist = int(base_dist + (base_dist * 0.1))
             if "-" in helper_axis:
                 helper_dist *= -1
@@ -233,7 +234,7 @@ class LimbTwistManager:
         self.help_jnt2_xform.match_xform(self.pivot_jnt_xform, "translate")
         # Moving the helper joint2 to be halfway between helper 1 and the pivot_jnt
         self.help_jnt2_xform.move_relative_to_obj(self.help_jnt1_xform,
-                                                  self.help_jnt2_xform.calculate_distance(self.help_jnt1_xform) / 2)
+                                                  self.help_jnt2_xform.calc.calculate_distance(self.help_jnt1_xform) / 2)
         cmds.parent(self.helper_joint2, self.helper_joint1)
         # Orienting the helper joints
         cmds.joint(self.helper_joint1, edit=True, orientJoint="xzy", secondaryAxisOrient="ydown", children=True,
@@ -286,27 +287,27 @@ class LimbTwistManager:
         cmds.parent(self.helper_top_joint_correcter, self.rk_top_jnt)
         self.u_twist_joints.append(self.helper_top_joint_correcter)
 
-    def create_lower_twist_system(self, up_dist=None, on_axis=None):
-        self.create_lower_twist_base(up_dist=up_dist, on_axis=on_axis)
+    def create_lower_twist_system(self, up_dist=None, up_axis=None):
+        self.create_lower_twist_base(up_dist=up_dist, up_axis=up_axis)
         cmds.select(clear=True)
-        # self.l_twist_locators = self.create_falloff_twist(self.l_name, self.pivot_jnt_xform, self.l_aim,
-        #                                                   self.l_target, self.l_loc_grp)
+        self.l_twist_locators = self.create_falloff_twist(self.l_name, self.pivot_jnt_xform, self.l_aim,
+                                                          self.l_target, self.l_loc_grp)
         cmds.select(clear=True)
-        # self.l_twist_joints = self.create_twist_joints(self.l_name, self.l_twist_locators, self.l_aim,
-        #                                                self.rk_pivot_jnt)
+        self.l_twist_joints = self.create_twist_joints(self.l_name, self.l_twist_locators, self.l_aim,
+                                                       self.rk_pivot_jnt)
         cmds.select(clear=True)
 
-    def create_lower_twist_base(self, up_dist=None, on_axis='y'):
+    def create_lower_twist_base(self, up_dist=None, up_axis='y'):
         if up_dist is None:
-            base_dist = self.pivot_jnt_xform.calculate_distance(self.bot_jnt_xform)
+            base_dist = self.pivot_jnt_xform.calc.calculate_distance(self.bot_jnt_xform)
             up_dist = int(base_dist / 4)
-            if "-" in on_axis:
+            if "-" in up_axis:
                 up_dist *= -1
             if self.get_side() == "R":
                 up_dist *= -1
-        if "-" in on_axis:
-            on_axis = on_axis.replace("-", "")
-        print(f"XformHandler.add_in_local up_dist: {up_dist}, on_axis: {on_axis}")
+        if "-" in up_axis:
+            up_axis = up_axis.replace("-", "")
+        print(f"XformHandler.add_in_local up_dist: {up_dist}, up_axis: {up_axis}")
 
         # Setting to joint positions
         for obj in [self.l_loc_grp_xform, self.l_aim_xform, self.l_up_xform]:
@@ -315,9 +316,9 @@ class LimbTwistManager:
         for obj in [self.l_loc_grp_xform, self.l_aim_xform, self.l_target_xform, self.l_up_xform]:
             obj.match_xform(self.bot_jnt_xform, "rotate")
 
-        self.l_up_xform.add_in_local('translate', **{on_axis: up_dist})
-
         cmds.parent(self.l_aim, self.l_target, self.l_up, self.l_loc_grp)
+
+        self.l_up_xform.add_in_world('translate', **{up_axis: up_dist})
 
         # Locking the position of the group to the pivot_jnt
         cmds.parentConstraint(self.rk_pivot_jnt, self.l_loc_grp, mo=True,
@@ -329,7 +330,7 @@ class LimbTwistManager:
         print(f"---BEFORE AIM CONSTRAINT---\n{self.l_target_xform}\n{self.l_aim_xform}\n{self.l_up_xform}")
         print(f"worldUpVector: {self.l_up_vector}, aimVector: {self.l_aim_vector}, worldUpObject: {self.l_up}\n"
               f"constrainer: {self.l_target}, constrained: {self.l_aim}, worldUpType: object, weight: 1")
-        cmds.aimConstraint(self.l_target, self.l_aim, worldUpType="object", worldUpVector=self.l_up_vector,
+        cmds.aimConstraint(self.l_target, self.l_aim, worldUpType="object", upVector=self.l_up_vector,
                            aimVector=self.l_aim_vector, worldUpObject=self.l_up, weight=1, maintainOffset=False,
                            name=f'aim_constraint__from_{self.l_target}')
         print(f"---AFTER AIM CONSTRAINT---\n{self.l_target_xform}\n{self.l_aim_xform}\n{self.l_up_xform}")
@@ -453,8 +454,6 @@ class LimbTwistManager:
 
 
 if __name__ == "__main__":
-    # print([val for val in cmds.listAttr("L_Lower_Leg_Loc_Grp") if f"L_Lower_Leg_Loc_Grp.{val}" in XformHandler("L_Lower_Leg_Loc_Grp").xform_attrs])
-    # exit()
     from functools import partial
 
     def module_name():
@@ -467,42 +466,40 @@ if __name__ == "__main__":
 
     print(f"\n{'-' * 25 + '|' + ' ' * 4} RUNNING {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 25}")
 
-    def perform_l_arm(selection, twist_count=1, up_vector=(0, 1, 0), aim_vector=(1, 0, 0)):
+    def perform_l_arm(selection, twist_count=1):
         return LimbTwistManager("L_Arm", "L_Upper_Arm", "L_ForeArm", selection[0], selection[1], selection[2],
-                                selection[3], twist_count=twist_count, up_vector=up_vector, aim_vector=aim_vector)
+                                selection[3], twist_count=twist_count)
 
-    def perform_r_arm(selection, twist_count=1, up_vector=(0, 1, 0), aim_vector=(1, 0, 0)):
+    def perform_r_arm(selection, twist_count=1):
         return LimbTwistManager("R_Arm", "R_Upper_Arm", "R_ForeArm", selection[0], selection[1], selection[2],
-                                selection[3], twist_count=twist_count, up_vector=up_vector, aim_vector=aim_vector)
+                                selection[3], twist_count=twist_count)
 
-    def perform_l_leg(selection, twist_count=1, up_vector=(0, 1, 0), aim_vector=(1, 0, 0)):
+    def perform_l_leg(selection, twist_count=1):
         return LimbTwistManager("L_Leg", "L_Upper_Leg", "L_Lower_Leg", selection[0], selection[1], selection[2],
-                                selection[3], twist_count=twist_count, up_vector=up_vector, aim_vector=aim_vector)
+                                selection[3], twist_count=twist_count)
 
-    def perform_r_leg(selection, twist_count=1, up_vector=(0, 1, 0), aim_vector=(1, 0, 0)):
+    def perform_r_leg(selection, twist_count=1):
         return LimbTwistManager("R_Leg", "R_Upper_Leg", "R_Lower_Leg", selection[0], selection[1], selection[2],
-                                selection[3], twist_count=twist_count, up_vector=up_vector, aim_vector=aim_vector)
+                                selection[3], twist_count=twist_count)
 
     def perform_func_call(excluded=None):
         excluded = [] if not excluded else excluded
-        arm_aim_vector = (1, 0, 0)
-        arm_up_vector = (0, 1, 0)
-        leg_aim_vector = (-1, 0, 0)
-        leg_up_vector = (0, 0, 1)
 
-        run_parameters = {"arm": {'u_up_axis': "-y", 'l_up_axis': "y", 'u_helper_axis': "-z", 'correct_percent': 10},
-                          "leg": {'u_up_axis': "y", 'l_up_axis': "z", 'correct_percent': 10}}
+        run_parameters = {"arm": {'correct_percent': 10},
+                          "leg": {'correct_percent': 10}}
 
-        functions = [partial(perform_l_arm, ["L_Arm_01_RK_Jnt", "L_Arm_02_RK_Jnt", "L_Arm_03_RK_Jnt", "L_Hand_FK_Jnt"],
-                             twist_count=1, up_vector=arm_up_vector, aim_vector=arm_aim_vector),
-                     partial(perform_r_arm, ["R_Arm_01_RK_Jnt", "R_Arm_02_RK_Jnt", "R_Arm_03_RK_Jnt", "R_Hand_FK_Jnt"],
-                             twist_count=1, up_vector=arm_up_vector, aim_vector=arm_aim_vector),
+        functions = [partial(perform_l_arm,
+                             ["L_Arm_01_RK_Jnt", "L_Arm_02_RK_Jnt", "L_Arm_03_RK_Jnt", "L_Hand_FK_Jnt"],
+                             twist_count=1),
+                     partial(perform_r_arm,
+                             ["R_Arm_01_RK_Jnt", "R_Arm_02_RK_Jnt", "R_Arm_03_RK_Jnt", "R_Hand_FK_Jnt"],
+                             twist_count=1),
                      partial(perform_l_leg,
                              ["L_Leg_01_RK_Jnt", "L_Leg_02_RK_Jnt", "L_Leg_03_RK_Jnt", "L_Foot_01_RK_Jnt"],
-                             twist_count=1, up_vector=leg_up_vector, aim_vector=leg_aim_vector),
+                             twist_count=1),
                      partial(perform_r_leg,
                              ["R_Leg_01_RK_Jnt", "R_Leg_02_RK_Jnt", "R_Leg_03_RK_Jnt", "R_Foot_01_RK_Jnt"],
-                             twist_count=1, up_vector=leg_up_vector, aim_vector=leg_aim_vector)]
+                             twist_count=1)]
 
         for i, func in enumerate(functions):
             if i not in excluded:
@@ -511,8 +508,8 @@ if __name__ == "__main__":
     def toggle_twist_grp_visibility():
         cmds.setAttr("Limb_Twist_Grp.visibility", 1 - cmds.getAttr("Limb_Twist_Grp.visibility"))
 
-    perform_func_call([0, 1])
-    # perform_func_call()
+    # perform_func_call([0, 1])
+    perform_func_call()
     # toggle_twist_grp_visibility()
 
     print(f"{'-' * 25 + '|' + ' ' * 4} COMPLETED {module_name()}  DUNDER MAIN {' ' * 4 + '|' + '-' * 25}\n")
