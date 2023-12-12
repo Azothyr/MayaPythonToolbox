@@ -1,11 +1,8 @@
 import maya.cmds as cmds
 
 
-import maya.cmds as cmds
-
-
 class WeightPaintHelper:
-    def __init__(self, obj=None, rotation_plane='yz', translate_axis='x', rotation_amount=35, translation_amount=2,
+    def __init__(self, obj=None, rotation_plane='yz', translate_axis='x', rotation_amount=50, translation_amount=10,
                  time_interval=15):
         self.obj = self.get_ctrl_shape(obj)
         self.rotation_amount = rotation_amount
@@ -31,82 +28,50 @@ class WeightPaintHelper:
             yield f"{self.obj}.r{attr}"
         yield f"{self.obj}.t{self.translate_axis}"
 
+    def _set_keyframes(self, primary_attr):
+        for attr in self.get_ctrl_shape_attrs():
+            if attr != primary_attr:
+                cmds.setAttr(attr, 0)
+            cmds.setKeyframe(attr)
+
     def set_keyframes_for_weight_painting(self):
         time = 0
-        for attr in self.get_ctrl_shape_attrs():
-            cmds.currentTime(time)
-            cmds.setKeyframe(attr)
+        cmds.currentTime(time)
+        self._set_keyframes("NO PRIMARY ATTR")
+        time += self.time_interval
 
         for attr in self.get_ctrl_shape_attrs():
             if attr.split(".")[1].startswith("r"):
-                print(f"TIME: {time}")
-                for i in range(2):
-                    print(i)
+                for i in range(3):
+                    cmds.currentTime(time)
                     if i == 0:
                         cmds.setAttr(attr, self.rotation_amount)
                     elif i == 1:
-                        cmds.setAttr(attr, -self.rotation_amount)
+                        cmds.setAttr(attr, -1 * self.rotation_amount)
                     else:
                         cmds.setAttr(attr, 0)
-                    cmds.currentTime(time)
-                    cmds.setKeyframe(attr)
+                    self._set_keyframes(attr)
                     time += self.time_interval
             elif attr.split(".")[1].startswith("t"):
                 for i in range(1):
+                    cmds.currentTime(time)
                     if i == 0:
                         cmds.setAttr(attr, self.translation_amount)
                     else:
                         cmds.setAttr(attr, 0)
-                    cmds.currentTime(time)
-                    cmds.setKeyframe(attr)
+                    self._set_keyframes(attr)
                     time += self.time_interval
+        time = 0
+        cmds.currentTime(time)
+
+    def remove_keyframes(self):
+        end_time = self.time_interval * 6 + 1
+        for attr in self.get_ctrl_shape_attrs():
+            keyframes = cmds.keyframe(attr, q=True, time=(0, end_time))
+            if keyframes:
+                cmds.cutKey(attr, time=(keyframes[0], keyframes[-1]))
 
 
 if __name__ == "__main__":
     tool = WeightPaintHelper()
-
-
-'''
-cmds.currentTime(0)
-# Keyframe 1
-cmds.currentTime(0)
-cmds.setAttr(selected_obj + '.rz', 35) # noqa
-cmds.setKeyframe(selected_obj)
-
-# Keyframe 2
-cmds.currentTime(15)
-cmds.setAttr(selected_obj + '.rz', -35) # noqa
-cmds.setKeyframe(selected_obj)
-
-# Keyframe 3
-cmds.currentTime(30)
-cmds.setAttr(selected_obj + '.rz', 0) # noqa
-cmds.setKeyframe(selected_obj)
-
-# Keyframe 4
-cmds.currentTime(45)
-cmds.setAttr(selected_obj + '.ry', 35) # noqa
-cmds.setKeyframe(selected_obj)
-
-# Keyframe 5
-cmds.currentTime(60)
-cmds.setAttr(selected_obj + '.ry', -35) # noqa
-cmds.setKeyframe(selected_obj)
-
-# Keyframe 6
-cmds.currentTime(75)
-cmds.setAttr(selected_obj + '.ry', 0) # noqa
-cmds.setKeyframe(selected_obj)
-
-# Keyframe 7
-cmds.currentTime(90)
-cmds.setAttr(selected_obj + '.tx', 2) # noqa
-cmds.setKeyframe(selected_obj)
-
-# Keyframe 8
-cmds.currentTime(105)
-cmds.setKeyframe(selected_obj)
-
-# Set time slider back to 0
-cmds.currentTime(0)
-'''
+    tool.remove_keyframes()
