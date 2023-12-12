@@ -2,8 +2,8 @@ import maya.cmds as cmds
 
 
 class WeightPaintHelper:
-    def __init__(self, obj=None, rotation_plane='yz', translate_axis='x', rotation_amount=50, translation_amount=10,
-                 time_interval=15):
+    def __init__(self, obj=None, rotation_plane='yz', translate_axis='x', rotation_amount=50, translation_amount=5,
+                 time_interval=15, mode="run"):
         self.obj = self.get_ctrl_shape(obj)
         self.rotation_amount = rotation_amount
         self.translation_amount = translation_amount
@@ -11,7 +11,23 @@ class WeightPaintHelper:
         self.rotation_plane = rotation_plane.lower()
         self.translate_axis = translate_axis.lower()
 
-        self.set_keyframes_for_weight_painting()
+        self.__auto_run(mode)
+
+    def __auto_run(self, mode):
+        valid_modes = ["run", "remove", "rem", "tool"]
+
+        match mode.lower().strip():
+            case "run":
+                self.set_keyframes_for_weight_painting()
+            case "remove":
+                self.remove_keyframes()
+            case "rem":
+                self.remove_keyframes()
+            case "tool":
+                return
+            case _:
+                valid_modes = "\n".join(valid_modes)
+                raise RuntimeError(f"Invalid mode: {mode}\n Valid modes: {valid_modes}")
 
     @staticmethod
     def get_ctrl_shape(obj):
@@ -73,5 +89,10 @@ class WeightPaintHelper:
 
 
 if __name__ == "__main__":
-    tool = WeightPaintHelper()
-    tool.remove_keyframes()
+    obj = "Pelvis_FK_Ctrl"
+    rem_obj = lambda obj_name, fallback: cmds.objExists(obj_name) and obj_name or fallback
+    rem_obj = rem_obj("Pelvis_FK_Ctrl", obj)
+    to_remove = rem_obj if cmds.objExists(rem_obj) else obj if cmds.objExists(obj) else None
+
+    tool = WeightPaintHelper(obj="Pelvis_FK_Ctrl", translation_amount=100)
+    WeightPaintHelper(obj=to_remove, mode="rem").remove_keyframes()
