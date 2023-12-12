@@ -1,4 +1,16 @@
 import maya.cmds as cmds
+from pprint import pprint
+
+
+debug_bool = True
+
+
+def debug(text: str, _debug: bool = False, pretty: bool = False):
+    if debug_bool or _debug:
+        if pretty:
+            pprint(f"{text}")
+        else:
+            print(f"{text}")
 
 
 class WeightPaintHelper:
@@ -35,6 +47,22 @@ class WeightPaintHelper:
             obj = cmds.ls(selection=True)[0]
         if not obj:
             raise RuntimeError("No object selected.")
+        cmds.select(clear=True)
+        possible_objs = cmds.ls(obj)
+        debug(f"Found objects: {possible_objs}")
+        if possible_objs:
+            obj = possible_objs[0]
+        else:
+            possible_objs = cmds.ls(f"*{obj}*")
+            debug(f"Searching through: {possible_objs}")
+            for possible_obj in possible_objs:
+                debug(f"Possible object: {possible_obj}")
+                if (obj in possible_obj and "constraint" not in possible_obj.lower() and
+                        "grp" not in possible_obj.lower() and "jnt" not in possible_obj.lower() and
+                        "shape" not in possible_obj.lower()):
+                    obj = possible_obj
+                    debug(f"Found object: {obj}")
+                    break
         if not cmds.objExists(obj):
             raise RuntimeError(f"Object does not exist: {obj}")
         return obj
@@ -81,7 +109,7 @@ class WeightPaintHelper:
         cmds.currentTime(time)
 
     def remove_keyframes(self):
-        end_time = self.time_interval * 6 + 1
+        end_time = self.time_interval * 10 + 1
         for attr in self.get_ctrl_shape_attrs():
             keyframes = cmds.keyframe(attr, q=True, time=(0, end_time))
             if keyframes:
@@ -89,10 +117,51 @@ class WeightPaintHelper:
 
 
 if __name__ == "__main__":
-    obj = "Pelvis_FK_Ctrl"
-    rem_obj = lambda obj_name, fallback: cmds.objExists(obj_name) and obj_name or fallback
-    rem_obj = rem_obj("Pelvis_FK_Ctrl", obj)
-    to_remove = rem_obj if cmds.objExists(rem_obj) else obj if cmds.objExists(obj) else None
+    def module_name():
+        import inspect
+        import os
+        # Get the current frame and find the file name of the script
+        frame = inspect.currentframe()
+        filename = inspect.getfile(frame)
+        return os.path.basename(filename).split('.')[0]
 
-    tool = WeightPaintHelper(obj="Pelvis_FK_Ctrl", translation_amount=100)
-    WeightPaintHelper(obj=to_remove, mode="rem").remove_keyframes()
+    def select(obj):
+        if cmds.objExists(obj):
+            cmds.select(obj)
+        else:
+            cmds.select(clear=True)
+            possible_objs = cmds.ls(obj)
+            debug(f"{possible_objs}")
+            if possible_objs:
+                cmds.select(possible_objs[0])
+            else:
+                for possible_obj in cmds.ls(f"*{obj}*"):
+                    if (obj in possible_obj and "constraint" not in possible_obj.lower() and
+                            "grp" not in possible_obj.lower() and "jnt" not in possible_obj.lower() and
+                            "shape" not in possible_obj.lower()):
+                        cmds.select(possible_obj)
+                        break
+
+    def run_tool(obj, mode="tool"):
+        match mode:
+            case "tool":
+                tool = WeightPaintHelper(obj=obj, translation_amount=100)
+            case "rem":
+                WeightPaintHelper(obj=obj, mode=mode).remove_keyframes()
+            case "xform":
+                pass
+            case "select":
+                select(obj)
+
+
+    debug(f"\n{'-' * 25 + '|' + ' ' * 4} RUNNING {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 25}")
+
+    ckecker_obj = lambda obj_name, fallback: cmds.objExists(obj_name) and obj_name or fallback
+    obj = "spine_01".capitalize()
+    rem_obj = ckecker_obj(ckecker_obj("", obj), None)
+
+    run_tool(obj, mode="tool")
+    #run_tool(obj, mode="select")
+    # run_tool(obj, mode="rem")
+
+    debug(f"{'-' * 25 + '|' + ' ' * 4} COMPLETED {module_name()}  DUNDER MAIN {' ' * 4 + '|' + '-' * 25}\n")

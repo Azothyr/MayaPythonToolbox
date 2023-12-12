@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/manual_tool_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/manual_tool_runner.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/weight_paint_time_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/weight_paint_time_scratch.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -16,6 +18,13 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -40,14 +49,14 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "settings.editor.selected.configurable": "settings.MayaSdkConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunManager">
     <configuration name="Maya" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION">
       <option name="executionType" value="FILE" />
-      <option name="mayaSdkPath" value="" />
+      <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
       <option name="scriptCodeText" value="" />
       <option name="scriptFilePath" value="C:\GitRepos\MayaPythonToolbox\maya_scripts\manual_tool_runner.py" />
       <method v="2" />
@@ -71,6 +80,7 @@
       <workItem from="1694484196586" duration="6000" />
       <workItem from="1702080639496" duration="1923000" />
       <workItem from="1702082708853" duration="4257000" />
+      <workItem from="1702401585572" duration="5180000" />
     </task>
     <servers />
   </component>
