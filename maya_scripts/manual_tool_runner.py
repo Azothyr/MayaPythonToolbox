@@ -169,8 +169,12 @@ if __name__ == "__main__":
     obj = "spine_01".capitalize()
     rem_obj = ckecker_obj(ckecker_obj("", obj), None)
 
-    run_tool(obj, mode="tool")
+    # run_tool(obj, mode="tool")
     #run_tool(obj, mode="select")
     # run_tool(obj, mode="rem")
 
     debug(f"{'-' * 25 + '|' + ' ' * 4} COMPLETED {module_name()}  DUNDER MAIN {' ' * 4 + '|' + '-' * 25}\n")
+    # , "DistantShotShape.renderable"
+    print(cmds.listConnections("DistantShotShape.renderable"))
+    cmds.disconnectAttr("EstShot_Renderable_DistantShotShape_rnd", "defaultRenderLayer")
+    print(cmds.listConnections("DistantShotShape.renderable"))
