@@ -1,6 +1,14 @@
 import maya.cmds as cmds
 
 
+def create_attr(node, attr_name, attr_type="float", min_val=0, max_val=1, default_val=0):
+    if not cmds.attributeQuery(attr_name, node=node, exists=True):
+        cmds.addAttr(node, longName=attr_name, attributeType=attr_type, defaultValue=default_val, minValue=min_val,
+                     maxValue=max_val, keyable=True)
+    else:
+        raise RuntimeError(f"Attribute {attr_name} already exists on {node}")
+
+
 def check_attr_exists(_attr):
     if cmds.objExists(_attr):
         return True

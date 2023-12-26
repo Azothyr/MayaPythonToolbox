@@ -1,0 +1,3 @@
+//string $sel[] = `ls -sl`;
+//string $influences[] = `skinCluster -q -inf (findRelatedSkinCluster($sel[0]))`;
+select -r $influences;

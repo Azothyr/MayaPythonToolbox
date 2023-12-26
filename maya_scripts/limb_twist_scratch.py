@@ -393,29 +393,30 @@ class LimbTwistManager:
             mult_div = cmds.shadingNode('multiplyDivide', name=f"{name}_Twist_Falloff_MD", asUtility=True)
         cmds.setAttr(f"{mult_div}.operation", 1)
 
-        if count == 1:
-            if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1X"):
-                cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1X", force=True)
-            cmds.setAttr(f"{mult_div}.input2X", 0.5)
+        match count:
+            case 1:
+                if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1X"):
+                    cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1X", force=True)
+                cmds.setAttr(f"{mult_div}.input2X", 0.5)
 
-        elif count == 2:
-            cmds.setAttr(f"{mult_div}.input2X", 0.33)
-            cmds.setAttr(f"{mult_div}.input2Y", 0.66)
-            if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1X"):
-                cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1X", force=True)
-            if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1Y"):
-                cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1Y", force=True)
+            case 2:
+                cmds.setAttr(f"{mult_div}.input2X", 0.33)
+                cmds.setAttr(f"{mult_div}.input2Y", 0.66)
+                if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1X"):
+                    cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1X", force=True)
+                if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1Y"):
+                    cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1Y", force=True)
 
-        else:
-            if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1X"):
-                cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1X", force=True)
-            if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1Y"):
-                cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1Y", force=True)
-            if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1Z"):
-                cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1Z", force=True)
-            cmds.setAttr(f"{mult_div}.input2X", 0.5)
-            cmds.setAttr(f"{mult_div}.input2Y", 0.25)
-            cmds.setAttr(f"{mult_div}.input2Z", 0.75)
+            case 3:
+                if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1X"):
+                    cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1X", force=True)
+                if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1Y"):
+                    cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1Y", force=True)
+                if not cmds.isConnected(f"{aim_loc}.rotateX", f"{mult_div}.input1Z"):
+                    cmds.connectAttr(f"{aim_loc}.rotateX", f"{mult_div}.input1Z", force=True)
+                cmds.setAttr(f"{mult_div}.input2X", 0.5)
+                cmds.setAttr(f"{mult_div}.input2Y", 0.25)
+                cmds.setAttr(f"{mult_div}.input2Z", 0.75)
 
         for i in range(count):
             percent = int(100 / (count + 1)) * (i + 1)
