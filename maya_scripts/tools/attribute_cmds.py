@@ -1,4 +1,5 @@
 from maya import cmds
+from managers.maya_exist_manager import Main as ex
 
 
 class RemoveBase:
@@ -6,18 +7,13 @@ class RemoveBase:
         self.obj = obj
         self.attr = attr if isinstance(attr, list) else [attr]
 
-    def remove_attrs(self, obj, attrs: list[str] = None):
+    @staticmethod
+    def remove_attrs(obj, attrs: list[str] = None):
         for attr in attrs:
-            if self.attr_exists(obj, attr):
+            if ex(obj, a=attr):
                 cmds.deleteAttr(f'{obj}.{attr}')
             else:
                 print(f'Attribute {attr} does not exist on {obj}.')
-
-    @staticmethod
-    def attr_exists(obj, attr: str = None):
-        if cmds.attributeQuery(attr, node=obj, exists=True):
-            return True
-        return False
 
 
 class RemoveAdvanced(RemoveBase):

@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/maya_scripts/tools/constraint_cmds.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/constraint_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/constraint_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/display_layer_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/display_layer_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/constrain_cmds.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/constraint_removal.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/tools/constraint_removal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/attribute_cmds.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/tools/attribute_cmds.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/constraint_removal.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +96,7 @@
       <workItem from="1702082708853" duration="4257000" />
       <workItem from="1702401585572" duration="5180000" />
       <workItem from="1703745945075" duration="3283000" />
-      <workItem from="1703781430481" duration="7750000" />
+      <workItem from="1703781430481" duration="9909000" />
     </task>
     <servers />
   </component>
