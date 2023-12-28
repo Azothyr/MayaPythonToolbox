@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from maya_scripts.tools import layer_control, joint_axis_vis_toggle, constrain_cmds, history_cmds, parent_cmds
+from maya_scripts.tools import layer_cmds, joint_axis_vis_toggle, constraint_cmds, history_cmds, parent_cmds
 from maya_scripts.components.window_base import WindowBase as Window
 
 
@@ -15,7 +15,7 @@ def layer_cmds_ui(_parent_ui, tool):
 
     def on_execute(*_):
         add_to = cmds.textField(layer_name_input, query=True, text=True)
-        layer_control.add_to_layer(add_to, cmds.ls(sl=True))
+        layer_cmds.add_to_layer(add_to, cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Add To Layer", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return layer_cmds_tab
@@ -43,7 +43,7 @@ def parent_scale_ui(_parent_ui, tool):
     cmds.text(l="Parent, Scale constrain between every other selected objects", p=f'{tool}_top_row')
 
     def on_execute(*_):
-        constrain_cmds.parent_scale_constrain(cmds.ls(sl=True))
+        constraint_cmds.parent_scale_constrain(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Parent and Scale", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return parent_scale_tab
@@ -79,7 +79,7 @@ def freeze_del_history_ui(_parent_ui, tool):
     cmds.text(l="Freeze the transformations and delete history of selected objects", p=f'{tool}_top_row')
 
     def on_execute(*_):
-        modify_history.freeze_delete(cmds.ls(sl=True))
+        history_cmds.freeze_delete(cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Freeze and Delete History", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return freeze_tab

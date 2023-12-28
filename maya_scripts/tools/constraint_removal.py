@@ -1,8 +1,6 @@
 import maya.cmds as cmds
-# from utilities.factory.meta_classes.plugin_registry_factory.plugin_meta_factory import PluginRegistryMeta
 
 
-# class ConstraintRemoval(metaclass=PluginRegistryMeta):
 class Removal:
     @staticmethod
     def remove_attrs(obj, attrs: list = None):

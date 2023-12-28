@@ -4,7 +4,7 @@ if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' in sys.path:
 if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
     sys.path.append('/')
 import maya.cmds as cmds
-from tools.constraint_removal import Removal
+from managers.constraint_manager import Main as constraint_manager
 
 
 class ControlGroup:
@@ -192,7 +192,7 @@ class BrokenFkManager:
 
     def run(self, clean=False, controls=True, joints=True):
         if clean:
-            Removal.remove_all_constraints()
+            constraint_manager(mode="r", )
         sorted_controls = [ControlGroup(control) for control in self.unsorted_selection]
         constraint_order = self.create_constraint_order(sorted_controls)
         control_map = {cg.control: cg for cg in sorted_controls}

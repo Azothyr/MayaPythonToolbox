@@ -5,17 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya_scripts/tools/constraint_cmds.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/add_to_layer_preserve_color.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/joint_to_mesh_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/joint_to_mesh_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/base_maya_objects/joint_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/maya_objects/joint_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/constraint_management/constraint_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/constraint_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/constraint_management/constraint_removal.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/tools/constraint_removal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/rk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/rk_manager_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/layer_control.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/constraint_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/constraint_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/display_layer_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/display_layer_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/constrain_cmds.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/constraint_removal.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/tools/constraint_removal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,24 +48,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "MayaCharm.Maya.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/zacst/Documents/MayaPythonToolbox",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "settings.MayaSdkConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;MayaCharm.Maya.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/zacst/Documents/MayaPythonToolbox&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.MayaSdkConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\managers" />
@@ -87,7 +84,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-67fca87a943a-c986f194a52a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.11799.259" />
+        <option value="bundled-python-sdk-7a29c1521ef0-c986f194a52a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.11799.298" />
       </set>
     </attachedChunks>
   </component>
@@ -104,6 +101,7 @@
       <workItem from="1702082708853" duration="4257000" />
       <workItem from="1702401585572" duration="5180000" />
       <workItem from="1703745945075" duration="3283000" />
+      <workItem from="1703781430481" duration="7750000" />
     </task>
     <servers />
   </component>

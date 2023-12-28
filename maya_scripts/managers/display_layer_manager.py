@@ -15,7 +15,7 @@ def print_if_allowed(message, allow=False):
 
 
 class Main(LayerCmds):
-    def __init__(self, mode):
+    def __init__(self, mode: str = None, **kwargs):
         match mode.lower():
             case "geo": self.set_geo_layer()
             case "joint": self.set_joint_layer()
