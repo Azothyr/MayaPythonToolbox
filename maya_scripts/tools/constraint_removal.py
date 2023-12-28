@@ -3,7 +3,7 @@ import maya.cmds as cmds
 
 
 # class ConstraintRemoval(metaclass=PluginRegistryMeta):
-class ConstraintRemoval:
+class Removal:
     @staticmethod
     def remove_attrs(obj, attrs: list = None):
         clean_attrs = ['FollowTranslate', 'FollowRotate'] if attrs is None else attrs
@@ -15,8 +15,8 @@ class ConstraintRemoval:
     def remove_from_all_ctrls():
         controls = [x for x in cmds.ls(type="transform") if x.lower().endswith("_ctrl")]
         for ctrl in controls:
-            ConstraintRemoval.remove_attrs(ctrl)
-            ConstraintRemoval.remove_from_hierarchy([ctrl])
+            Removal.remove_attrs(ctrl)
+            Removal.remove_from_hierarchy([ctrl])
 
     @staticmethod
     def remove_from_hierarchy(selection=None):
@@ -24,7 +24,7 @@ class ConstraintRemoval:
             selection = cmds.ls(sl=True) if cmds.ls(sl=True) else\
                 [x for x in cmds.ls(type="transform") if x.lower().endswith("_ctrl")]
         for node in selection:
-            ConstraintRemoval._recursive_removal_from_hierarchy(node)
+            Removal._recursive_removal_from_hierarchy(node)
 
     @staticmethod
     def _recursive_removal_from_hierarchy(_node):
@@ -36,18 +36,18 @@ class ConstraintRemoval:
         children = cmds.listRelatives(_node, children=True, fullPath=True)
         if children:
             for child in children:
-                ConstraintRemoval._recursive_removal_from_hierarchy(child)
+                Removal._recursive_removal_from_hierarchy(child)
 
     @staticmethod
     def remove_all_constraints():
         for constraint in cmds.ls(type='constraint'):
             cmds.delete(constraint)
-        ConstraintRemoval.remove_from_all_ctrls()
+        Removal.remove_from_all_ctrls()
 
     @staticmethod
     def remove_constraints_from_object(object_name, attrs=None):
         # Clean attributes from the object
-        ConstraintRemoval.remove_attrs(object_name, attrs)
+        Removal.remove_attrs(object_name, attrs)
 
         # List all the constraints on the object
         constraints = cmds.listRelatives(object_name, type='constraint')

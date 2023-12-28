@@ -8,13 +8,26 @@
       <change beforePath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/manual_tool_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/manual_tool_runner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/weight_paint_time_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/weight_paint_time_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/add_to_layer_preserve_color.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/joint_to_mesh_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/joint_to_mesh_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/base_maya_objects/joint_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/maya_objects/joint_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/constraint_management/constraint_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/managers/constraint_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/managers/constraint_management/constraint_removal.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/tools/constraint_removal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/rk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/rk_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/tools/layer_control.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -31,6 +44,9 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="2VHDcfJRGUVmn6KSl7WZQSOHfYN" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -43,7 +59,7 @@
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/GitRepos/MayaPythonToolbox/maya_scripts/manual_tool_runner.py",
+    "last_opened_file_path": "C:/Users/zacst/Documents/MayaPythonToolbox",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -53,6 +69,12 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\managers" />
+      <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\tools" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="Maya" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION">
       <option name="executionType" value="FILE" />
@@ -81,6 +103,7 @@
       <workItem from="1702080639496" duration="1923000" />
       <workItem from="1702082708853" duration="4257000" />
       <workItem from="1702401585572" duration="5180000" />
+      <workItem from="1703745945075" duration="3283000" />
     </task>
     <servers />
   </component>

@@ -6,7 +6,7 @@ if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
 import maya.cmds as cmds
 from pprint import pprint
 import re
-from managers.base_maya_objects.joint_manager import JointManager
+from managers.maya_objects.joint_manager import JointManager
 
 
 def get_part_names(data):

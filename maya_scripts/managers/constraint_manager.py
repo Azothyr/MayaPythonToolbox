@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 
 
-class ConstraintManager:
+class Main:
     def __init__(self, name: str, leader: object, follower: object, constraint_type: str):
         self.name = name
         self.leader = leader

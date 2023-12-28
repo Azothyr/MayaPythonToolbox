@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from managers.base_maya_objects.joint_manager import JointManager
+from managers.maya_objects.joint_manager import JointManager
 
 
 class RkManager:
