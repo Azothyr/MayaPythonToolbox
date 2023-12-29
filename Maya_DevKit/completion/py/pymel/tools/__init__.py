@@ -2,10 +2,10 @@
 Tool Modules
 ------------
 
-  - `pymel.tools.loggingControl`
-  - `pymel.tools.mel2py`
-  - `pymel.tools.py2mel`
-  - `pymel.tools.envparse`
+  - `pymel.components.loggingControl`
+  - `pymel.components.mel2py`
+  - `pymel.components.py2mel`
+  - `pymel.components.envparse`
 """
 
 

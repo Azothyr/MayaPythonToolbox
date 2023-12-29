@@ -1686,7 +1686,7 @@ def disable(*args, **kwargs):
 def XgmSetSelectBrushToolOption(*args, **kwargs): pass
 def saveToolSettings(*args, **kwargs):
     """
-    This command causes all the tools not on the shelf to save their settings as
+    This command causes all the components not on the shelf to save their settings as
     optionVars.  This is called automatically by the system when Maya exits.
     
     
@@ -2684,7 +2684,7 @@ def createPolyCylinderCtx(*args, **kwargs):
     pass
 def renderThumbnailUpdate(*args, **kwargs):
     """
-    Toggle the updating of object thumbnails. These are visible in tools like the
+    Toggle the updating of object thumbnails. These are visible in components like the
     Attribute Editor and Hypershade. All thumbnails everywhere will not update to
     reflect changes to the object until this command is used to toggle to true
     unless a specific thumbnail is forced to render using the -forceUpdate flag. In
@@ -16414,7 +16414,7 @@ def selectPref(*args, **kwargs):
         surface in the current camera view.
     
     - xformNoSelect : xns            (bool)          [create,query]
-        Disable selection in xform tools                  Flag can have multiple
+        Disable selection in xform components                  Flag can have multiple
         arguments, passed either as a tuple or a list.
     
     
@@ -20462,7 +20462,7 @@ def lookThru(*args, **kwargs):
     """
     This command sets a particular camera to look through in a view. This command
     may also be used to view the negative z axis of lights or other DAG objects. The
-    standard camera tools can then be used to place the object. Note: if there are
+    standard camera components can then be used to place the object. Note: if there are
     multiple objects under the transform selected, cameras and lights take
     precedence. In query mode, return type is based on queried flag.
     
@@ -30515,7 +30515,7 @@ def artBuildPaintMenu(*args, **kwargs):
 def sculptTarget(*args, **kwargs):
     """
     This command is used to specify the blend shape target to be modified by the
-    sculpting tools and transform manipulators.
+    sculpting components and transform manipulators.
     
     Flags:
     - after : af                     (bool)          [create,edit]
@@ -30570,7 +30570,7 @@ def sculptTarget(*args, **kwargs):
     
     - inbetweenWeight : ibw          (float)         [edit]
         Specifies the in between target weight of the blend shape node that will be made
-        editable by the sculpting and transform tools.
+        editable by the sculpting and transform components.
     
     - includeHiddenSelections : ihs  (bool)          [create]
         Apply the deformer to any visible and hidden objects in the selection list.
@@ -30612,7 +30612,7 @@ def sculptTarget(*args, **kwargs):
     
     - target : t                     (int)           [edit]
         Specifies the target index of the blend shape node that will be made editable by
-        the sculpting and transform tools.                  Flag can have multiple
+        the sculpting and transform components.                  Flag can have multiple
         arguments, passed either as a tuple or a list.
     
     
@@ -30777,7 +30777,7 @@ def listSets(*args, **kwargs): pass
 def xformConstraint(*args, **kwargs):
     """
     This command allows you to change the transform constraint used by the transform
-    tools during component transforms.              In query mode, return type is
+    components during component transforms.              In query mode, return type is
     based on queried flag.
     
     Flags:
@@ -39935,26 +39935,26 @@ def artAttrTool(*args, **kwargs):
     """
     The artAttrTool command manages the list of tool types which are         used
     for attribute painting. This command supports querying the         list contents
-    as well as adding new tools to the list. Note that         there is a set of
-    built-in tools. The list of built-ins can         be queried by starting Maya
-    and doing an artAttrTool -q. The tools which are managed by this command are all
+    as well as adding new components to the list. Note that         there is a set of
+    built-in components. The list of built-ins can         be queried by starting Maya
+    and doing an artAttrTool -q. The components which are managed by this command are all
     intended for         attribute painting via Artisan: when you create a new
     context via         artAttrCtx you specify the tool name via artAttrCtx's
     -whichToolflag. Typically the user may wish to simply use one of the built-in
-    tools. However, if you need to have custom Properties and Values sheets
+    components. However, if you need to have custom Properties and Values sheets
     asscociated with your tool, you will need to define a custom tool         via
     artAttrTool -add toolName. For an example of a custom         attribute painting
     tool, see the devkit example customtoolPaint.mel.           In query mode,
     return type is based on queried flag.
     
     Flags:
-    - add : string                   (Adds the named tool to the internal list of tools.) [create]
+    - add : string                   (Adds the named tool to the internal list of components.) [create]
     
     - exists : ex                    (unicode)       [create,query]
         Checks if the named tool exists, returning true if found, and false otherwise.
     
     - remove : rm                    (unicode)       [create]
-        Removes the named tool from the internal list of tools.
+        Removes the named tool from the internal list of components.
         Flag can have multiple arguments, passed either as a tuple or a list.
     
     

@@ -191,7 +191,7 @@ def melInfo(input):
     """
     Get information about procedures in a mel file.
     
-        >>> import pymel.tools.mel2py as mel2py
+        >>> import pymel.components.mel2py as mel2py
         >>> mel2py.melInfo('attributeExists')
         (['attributeExists'], {'attributeExists': {'returnType': 'int', 'args': [('string', '$attr'), ('string', '$node')]}}, {})
     
@@ -262,7 +262,7 @@ def mel2pyStr(data, currentModule='None', pymelNamespace="''", forceCompatibilit
     """
     convert a string representing mel code into a string representing python code
     
-        >>> import pymel.tools.mel2py as mel2py
+        >>> import pymel.components.mel2py as mel2py
         >>> print mel2py.mel2pyStr('paneLayout -e -configuration "top3" test;')
         from pymel.all import *
         paneLayout('test',configuration="top3",e=1)

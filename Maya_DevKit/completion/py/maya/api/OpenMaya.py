@@ -2908,7 +2908,7 @@ class MRichSelection(object):
         getSymmetryPlane(MDagPath, space) -> MPlane
         
         Returns the plane of symmetry, in the specified transformation space
-        (see MSpace). This can be used to enforce seam weights in tools that
+        (see MSpace). This can be used to enforce seam weights in components that
         support symmetry. Note that the direction of the plane carries no
         significance. Specifically, having a positive offset from the plane
         does not imply a point is part of the non-symmetric selection.
@@ -20942,7 +20942,7 @@ class MPxSurfaceShape(MPxNode):
         transformUsing(matrix, componentList, cachingMode=None, pointCache=None) -> self
         
         Transform the given components using the specified transformation matrix.
-        This method should be overridden if the shape supports components that can be transformed using maya's move, scale, and rotate tools.
+        This method should be overridden if the shape supports components that can be transformed using maya's move, scale, and rotate components.
         
         * matrix (MMatrix) - the matrix representing the transformation that is to be applied to the components
         * componentList (MObjectArray) - a list of components to be transformed. If the list is empty, it indicates that every point in the geometry should be transformed.
@@ -20962,7 +20962,7 @@ class MPxSurfaceShape(MPxNode):
         tweakUsing(matrix, componentList, cachingMode, pointCache, handle) -> self
         
         Transform the given components using the specified transformation matrix.
-        This method should be overridden if the shape supports components that can be transformed using maya's move, scale, and rotate tools. This method is called when the shape has history & connected to a tweak node. The most common reason why the shape would be connected to a tweak node is if it is being deformed. When a shape is connected to a tweak node, transformations applied to the points are placed in the tweak node rather than in the shape itself.
+        This method should be overridden if the shape supports components that can be transformed using maya's move, scale, and rotate components. This method is called when the shape has history & connected to a tweak node. The most common reason why the shape would be connected to a tweak node is if it is being deformed. When a shape is connected to a tweak node, transformations applied to the points are placed in the tweak node rather than in the shape itself.
         
         * matrix (MMatrix) - the matrix representing the transformation that is to be applied to the components
         * componentList (MObjectArray) - a list of components to be tranformed. If the list is empty, it indicates that every point in the geometry should be transformed.
@@ -21030,7 +21030,7 @@ class MPxSurfaceShape(MPxNode):
         weightedTweakUsing(xform, space, componentList, cachingMode, pointCache, freezePlane, handle) -> self
         
         Transform the given components with interpolation using the specified transformation matrix.
-        This method is called for transforming components using maya's move, scale, and rotate tools when the shape has history and is connected to a tweak node. The most common reason why the shape would be connected to a tweak node is if it is being deformed. When a shape is connected to a tweak node, transformations applied to the points are placed in the tweak node rather than in the shape itself.
+        This method is called for transforming components using maya's move, scale, and rotate components when the shape has history and is connected to a tweak node. The most common reason why the shape would be connected to a tweak node is if it is being deformed. When a shape is connected to a tweak node, transformations applied to the points are placed in the tweak node rather than in the shape itself.
         
         If not overridden, then a default implementation will be used to perform the transformation and interpolation.
         The default implementation calls setPoint() for each transformed point.

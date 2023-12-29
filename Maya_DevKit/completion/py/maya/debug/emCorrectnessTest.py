@@ -104,7 +104,7 @@ class EMCorrectnessContext(object):
         pass
     def __init__(self):
         """
-        Create the evaluator managers and remember the desired configuration values
+        Create the evaluator core and remember the desired configuration values
         """
         pass
     @staticmethod

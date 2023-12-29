@@ -1,6 +1,6 @@
 """
 These are utilities to interact with Maya.  They give basic building blocks to
-wrap simple operations in easier-to-use tools.
+wrap simple operations in easier-to-use components.
 
 These can be used inside Maya and MayaLT.
 """

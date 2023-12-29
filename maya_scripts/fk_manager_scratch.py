@@ -1,10 +1,5 @@
-import sys
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' in sys.path:
-    sys.path.remove('/')
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
-    sys.path.append('/')
 import maya.cmds as cmds
-from managers.constraint_manager import Main as constraint_manager
+from core.constrainer import Main as constraint_manager
 
 
 class ControlGroup:

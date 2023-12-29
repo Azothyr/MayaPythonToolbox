@@ -1,5 +1,5 @@
 import unittest
-from maya_scripts.utilities.global_var import GlobalVar
+from utilities.global_var import GlobalVar
 
 
 class TestGlobalVar(unittest.TestCase):

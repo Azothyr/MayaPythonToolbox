@@ -43,7 +43,7 @@ def py2melCmd(pyObj, commandName='None', register='True', includeFlags='None', e
             return first + ' ' + last
     
         import pymel as pm
-        from pymel.tools.py2mel import py2melCmd
+        from pymel.components.py2mel import py2melCmd
         cmd = py2melCmd( makeName, 'makeNameCmd' )
         pm.makeNameCmd( 'Homer', 'Simpson')
         # Result: Homer Simpson #
@@ -164,7 +164,7 @@ def py2melProc(function, returnType='None', procName='None', evaluateInputs='Tru
         you to pass a more complex python objects as an argument. For example:
     
         In python:
-            >>> import pymel.tools.py2mel as py2mel
+            >>> import pymel.components.py2mel as py2mel
             >>> def myFunc( arg ):
             ...    for x in arg:
             ...       print x

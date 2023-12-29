@@ -2445,7 +2445,7 @@ class MFrameContext(object):
         userChangingViewContext() -> bool
         
         Returns True during any interactive refresh, as when user is    changing the view using view context
-        tools such as tumble, dolly or track.
+        components such as tumble, dolly or track.
         """
         pass
     @staticmethod

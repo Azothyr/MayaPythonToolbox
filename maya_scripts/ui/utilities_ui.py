@@ -1,6 +1,6 @@
 import maya.cmds as cmds
-from maya_scripts.tools import layer_cmds, joint_axis_vis_toggle, constraint_cmds, history_cmds, parent_cmds
-from maya_scripts.components.window_base import WindowBase as Window
+from core.components import display_layer, joint_axis_vis_toggle, constraint_cmds, history_cmds, parent_cmds
+from ui.components.window_base import WindowBase as Window
 
 
 def layer_cmds_ui(_parent_ui, tool):
@@ -15,7 +15,8 @@ def layer_cmds_ui(_parent_ui, tool):
 
     def on_execute(*_):
         add_to = cmds.textField(layer_name_input, query=True, text=True)
-        layer_cmds.add_to_layer(add_to, cmds.ls(sl=True))
+        print("CURRENTLY BROKEN")
+        # display_layer.add_to_layer(add_to, cmds.ls(sl=True))
 
     cmds.button(f'{tool}_button', l="Add To Layer", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
     return layer_cmds_tab
@@ -88,7 +89,7 @@ def freeze_del_history_ui(_parent_ui, tool):
 def _setup_ui(_parent_ui):
     main_layout = cmds.formLayout('util_form', p=_parent_ui)
 
-    # Create each UI for tools
+    # Create each UI for components
     layer_cmd_ui = layer_cmds_ui(main_layout, 'layer_cmds')
     axis_visibility_ui_elem = axis_visibility_ui(main_layout, 'axis_visibility')
     constrain_ui_elem = parent_scale_ui(main_layout, 'constrain')
@@ -131,7 +132,7 @@ def create_ui_window(manual_run=False):
 
     main_layout = cmds.formLayout('main_layout')
 
-    # Create each UI for tools
+    # Create each UI for components
     layer_cmd_ui = layer_cmds_ui(main_layout, 'layer_cmds')
     axis_visibility_ui_elem = axis_visibility_ui(main_layout, 'axis_visibility')
     constrain_ui_elem = parent_scale_ui(main_layout, 'constrain')

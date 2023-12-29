@@ -1,16 +1,16 @@
 import unittest
 import maya.cmds as cmds
 import os
-from maya_scripts.utilities.arg_map_utils import refresh_arg_lib
-from maya_scripts.utilities.arg_lib_reader import LibReader
-from maya_scripts.components.window_base import WindowBase as Win
-from maya_scripts.components.button_base import ButtonBase as Button
-from maya_scripts.components.optionMenu_base import OptionMenuBase as OpMenu
-from maya_scripts.components.menuItem_base import MenuItemBase as MItem
-from maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase as RCLay
-from maya_scripts.components.tabLayout_base import TabLayoutBase as TabLay
-from maya_scripts.components.text_base import TextBase as Txt
-from maya_scripts.components.textField_base import TextFieldBase as TxtF
+# from utilities.arg_map_utils import refresh_arg_lib
+from utilities.arg_lib_reader import LibReader
+from ui.components.window_base import WindowBase as Win
+from ui.components.button_base import ButtonBase as Button
+from ui.components.optionMenu_base import OptionMenuBase as OpMenu
+from ui.components.menuItem_base import MenuItemBase as MItem
+from ui.components.rowColumnLayout_base import RowColumnLayoutBase as RCLay
+from ui.components.tabLayout_base import TabLayoutBase as TabLay
+from ui.components.text_base import TextBase as Txt
+from ui.components.textField_base import TextFieldBase as TxtF
 
 
 def perform_maya_test():

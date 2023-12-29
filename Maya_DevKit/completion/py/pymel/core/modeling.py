@@ -3928,7 +3928,7 @@ def subdiv(*args, **kwargs):
         When queried, this flag returns an integer representing whether or not the
         subdivision surface is in polygon proxymode. Proxymode allows the base mesh of a
         subdivision surface without construction history to be edited using the
-        polygonal editing tools. Returns 1, if the subdivision surface is in polygon
+        polygonal editing components. Returns 1, if the subdivision surface is in polygon
         proxymode. Returns 0, if the surface is not currently in proxymode, but could be
         put into proxymode since it has no construction history.  (This state is also
         known as standardmode.) Returns 2, if the surface is not in proxymode and cannot
@@ -8607,8 +8607,8 @@ def polyPinUV(*args, **kwargs):
     This command is used to pin and unpin UVs. A pinnedUV is one which should not be
     modified.  Each UV has an associated pin weight, that defaults to 0.0 meaning
     that the UV is not pinned. If pin weight is set to 1.0 then it becomes fully
-    pinned and UV tools should not modify that UV. If the pin weight is set to a
-    value between 0.0 and 1.0 then UV tools should weight their changes to that UV
+    pinned and UV components should not modify that UV. If the pin weight is set to a
+    value between 0.0 and 1.0 then UV components should weight their changes to that UV
     accordingly.  UV pinning is not enforced by the shape node: it is up to each
     tool to decide whether it will obey the pin weights.
     

@@ -1,14 +1,8 @@
-import sys
-
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' in sys.path:
-    sys.path.remove('C:/GitRepos/MayaPythonToolbox/maya_scripts')
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
-    sys.path.append('C:/GitRepos/MayaPythonToolbox/maya_scripts')
 import maya.cmds as cmds
 from pprint import pprint
 # import re
 # from weight_paint_time_scratch import WeightPaintHelper
-from tools.xform_handler import XformHandler
+from components.xform_handler import XformHandler
 
 debug_bool = False
 

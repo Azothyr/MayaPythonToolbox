@@ -25,7 +25,7 @@ if False:
 
 class SubsectionTools(EvaluationToolkitSubsection):
     """
-    Class managing the "tools" subsection of the debugging section.
+    Class managing the "components" subsection of the debugging section.
     It will contain trace objects and buttons to launch windows.
     
     :member checkbox_traces: Checkbox widgets for the trace object controls
@@ -306,7 +306,7 @@ class EvaluationToolkitSectionDebugging(EvaluationToolkitSection):
     
     def __init__(self, title, start_closed, get_graphviz_manager):
         """
-        Set up the framework for the debugging tools
+        Set up the framework for the debugging components
         :param title: Name of the main debugging section
         :param start_closed: True means the section should be initially closed when the UI window is created
         :param get_graphviz_manager: Callback to retrieve a GraphVizManager for use in DOT/PDF file generation

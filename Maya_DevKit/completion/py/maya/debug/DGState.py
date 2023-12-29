@@ -1,7 +1,7 @@
 """
 Utility to contain the DG state information captured by a correctness
 analysis. It reads the information from a file and provides analysis
-tools, such as comparison.
+components, such as comparison.
 
 State information is in JSON format for easy storage, parsing, and comparison.
 Data is stored in a method that provides a parsing clue for what types of

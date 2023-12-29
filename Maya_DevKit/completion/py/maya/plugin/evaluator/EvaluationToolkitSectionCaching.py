@@ -42,7 +42,7 @@ class EvaluationToolkitSectionCaching(EvaluationToolkitSection, CacheUiBase):
     
     def __init__(self, title, start_closed):
         """
-        Set up the framework for the caching tools
+        Set up the framework for the caching components
         :param title: Name of the main caching section
         :param start_closed: True means the section should be initially closed when the UI window is created
         """

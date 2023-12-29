@@ -2,8 +2,6 @@ import textwrap
 import os
 import importlib.util
 from pathlib import Path
-from script_tools.utils.file_ops.file_basic_ops import write_to_file
-from script_tools.utils.file_ops.file_path_ops import get_file_path_from_lib as get_path
 
 
 def _load_map_from_file_path(file_path):
@@ -103,21 +101,22 @@ def translate_for_kwargs(arg_map, kwargs):
     return translated_kwargs
 
 
-def refresh_arg_lib():
-    print("preparing to refresh Arg Library")
-    arg_lib_path = Path
-    arg_maps = Path.read_text(Path.home() / "Documents" / "custom_scripts" / "arg_maps" / "arg_maps.txt")
-    lines_to_write = ["import os",
-                      "from azothyr_tools.functions.file_tools import get_file_path_from_lib as get_path\n",
-                      f"base_path = get_path(maya_info=True)",
-                      "arg_lib = {"]
-    for key, value in arg_maps:
-        lines_to_write.append(f"\t'{key}': {value},")
-    lines_to_write.append("}")
-
-    Path.write_text("\n".join(lines_to_write)
-    return "Completed library refresh"
+# def refresh_arg_lib():
+#     print("preparing to refresh Arg Library")
+#     arg_lib_path = Path
+#     arg_maps = Path.read_text(Path.home() / "Documents" / "custom_scripts" / "arg_maps" / "arg_maps.txt")
+#     lines_to_write = ["import os",
+#                       "from azothyr_tools.functions.file_tools import get_file_path_from_lib as get_path\n",
+#                       f"base_path = get_path(maya_info=True)",
+#                       "arg_lib = {"]
+#     for key, value in arg_maps:
+#         lines_to_write.append(f"\t'{key}': {value},")
+#     lines_to_write.append("}")
+#
+#     Path.write_text("\n".join(lines_to_write))
+#     return "Completed library refresh"
 
 
 if __name__ == "__main__":
-    refresh_arg_lib()
+    # refresh_arg_lib()
+    pass

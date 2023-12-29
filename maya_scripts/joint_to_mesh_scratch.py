@@ -1,12 +1,7 @@
-import sys
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' in sys.path:
-    sys.path.remove('/')
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
-    sys.path.append('/')
 import maya.cmds as cmds
 from pprint import pprint
 import re
-from managers.maya_objects.joint_manager import JointManager
+from core.maya_objects.joint_manager import JointManager
 
 
 def get_part_names(data):

@@ -1,8 +1,6 @@
 __all__ = [
-    "components",
     "config",
-    "managers",
-    "tools",
+    "core",
     "ui",
     "utilities",
 ]

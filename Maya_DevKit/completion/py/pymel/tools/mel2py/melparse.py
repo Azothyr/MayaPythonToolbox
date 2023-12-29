@@ -840,7 +840,7 @@ NON_COMMENT_LINE_RE = None
 
 tokens = ()
 
-tag = '# script created by pymel.tools.mel2py'
+tag = '# script created by pymel.components.mel2py'
 
 reserved = set()
 

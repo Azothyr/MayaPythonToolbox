@@ -1,15 +1,15 @@
-from maya_scripts.tools import control_creator as control_tool
-from maya_scripts.tools import color_changer as color_tool
-from maya_scripts.components.color_library import ColorIndex as ColorLib
-from maya_scripts.components.window_base import WindowBase as Window
-from maya_scripts.components.button_base import ButtonBase as Button
-from maya_scripts.components.optionMenu_base import OptionMenuBase as OptionMenu
-from maya_scripts.components.menuItem_base import MenuItemBase as MenuItem
-from maya_scripts.components.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
-from maya_scripts.components.tabLayout_base import TabLayoutBase as TabLayout
-from maya_scripts.components.text_base import TextBase as Text
-from maya_scripts.components.textField_base import TextFieldBase as TextField
-from maya_scripts.components.columnLayout_base import ColumnLayoutBase as ColLayout
+from core.components import control_creator as control_tool
+from core.components import color_changer as color_tool
+from core.components.color_library import ColorIndex as ColorLib
+from ui.components.window_base import WindowBase as Window
+from ui.components.button_base import ButtonBase as Button
+from ui.components.optionMenu_base import OptionMenuBase as OptionMenu
+from ui.components.menuItem_base import MenuItemBase as MenuItem
+from ui.components.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
+from ui.components.tabLayout_base import TabLayoutBase as TabLayout
+from ui.components.text_base import TextBase as Text
+from ui.components.textField_base import TextFieldBase as TextField
+from ui.components.columnLayout_base import ColumnLayoutBase as ColLayout
 
 
 def _ui_setup(parent_ui, tool):

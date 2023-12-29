@@ -443,7 +443,7 @@ def qruiGetCharacter(tool):
     """
     ###############################################################################
     #                                                                             #
-    #  Quick Rig UI utility tools (methods and classes)                           #
+    #  Quick Rig UI utility components (methods and classes)                           #
     #                                                                             #
     #  These are very specific to the way the QuickRig UI is built.               #
     #                                                                             #

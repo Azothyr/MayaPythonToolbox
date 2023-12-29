@@ -50,7 +50,7 @@ class CacheCorrectnessContext(object):
         pass
     def __init__(self, mode, cache_timeout):
         """
-        Create the evaluator managers and remember the desired configuration values
+        Create the evaluator core and remember the desired configuration values
         """
         pass
     def __str__(self):

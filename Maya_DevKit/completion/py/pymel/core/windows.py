@@ -18143,18 +18143,18 @@ def toolButton(*args, **kwargs):
     new tool will simply override the previous attached tool.  If you use the
     amt/allowMultipleToolsflag then you will be able to attach more than one tool
     with this control.  Only one tool will be current within the control.  To access
-    the other tools press the right mouse button to display a popup menu containing
-    all the tools associated with this control.  If you set the
+    the other components press the right mouse button to display a popup menu containing
+    all the components associated with this control.  If you set the
     piv/popupIndicatorVisibleflag then a small arrow will be drawn on the control to
-    indicate that additional tools are attached to this control.
+    indicate that additional components are attached to this control.
     
     Flags:
     - allowMultipleTools : amt       (bool)          [create,query]
         Indicates whether this control will allow you to attach more than one tool.  By
-        default, this control accepts only one tool. You can add multiple tools by
+        default, this control accepts only one tool. You can add multiple components by
         setting this flag to true. Only one tool will be current and displayed at any
         one time. Use the pop up menu attached to the right mouse button to view all the
-        tools.
+        components.
     
     - annotation : ann               (unicode)       [create,query,edit]
         Annotate the control with an extra string value.
@@ -18333,11 +18333,11 @@ def toolButton(*args, **kwargs):
         more than one tool.
     
     - toolArray : ta                 (bool)          [query]
-        This query only flag returns the names of all the tools attached to the
+        This query only flag returns the names of all the components attached to the
         toolButton control.
     
     - toolCount : tc                 (bool)          [query]
-        This query only flag return the number of tools attached to the toolButton
+        This query only flag return the number of components attached to the toolButton
         control.
     
     - toolImage1 : ti1               (unicode, unicode) [create,query,edit]

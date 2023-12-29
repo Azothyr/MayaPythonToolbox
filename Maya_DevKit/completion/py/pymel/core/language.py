@@ -226,7 +226,7 @@ class Mel(object):
             When set to 'python', the source command will look for the
             python equivalent of this mel file, if it exists, and attempt
             to import it. This is particularly useful when transitioning
-            from mel to python via `pymel.tools.mel2py`, with this simple
+            from mel to python via `pymel.components.mel2py`, with this simple
             switch you can change back and forth from sourcing mel to
             importing python.
         """

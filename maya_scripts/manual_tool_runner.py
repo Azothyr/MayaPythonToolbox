@@ -1,9 +1,4 @@
-import sys
 
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' in sys.path:
-    sys.path.remove('C:/GitRepos/MayaPythonToolbox/maya_scripts')
-if 'C:/GitRepos/MayaPythonToolbox/maya_scripts' not in sys.path:
-    sys.path.append('C:/GitRepos/MayaPythonToolbox/maya_scripts')
 import maya.cmds as cmds
 from pprint import pprint
 

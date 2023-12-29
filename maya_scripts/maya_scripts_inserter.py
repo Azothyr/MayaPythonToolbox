@@ -11,7 +11,7 @@ Set a sys env variable "pythonpath" with script folder path value.
 import os
 import platform
 from textwrap import dedent
-from maya_scripts.utilities.maya_setup import push_scripts_to_sys
+from config.maya_setup import push_scripts_to_sys
 from script_tools.functions.file_tools import get_file_path_from_lib as get_path
 from script_tools.functions.file_tools import (clear_directory,
                                                transfer_py_dir_in_current, write_to_file)
@@ -37,7 +37,7 @@ def main():
         print("No repo found")
         exit()
     code = dedent(f"""\
-            from maya_scripts.utilities.maya_setup import set_maya_on_start
+            from config.maya_setup import set_maya_on_start
 
             set_maya_on_start()
             """)

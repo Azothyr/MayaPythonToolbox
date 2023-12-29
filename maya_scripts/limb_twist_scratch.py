@@ -1,6 +1,6 @@
 import maya.cmds as cmds
-from tools.xform_handler import XformHandler, Calculator3dSpace
-from maya_scripts.tools.color_changer import change_color
+from core.components.xform_handler import XformHandler, Calculator3dSpace
+from core.components.color_changer import change_color
 
 
 class LimbTwistManager:

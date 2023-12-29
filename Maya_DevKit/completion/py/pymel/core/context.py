@@ -1480,7 +1480,7 @@ def showManipCtx(*args, **kwargs):
     pass
 def scriptCtx(*args, **kwargs):
     """
-    This command allows a user to create their own tools based on the selection
+    This command allows a user to create their own components based on the selection
     tool. A number of selection lists can be collected, the behaviour of the
     selection and the selection masks are fully customizable, etc. The command is
     processed prior to being executed.  The keyword $Selection#where # is a number 1

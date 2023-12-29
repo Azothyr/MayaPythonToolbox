@@ -14,7 +14,7 @@ class CachingScope(object):
     
     def __enter__(self):
         """
-        Enter the scope, setting up the evaluator managers and initial states
+        Enter the scope, setting up the evaluator core and initial states
         """
         pass
     def __exit__(self, exit_type, value, traceback):
@@ -77,7 +77,7 @@ class NonCachingScope(object):
     
     def __enter__(self):
         """
-        Enter the scope, setting up the evaluator managers and initial states
+        Enter the scope, setting up the evaluator core and initial states
         """
         pass
     def __exit__(self, exit_type, value, traceback):

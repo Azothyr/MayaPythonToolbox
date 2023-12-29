@@ -3,10 +3,7 @@ Script to automate the creation of Maya commands base classes and their associat
 
 last update: 2023-09-12
 """
-import os
-from maya_scripts.utilities import arg_map_utils as map_handler
-from script_tools.components.custom_exception import CustomException
-from utils.file_ops import read_file as reader
+from pathlib import Path
 
 
 def _get_data_from_file(src):
@@ -27,7 +24,7 @@ def _get_data_from_file(src):
     result = []
     buffer = ""
     inside_parenthesis = False
-    file_contents = reader(src)
+    file_contents = Path(src).read_text()
 
     with open(src, "r") as f:
         for line in f:
@@ -90,7 +87,7 @@ def _process_variables(text):
                              "\n>>>\tmake sure to put a '(' at the start of the first"
                              " line and a ')' at the beginning of the last line"
                              "\n>>>\tof the description.")
-                raise CustomException(error=error_txt, exit=True)
+                raise RuntimeError(error_txt)
         else:
             items.append(parts)
     long_names, short_names = zip(*[name.replace(")", "").split('(') for name, _, _ in items])
@@ -169,9 +166,9 @@ def write_to_specific_file(txt, ofp, ufp, handler_func, *handler_args, ):
         content = handler_func(txt, *handler_args)
 
         # Create directory if it doesn't exist
-        directory = os.path.dirname(ofp)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        directory = Path(ofp).parent
+        if not directory.exists():
+            directory.mkdir(parents=True)
 
         with open(ofp, "w") as file:
             file.write(content)
@@ -218,8 +215,8 @@ def class_handler(txt, cls):
     lower_name = cls[0]
     content = [
         "import maya.cmds as cmds",
-        f"from maya_scripts.info.{lower_name}_arg_map import {lower_name}_arg_map as _map_src",
-        "from maya_scripts.components.maya_cmds_base import CmdsBase",
+        f"from info.{lower_name}_arg_map import {lower_name}_arg_map as _map_src",
+        "from ui.components.maya_cmds_base import CmdsBase",
         f"\n\nclass {class_name}(CmdsBase):",
         "\tdef __init__(self, name, **kwargs):\n\t\tsuper().__init__(name)\n",
         "\tdef _get_arg_map(self):\n\t\treturn _map_src\n",
@@ -238,7 +235,7 @@ def _check_duplicates(path, check_lyst):
     Returns:
         tuple: Boolean indicating if duplicates were found, and a related message.
     """
-    if not os.path.exists(path):
+    if not Path(path).exists():
         return None, f"File {path} does not exist!"
 
     with open(path, "r") as file:
@@ -300,16 +297,11 @@ def main(output_file_path="", name=""):
         output_file_path (str, optional): Destination path for the output files. Defaults to an inferred path.
         name (str, optional): Name of the class to be generated. Defaults to "test".
     """
-    src = os.path.expanduser("~\\Downloads\\mayaflags.txt")
+    src = Path.home() / "Downloads/mayaflags.txt"
     text_data = _get_data_from_file(src)
     if output_file_path == "":
-        if "Demon" in os.path.expanduser("~"):
-            output_file_path = "C:\\GitRepos\\MayaPythonToolbox\\maya_scripts\\maya_scripts\\"
-        elif "zacst" in os.path.expanduser("~"):
-            output_file_path = "/\\maya_scripts\\"
-        else:
-            raise ValueError("Must give an output file path")
-    update_file_path = os.path.expanduser(f"~\\Documents\\maya\\customscripts\\maya_scripts\\")
+        output_file_path = Path.home() / "MayaPythonToolbox/maya_scripts"
+    update_file_path = str(Path.home() / "MayaPythonToolbox/maya_scripts")
     print(f"Output path = {output_file_path}\n")
     if name == "":
         name = "test"
@@ -320,7 +312,7 @@ def main(output_file_path="", name=""):
     result = write_to_file(output_file_path, update_file_path, arg_map, class_map, class_name)
 
     print(result)
-    print(map_handler.refresh_arg_lib())
+    # print(map_handler.refresh_arg_lib())
 
 
 if __name__ == "__main__":
