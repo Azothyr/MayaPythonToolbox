@@ -30,7 +30,8 @@ def create_tools_menu():
     cmds.menu("customToolsMenu", label="Custom Tools", parent="MayaWindow", tearOff=True, allowOptionBoxes=True)
 
     # Define the directory where the custom scripts reside
-    script_directory = str(Path(__file__).parent.parent)
+    script_directory = str(Path(__file__).parent.parent / "ui")
+    # print("Script Directory:", script_directory)
 
     # List all scripts in the directory
     scripts = [script for script in os.listdir(script_directory) if script.endswith(('_ui.mel', '_ui.py'))]
