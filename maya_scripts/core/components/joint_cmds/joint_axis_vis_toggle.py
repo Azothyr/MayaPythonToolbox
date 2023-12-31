@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from utilities import selection_check
+from utilities import selection_manager
 
 
 def toggle_visibility(*args):

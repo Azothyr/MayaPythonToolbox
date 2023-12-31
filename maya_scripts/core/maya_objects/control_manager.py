@@ -1,18 +1,33 @@
 import maya.cmds as cmds
+from core.components.validate_cmds.maya_exist_cmds import Exists as exists
 
 
-class Main:
+class Control:
     def __init__(self, name: str = None):
-        self.group, self.control = self._split_to_control_and_group(control_objects)
+        self.control, self.shape, self.group = self._split_to_control_and_group(name)
 
     @staticmethod
-    def _split_to_control_and_group(_object):
-        if cmds.objectType(_object) != "transform":
-            raise ValueError(f"ERROR: Incorrect object type for {_object}. Expected 'transform', got {cmds.objectType(_object)}.")
+    def _fetch_control(obj):
+        if "shape" in obj.lower():
+            return cmds.listRelatives(obj, parent=True, type="transform")[0]
+        if exists.control(obj):
+            return obj
+        return obj
 
-        if _object.lower().endswith("_ctrl"):
-            return cmds.listRelatives(_object, parent=True, type="transform")[0], _object
-        elif _object.lower().endswith("_grp"):
-            return _object, cmds.listRelatives(_object, children=True, type="transform")[0]
 
-        raise ValueError(f"ERROR: {_object} does not end with '_Ctrl' or '_Grp'.")
+    def _split_to_control_and_group(self, obj):
+        if not exists.control(obj):
+            raise ValueError(
+                f"ERROR: Incorrect object type for {obj}. Expected 'transform', got {cmds.objectType(obj)}.")
+
+        if obj.lower().endswith("_ctrl"):
+            return obj, cmds.listRelatives(obj, shapes=True, type="nurbsCurve")[0], \
+                   cmds.listRelatives(obj, parent=True, type="transform")[0]
+        elif obj.lower().endswith("_grp"):
+            return cmds.listRelatives(obj, children=True, type="nurbsCurve")[0], \
+                   cmds.listRelatives(obj, shapes=True, type="nurbsCurve")[0], obj
+        elif obj.lower().endswith("Shape"):
+            return cmds.listRelatives(obj, parent=True, type="transform")[0], obj, \
+                   cmds.listRelatives(obj, parent=True, type="transform")[0]
+
+        raise ValueError(f"ERROR: {obj} does not end with '_Ctrl' or '_Grp'.")

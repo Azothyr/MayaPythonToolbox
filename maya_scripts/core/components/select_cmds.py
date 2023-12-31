@@ -1,9 +1,9 @@
 import maya.cmds as cmds
-from utilities import selection_check
+from utilities import selection_manager
 
 
 def __selection():
-    return selection_check.check_selection()
+    return selection_check.filter_selection()
 
 
 def replace_selection(obj):
@@ -40,6 +40,7 @@ def select_top_hierarchy(**kwargs):
     if not isinstance(selected_object, str):
         select_top_multi(error="ERROR: select_top_hierarchy only works with a single object selected.")
     parent = cmds.listRelatives(selected_object, parent=True)
+    prev_parent = None
     while parent:
         prev_parent = parent
         parent = cmds.listRelatives(parent, parent=True)

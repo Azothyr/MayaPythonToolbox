@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from utilities import selection_check
+from utilities import selection_manager
 
 
 def _single_renamer(new_name, obj):
@@ -33,7 +33,7 @@ def _sequential_renamer(txt, lyst):
 
 
 def perform_rename(txt, selection=None):
-    selection_check.check_selection(selection)
+    selection_check.filter_selection(selection)
     if len(selection) > 1 and "#" not in txt:
         txt = txt + "##"
     if "#" in txt:
@@ -48,7 +48,7 @@ def rename_selected():
     """
     Renames selected objects.
     """
-    selection = selection_check.check_selection()
+    selection = selection_check.filter_selection()
     new_name = cmds.promptDialog(
         title='Rename',
         message='Enter Name:',

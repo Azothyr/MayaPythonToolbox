@@ -1,5 +1,5 @@
 from core.components import color_changer as color_tool
-from utilities import selection_check
+from utilities import selection_manager
 from core.components.color_library import ColorIndex as ColorLib
 from ui.components.window_base import WindowBase as Window
 from ui.components.button_base import ButtonBase as Button
@@ -30,7 +30,7 @@ def _ui_setup(parent_ui, tool):
 
     def on_execute(*_):
         selected_color = color_option_menu.query('value')
-        objects = selection_check.check_selection()
+        objects = selection_check.filter_selection()
         color_tool.change_color(selected_color, objects)
 
     exec_button = Button(f'{tool}_button', l="Change Color",

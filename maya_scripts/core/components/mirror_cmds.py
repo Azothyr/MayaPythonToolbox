@@ -1,10 +1,10 @@
 import maya.cmds as cmds
-from utilities import selection_check
+from utilities import selection_manager
 from core.components import xform_handler, select_cmds, selection_renamer, history_cmds, parent_cmds
 
 
 def mirror_controls():
-    selected_controls = selection_check.check_selection()
+    selected_controls = selection_check.filter_selection()
     mirrored_controls = []
     parent_group = []
 
