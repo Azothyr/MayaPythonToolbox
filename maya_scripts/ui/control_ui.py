@@ -1,4 +1,4 @@
-from core.components import control_creator as control_tool
+from core.components.control_cmds import control_creator as control_tool
 from core.components import color_changer as color_tool
 from core.components.color_library import ColorIndex as ColorLib
 from ui.components.window_base import WindowBase as Window

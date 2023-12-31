@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from components.maya_exist_cmds import
+from core.components.maya_exist_cmds import Exists as ex
 
 
 def create_attr(node, attr_name, attr_type="float", min_val=0, max_val=1, default_val=0):
@@ -10,35 +10,27 @@ def create_attr(node, attr_name, attr_type="float", min_val=0, max_val=1, defaul
         raise RuntimeError(f"Attribute {attr_name} already exists on {node}")
 
 
-def check_attr_exists(_attr):
-    if cmds.objExists(_attr):
-        return True
-    else:
-        print(f"Attribute does not exist: {_attr}")
-        return False
-
-
 def get_attr(_attr):
-    if check_attr_exists(_attr):
+    if ex.obj_exists(_attr):
         return cmds.getAttr(_attr)
 
 
 def unlock_and_unhide(_attr):
-    if check_attr_exists(_attr):
+    if ex.obj_exists(_attr):
         cmds.setAttr(_attr, keyable=True)
         cmds.setAttr(_attr, channelBox=True)
         cmds.setAttr(_attr, lock=False)
 
 
 def lock_and_hide(_attr):
-    if check_attr_exists(_attr):
+    if ex.obj_exists(_attr):
         cmds.setAttr(_attr, keyable=False)
         cmds.setAttr(_attr, channelBox=False)
         cmds.setAttr(_attr, lock=True)
 
 
 def set_attr(_attr, value):
-    if check_attr_exists(_attr):
+    if ex.obj_exists(_attr):
         cmds.setAttr(_attr, value)
 
 

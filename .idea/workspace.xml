@@ -6,7 +6,19 @@
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/_main_ui_.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/_main_ui_.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/channel_box_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/channel_box_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/channel_scratch.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/attribute_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/attribute_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/constraint_cmds.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/control_creator.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/control_creator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/joint_axis_vis_toggle.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/joint_creator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/joint_orient.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/constrainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/constrainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,40 +54,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "MayaCharm.Maya.executor": "Run",
-    "Python._main_ui_.executor": "Run",
-    "Python.arg_lib.executor": "Run",
-    "Python.cmds_class_builder.executor": "Run",
-    "Python.color_change_ui.executor": "Run",
-    "Python.color_library.executor": "Run",
-    "Python.constraint_cmds.executor": "Run",
-    "Python.maya_exist_manager.executor": "Run",
-    "Python.maya_setup.executor": "Run",
-    "Python.userSetup.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/Demon/Documents/Scripts_Private",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "settings.MayaSdkConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;MayaCharm.Maya.executor&quot;: &quot;Run&quot;,
+    &quot;Python._main_ui_.executor&quot;: &quot;Run&quot;,
+    &quot;Python.arg_lib.executor&quot;: &quot;Run&quot;,
+    &quot;Python.cmds_class_builder.executor&quot;: &quot;Run&quot;,
+    &quot;Python.color_change_ui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.color_library.executor&quot;: &quot;Run&quot;,
+    &quot;Python.constraint_cmds.executor&quot;: &quot;Run&quot;,
+    &quot;Python.maya_exist_manager.executor&quot;: &quot;Run&quot;,
+    &quot;Python.maya_setup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.userSetup.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Demon/Documents/Scripts_Private&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.MayaSdkConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\components\control_cmds" />
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\components\constraint_cmds" />
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\components\joint_cmds" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\components" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\config" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\config\arg_lib_info" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\setup" />
     </key>
   </component>
   <component name="RunManager">
@@ -110,6 +122,9 @@
       <workItem from="1703781430481" duration="9909000" />
       <workItem from="1703797089334" duration="400000" />
       <workItem from="1703803766227" duration="13772000" />
+      <workItem from="1703915429735" duration="3072000" />
+      <workItem from="1703971646646" duration="1037000" />
+      <workItem from="1703973233718" duration="5515000" />
     </task>
     <servers />
   </component>

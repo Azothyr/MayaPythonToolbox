@@ -1,5 +1,5 @@
-from components.constraint_cmds import Remove as rem
-from components.constraint_cmds import Create as cr
+from core.components.constraint_cmds.removal import Remove as rem
+from core.components.constraint_cmds.creation import Create as cr
 
 
 class Main:

@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 from core.constrainer import Main as constraint_manager
+from core.components.control_cmds
 
 
 class ControlGroup:

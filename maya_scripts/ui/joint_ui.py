@@ -1,17 +1,7 @@
 import maya.cmds as cmds
 from functools import partial
-from core.components import (joint_creator, selection_renamer, parent_cmds, center_locator,
-                                     joint_axis_vis_toggle)
-from core.components.color_library import ColorIndex as ColorLib
-from ui.components.window_base import WindowBase as Window
-from ui.components.button_base import ButtonBase as Button
-from ui.components.optionMenu_base import OptionMenuBase as OptionMenu
-from ui.components.menuItem_base import MenuItemBase as MenuItem
-from ui.components.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
-from ui.components.tabLayout_base import TabLayoutBase as TabLayout
-from ui.components.text_base import TextBase as Text
-from ui.components.textField_base import TextFieldBase as TextField
-from ui.components.columnLayout_base import ColumnLayoutBase as ColLayout
+from core.components import (selection_renamer, parent_cmds, center_locator)
+from core.components.joint_cmds import joint_creator, joint_axis_vis_toggle
 from utilities.global_var import GlobalVar
 
 center_locations = GlobalVar('center_locations', value=[])
