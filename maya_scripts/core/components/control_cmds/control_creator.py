@@ -1,5 +1,4 @@
 import maya.cmds as cmds
-from utilities import selection_manager
 
 
 def create_at_joint(radius):

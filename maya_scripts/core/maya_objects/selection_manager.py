@@ -1,5 +1,6 @@
 import maya.cmds as cmds
-from core.components.validate_cmds.maya_exist_cmds import Exists as exists
+from core.components.validate_cmds import exists_maya as exists
+from utilities.kwarg_option_menu import Menu
 
 
 class SelectBase:
@@ -11,18 +12,9 @@ class SelectAdvanced(SelectBase):
     def __init__(self, selection=None):
         super().__init__(selection)
         self.selection = None
-        self.options = {
-            'controls': self.filter_controls,
-            'control': self.filter_controls,
-            'ctrls': self.filter_controls,
-            'ctrl': self.filter_controls,
-            'c': self.filter_controls,
-            'joints': self.filter_joints,
-            'joint': self.filter_joints,
-            'jnts': self.filter_joints,
-            'jnt': self.filter_joints,
-            'j': self.filter_joints,
-        }
+        self.options = Menu({
+            'controls': (['control', 'ctrls', 'ctrl', 'c'], self.filter_controls),
+            "joints": (['joint', 'jnts', 'jnt', 'j'], self.filter_joints)})
 
     def update_selection(self, _selection=None):
         if not self.selection:
@@ -62,7 +54,6 @@ class SelectAdvanced(SelectBase):
         if not controls:
             cmds.warning("No controls provided.")
         return controls
-
 
 
 class Select(SelectAdvanced):

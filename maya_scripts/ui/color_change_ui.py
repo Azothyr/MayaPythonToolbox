@@ -1,5 +1,4 @@
 from core.components import color_changer as color_tool
-from utilities import selection_manager
 from core.components.color_library import ColorIndex as ColorLib
 from ui.components.window_base import WindowBase as Window
 from ui.components.button_base import ButtonBase as Button

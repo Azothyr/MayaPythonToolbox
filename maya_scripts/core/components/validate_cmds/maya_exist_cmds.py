@@ -1,6 +1,6 @@
 import maya.cmds as cmds
-from maya_scripts.utilities.kwarg_parser import Parser as Parse
-from maya_scripts.utilities.kwarg_option_menu import Menu as OptMenu
+from utilities.kwarg_parser import Parser as Parse
+from utilities.kwarg_option_menu import Menu as OptMenu
 
 
 class Exists:
@@ -33,6 +33,16 @@ class Exists:
         })
         self.exists = self._init_check(**kwargs)
 
+    def __call__(self, **kwargs) -> bool:
+        """
+        Allows the Exists instance to be called directly, passing a keyword to execute the corresponding callback.
+        The keyword is treated in lowercase.
+
+        :param kwargs: Keyword arguments to pass to the callback.
+        :return: True if the entity exists, False otherwise.
+        """
+        return self._init_check(**kwargs)
+
     def __repr__(self) -> str:
         """Returns the representation of the Exists class."""
         return f"{self.__class__.__name__}({self.name!r}, {self.type!r})\nOPTIONS: {self.options}"
@@ -51,6 +61,9 @@ class Exists:
         :param kwargs: Additional keyword arguments that may be needed for specific checks.
         :return: True if the entity exists and matches the specified type, False otherwise.
         """
+        for key, value in kwargs.items():
+            if value:
+                return self.options(key, **kwargs)
 
     @staticmethod
     def _invalid() -> bool:
@@ -127,4 +140,5 @@ class Exists:
 
 
 if __name__ == "__main__":
-    print(Exists("pCube1", "object").__repr__())
+    # print(Exists("pCube1", "object").__repr__())
+    print(Exists("pCube1", "object"))

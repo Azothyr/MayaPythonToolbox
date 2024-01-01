@@ -1,6 +1,5 @@
 import maya.cmds as cmds
-from utilities import selection_manager
-from core.components import xform_handler, select_cmds, selection_renamer, history_cmds, parent_cmds
+from core.components import xform_handler, select_cmds, history_cmds, parent_cmds
 
 
 def mirror_controls():

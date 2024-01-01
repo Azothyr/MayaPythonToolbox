@@ -84,5 +84,5 @@ def create_user_setup(year: str = None):
 
 if __name__ == "__main__":
     set_maya_on_start()
-    refresh_tools()
+    # refresh_tools()
     # create_user_setup("2024")

@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from utilities import selection_manager
+from core.maya_objects.selection_manager import Select as sl
 
 
 def _single_renamer(new_name, obj):
@@ -33,7 +33,7 @@ def _sequential_renamer(txt, lyst):
 
 
 def perform_rename(txt, selection=None):
-    selection_check.filter_selection(selection)
+    sl(selection).filter_selection()
     if len(selection) > 1 and "#" not in txt:
         txt = txt + "##"
     if "#" in txt:

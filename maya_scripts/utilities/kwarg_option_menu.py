@@ -42,8 +42,8 @@ class Menu:
                 self.variant_mapping[variant_lower] = primary_keyword
 
     def __str__(self):
-        return (f"{self.__class__.__name__}"
-                f"({[(kw, vars, self.option_mapping[kw]) for kw, vars in self.keywords.items()]})")
+        return (f"{self.__class__.__name__}" +
+                "({})".format(", ".join(f"{kw}: {vars}" for kw, vars in self.keywords.items())))
 
     def __repr__(self):
         return (f"{self.__class__.__name__}"
