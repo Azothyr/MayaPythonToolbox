@@ -16,8 +16,8 @@ class Exists:
         :param type: The type of the entity (e.g., 'obj', 'attr', 'mesh').
         :param kwargs: Additional arguments for specific checks.
         """
-        # self.name = name
-        # self.type = type
+        self.name = name
+        self.type = type
         self.options = OptMenu({
             "object": (["o", "obj"], self.obj),
             "attribute": (["a", "at", "attr"], lambda name, **kw: self.attr(
@@ -31,11 +31,10 @@ class Exists:
             "locator": (["l", "loc"], self.locator),
             "shape": (["s", "shp"], self.shape),
         })
-        # self.exists = self._init_check(**kwargs)
+        self.exists = self._init_check(**kwargs)
 
     def __repr__(self) -> str:
         """Returns the representation of the Exists class."""
-        return f"{self.__class__.__name__}(OPTIONS: {self.options})"
         return f"{self.__class__.__name__}({self.name!r}, {self.type!r})\nOPTIONS: {self.options}"
 
     def __bool__(self) -> bool:

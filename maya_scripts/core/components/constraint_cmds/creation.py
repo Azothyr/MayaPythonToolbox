@@ -2,11 +2,14 @@ import maya.cmds as cmds
 
 
 class CreateBase:
-    def __init__(self, name: str, leader: object, follower: object, constraint_type: str):
-        self.name = name
-        self.leader = leader
-        self.follower = follower
-        self.constraint_type = constraint_type.lower()
+    def __init__(self, name: str = None, leader: object = None, follower: object = None, constraint_type: str = None):
+        if not all([name, leader, follower, constraint_type]):
+            cmds.warning("ERROR: Please provide a name, leader, follower, and constraint type.")
+        else:
+            self.name = name
+            self.leader = leader
+            self.follower = follower
+            self.constraint_type = constraint_type.lower()
 
     def create_constraint(self):
         match self.constraint_type:
@@ -41,9 +44,13 @@ class CreateBase:
 
 
 class CreateAdvanced(CreateBase):
-    def __init__(self, name: str, leader: object, follower: object, constraint_type: str):
-        super().__init__(name, leader, follower, constraint_type)
+    def __init__(self, objects: list = None, split: str = "half", **kwargs):
+        if objects is None:
+            super().__init__(**kwargs)
+        else:
+            self.objects = objects
 
+    @staticmethod
     def parent_scale_constrain(obj_lyst, split="half"):
         # Check that there is an even number of objects selected
         if len(obj_lyst) % 2 != 0:
@@ -55,10 +62,10 @@ class CreateAdvanced(CreateBase):
 
         # Check if the split mode is valid, half, or every other
         match split:
-            case "half", "h":
+            case var if var in any(["half", "h"]):
                 parent_objs = obj_lyst[:half]
                 child_objs = obj_lyst[half:]
-            case "every other", "eo", "mod", "modulo":
+            case var if var in any([ "every other", "eo", "mod", "modulo"]):
                 parent_objs = obj_lyst[::2]
                 child_objs = obj_lyst[1::2]
             case _:
@@ -85,5 +92,9 @@ class CreateAdvanced(CreateBase):
 
 
 class Create(CreateAdvanced):
-    def __init__(self, name: str, leader: object = None, follower: object = None, constraint_type: str = None):
-        super().__init__(name, leader, follower, constraint_type)
+    def __init__(self, name: str, leader: object = None, follower: object = None, constraint_type: str = None,
+                 objects: list = None):
+        if objects is None:
+            super().__init__(name, leader, follower, constraint_type)
+        else:
+            super().__init__(objects)
