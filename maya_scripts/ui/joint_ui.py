@@ -1,17 +1,34 @@
 import maya.cmds as cmds
 from functools import partial
 from core.components import (selection_renamer, parent_cmds, center_locator)
+from core.maya_objects.selection_manager import Select as sl
 from core.components.joint_cmds import joint_creator, joint_axis_vis_toggle
 from utilities.global_var import GlobalVar
 
 center_locations = GlobalVar('center_locations', value=[])
 
 
-def _ui_setup(parent_ui, tool):
+def _ui_setup(parent_ui: str, tool: str) -> str:
     """
-    Returns: Joint Creator UI
+    :param parent_ui: Parent UI to attach to (tabLayout)
+    :param tool: Name of the tool to create the UI for
+
+    :return: Joint Creator UI
     """
     global center_locations
+
+    def add(mode: str, *_):
+        """
+        Adds the center of the selection to the list.
+
+        :param mode: Mode to add the center in.
+        :param _: Unused
+        """
+        match mode:
+            case opt if opt in ["all", "a"]:
+                add_center_to_list()
+            case opt if opt in ["each", "e"]:
+                add_selection_to_list()
 
     def add_center_to_list(*_):
         """
@@ -23,6 +40,17 @@ def _ui_setup(parent_ui, tool):
         center_txt = str(center)
         cmds.textScrollList('position_list', edit=True, append=f'{len(center_locations)}: {center_txt}')
         cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
+
+    def add_selection_to_list(*_):
+        """
+        Calls center_locator module and adds the center to the list.
+
+        :param _:
+        :return:
+        """
+        selection = sl()
+        for item in selection:
+            add_center_to_list(item)
 
     def move_center_item_up(*_):
         global center_locations
@@ -123,9 +151,11 @@ def _ui_setup(parent_ui, tool):
                          enable=False, parent='parent_column_lower')
     cmds.columnLayout('lower_column', adjustableColumn=True, parent='base_column')
 
-    cmds.button(label='Add Joint Position', command=add_center_to_list,
+    cmds.button(label='Add CENTER OF ALL SELECTED', command=add_center_to_list,
                 backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
-    cmds.button(label='Remove Entry', command=remove_center_item,
+    cmds.button(label='Add CENTER OF EACH IN SELECTION', command=add_selection_to_list,
+                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
+    cmds.button(label='Remove', command=remove_center_item,
                 backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
     cmds.button(label='Clear', command=clear_center_list,
                 backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')

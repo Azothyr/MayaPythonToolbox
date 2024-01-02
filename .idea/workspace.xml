@@ -6,18 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/config/maya_setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/config/maya_setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/constraint_cmds/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/constraint_cmds/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/control_creator.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/control_creator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/joint_cmds/joint_axis_vis_toggle.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/joint_cmds/joint_axis_vis_toggle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/mirror_cmds.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/mirror_cmds.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/select_cmds.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/select_cmds.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/selection_renamer.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/selection_renamer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/validate_cmds/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/validate_cmds/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/validate_cmds/maya_exist_cmds.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/validate_cmds/maya_exist_cmds.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/color_change_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/color_change_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/maya_objects/selection_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/maya_objects/selection_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/utilities/global_var.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/utilities/global_var.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/utilities/kwarg_option_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/utilities/kwarg_option_menu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/utilities/selection_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/maya_objects/selection_manager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +56,7 @@
     "Python.color_change_ui.executor": "Run",
     "Python.color_library.executor": "Run",
     "Python.constraint_cmds.executor": "Run",
+    "Python.joint_axis_vis_toggle.executor": "Run",
     "Python.kwarg_option_menu.executor": "Run",
     "Python.kwarg_parser.executor": "Run",
     "Python.maya_exist_cmds.executor": "Run",
@@ -131,6 +126,7 @@
       <workItem from="1703973233718" duration="5515000" />
       <workItem from="1704040710617" duration="15244000" />
       <workItem from="1704086898134" duration="7799000" />
+      <workItem from="1704156916223" duration="5974000" />
     </task>
     <servers />
   </component>
@@ -141,6 +137,7 @@
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$maya_exist_manager.coverage" NAME="maya_exist_manager Coverage Results" MODIFIED="1703820039387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$color_change_ui.coverage" NAME="color_change_ui Coverage Results" MODIFIED="1703818041680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$_main_ui_.coverage" NAME="_main_ui_ Coverage Results" MODIFIED="1704098524557" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
+    <SUITE FILE_PATH="coverage/MayaPythonToolbox$joint_axis_vis_toggle.coverage" NAME="joint_axis_vis_toggle Coverage Results" MODIFIED="1704161173771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core/components/joint_cmds" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$kwarg_parser.coverage" NAME="kwarg_parser Coverage Results" MODIFIED="1704053122846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/utilities" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$userSetup.coverage" NAME="userSetup Coverage Results" MODIFIED="1704098389943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../maya/2024/scripts" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$maya_setup.coverage" NAME="maya_setup Coverage Results" MODIFIED="1704098400554" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/config" />

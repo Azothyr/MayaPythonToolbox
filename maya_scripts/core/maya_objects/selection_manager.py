@@ -5,13 +5,19 @@ from utilities.kwarg_option_menu import Menu
 
 class SelectBase:
     def __init__(self, selection=None):
-        self.selection = selection if selection is not None else cmds.ls(selection=True)
+        self.selection = selection if selection is not None else\
+            cmds.ls(selection=True) if cmds.ls(selection=True) else []
+
+    def __str__(self):
+        return f"{self.selection!s}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(SELECTION: {self.selection!r})"
 
 
 class SelectAdvanced(SelectBase):
     def __init__(self, selection=None):
         super().__init__(selection)
-        self.selection = None
         self.options = Menu({
             'controls': (['control', 'ctrls', 'ctrl', 'c'], self.filter_controls),
             "joints": (['joint', 'jnts', 'jnt', 'j'], self.filter_joints)})
@@ -24,7 +30,7 @@ class SelectAdvanced(SelectBase):
         if kwargs:
             for key, value in kwargs.items():
                 if value:
-                    self.selection = self.options[key](self.selection)
+                    self.selection = self.options(key, self.selection)
         return self.selection
 
     @staticmethod
@@ -59,3 +65,17 @@ class SelectAdvanced(SelectBase):
 class Select(SelectAdvanced):
     def __init__(self, selection=None):
         super().__init__(selection)
+
+
+if __name__ == "__main__":
+    # selection = Select()
+    # print(selection)
+    # print(selection.__repr__())
+    selection = Select().filter_selection(joints=True)
+    print(selection)
+    # selection = Select().filter_selection(controls=True)
+    # print(selection)
+    # selection = Select().filter_selection(joints=True, controls=True)
+    # print(selection)
+    # selection = Select().filter_selection()
+    # print(selection)

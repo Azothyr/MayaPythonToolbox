@@ -62,6 +62,27 @@ class GlobalVar:
         else:
             raise TypeError(f"'{type(self._value).__name__}' object has no method 'append'")
 
+    def extend(self, value):
+        if isinstance(self._value, list):
+            self._value.extend(value)
+            self.globals_dict[self._name] = self._value
+        else:
+            raise TypeError(f"'{type(self._value).__name__}' object has no method 'extend'")
+
+    def remove(self, value):
+        if isinstance(self._value, list):
+            self._value.remove(value)
+            self.globals_dict[self._name] = self._value
+        else:
+            raise TypeError(f"'{type(self._value).__name__}' object has no method 'remove'")
+
+    def pop(self, index=-1):
+        if isinstance(self._value, list):
+            self._value.pop(index)
+            self.globals_dict[self._name] = self._value
+        else:
+            raise TypeError(f"'{type(self._value).__name__}' object has no method 'pop'")
+
     def clear(self):
         try:
             if isinstance(self._value, list):

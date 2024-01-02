@@ -33,6 +33,13 @@ class Exists:
         })
         self.exists = self._init_check(**kwargs)
 
+    def __str__(self) -> str:
+        return f"NAME: {self.name}, OF_TYPE: {self.type}, EXISTS: {self.exists}"
+
+    def __repr__(self) -> str:
+        """Returns the representation of the Exists class."""
+        return f"{self.__class__.__name__}({self.name!r}, {self.type!r})\nOPTIONS: {self.options}"
+
     def __call__(self, **kwargs) -> bool:
         """
         Allows the Exists instance to be called directly, passing a keyword to execute the corresponding callback.
@@ -42,10 +49,6 @@ class Exists:
         :return: True if the entity exists, False otherwise.
         """
         return self._init_check(**kwargs)
-
-    def __repr__(self) -> str:
-        """Returns the representation of the Exists class."""
-        return f"{self.__class__.__name__}({self.name!r}, {self.type!r})\nOPTIONS: {self.options}"
 
     def __bool__(self) -> bool:
         """Returns the boolean value of the existence check."""
@@ -61,9 +64,9 @@ class Exists:
         :param kwargs: Additional keyword arguments that may be needed for specific checks.
         :return: True if the entity exists and matches the specified type, False otherwise.
         """
-        for key, value in kwargs.items():
-            if value:
-                return self.options(key, **kwargs)
+        if self.type is None:
+            return self._invalid()
+        return self.options(self.type, self.name, **kwargs)
 
     @staticmethod
     def _invalid() -> bool:
@@ -140,5 +143,5 @@ class Exists:
 
 
 if __name__ == "__main__":
-    # print(Exists("pCube1", "object").__repr__())
+    print(Exists("pCube1", "object").__repr__())
     print(Exists("pCube1", "object"))

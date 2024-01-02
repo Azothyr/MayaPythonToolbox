@@ -60,6 +60,15 @@ class Menu:
         """
         return self.parse_and_execute(keyword.lower(), *args, **kwargs)
 
+    def __getitem__(self, item):
+        """
+        Allows the Menu instance to be indexed directly, passing a keyword to execute the corresponding callback.
+        The keyword is treated in lowercase.
+
+        :param item: The keyword to parse.
+        """
+        return self.parse_and_execute(item.lower())
+
     def add_option(self, primary_keyword, variants, callback):
         """
         Adds a new option with its variants and callback. The primary keyword and variants are treated in lowercase.
