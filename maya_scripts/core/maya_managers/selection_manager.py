@@ -4,23 +4,29 @@ from utilities.kwarg_option_menu import Menu
 
 
 class SelectBase:
-    def __init__(self, selection=None):
+    def __init__(self, selection: list[str] = None, default: str = "none"):
+        if default == "none":
+            default = []
         self.selection = selection if selection is not None else\
-            cmds.ls(selection=True) if cmds.ls(selection=True) else []
+            cmds.ls(selection=True) if cmds.ls(selection=True) else default
 
     def __str__(self):
+        if self.selection is None:
+            self.selection = []
         return f"{self.selection!s}"
 
     def __repr__(self):
+        if self.selection is None:
+            self.selection = []
         return f"{self.__class__.__name__}(SELECTION: {self.selection!r})"
 
 
 class SelectAdvanced(SelectBase):
-    def __init__(self, selection=None):
-        super().__init__(selection)
+    def __init__(self, selection=None, **kwargs):
+        super().__init__(selection, **kwargs)
         self.options = Menu({
-            'controls': (['control', 'ctrls', 'ctrl', 'c'], self.filter_controls),
-            "joints": (['joint', 'jnts', 'jnt', 'j'], self.filter_joints)})
+            'controls': (['control', 'ctrls', 'ctrl', 'c'], self._filter_controls),
+            "joints": (['joint', 'jnts', 'jnt', 'j'], self._filter_joints)})
 
     def update_selection(self, _selection=None):
         if not self.selection:
@@ -47,14 +53,14 @@ class SelectAdvanced(SelectBase):
             return False
         return True
 
-    def filter_joints(self, objs=None):
+    def _filter_joints(self, objs=None):
         self.update_selection(objs)
         joints = [obj for obj in self.selection if self._is_joint(obj)]
         if not joints:
             cmds.warning("No joints selected")
         return joints
 
-    def filter_controls(self, objs=None):
+    def _filter_controls(self, objs=None):
         self.update_selection(objs)
         controls = [obj for obj in self.selection if self._is_control(obj)]
         if not controls:
@@ -63,8 +69,8 @@ class SelectAdvanced(SelectBase):
 
 
 class Select(SelectAdvanced):
-    def __init__(self, selection=None):
-        super().__init__(selection)
+    def __init__(self, selection=None, **kwargs):
+        super().__init__(selection, **kwargs)
 
 
 if __name__ == "__main__":

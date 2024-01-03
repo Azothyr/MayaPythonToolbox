@@ -1,5 +1,6 @@
 from core.components import color_changer as color_tool
 from core.components.color_library import ColorIndex as ColorLib
+from core.maya_managers.selection_manager import Select as sl
 from ui.components.window_base import WindowBase as Window
 from ui.components.button_base import ButtonBase as Button
 from ui.components.optionMenu_base import OptionMenuBase as OptionMenu
@@ -29,7 +30,7 @@ def _ui_setup(parent_ui, tool):
 
     def on_execute(*_):
         selected_color = color_option_menu.query('value')
-        objects = selection_check.filter_selection()
+        objects = sl()
         color_tool.change_color(selected_color, objects)
 
     exec_button = Button(f'{tool}_button', l="Change Color",

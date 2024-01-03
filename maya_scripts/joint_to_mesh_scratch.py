@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 from pprint import pprint
 import re
-from core.maya_objects.joint_manager import JointManager
+from core.maya_managers.joint_manager import JointManager
 
 
 def get_part_names(data):

@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 from functools import partial
 from core.components import (selection_renamer, parent_cmds, center_locator)
-from core.maya_objects.selection_manager import Select as sl
+from core.maya_managers.selection_manager import Select as sl
 from core.components.joint_cmds import joint_creator, joint_axis_vis_toggle
 from utilities.global_var import GlobalVar
 

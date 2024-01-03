@@ -1,19 +1,23 @@
 import maya.cmds as cmds
 from core.components.validate_cmds.maya_exist_cmds import Exists as exists
+from core.components.control_cmds import Create as create
 
 
 class Control:
     def __init__(self, name: str = None):
+        self.control = self._fetch_control(name)
+        if self.control is None:
+            create(name=name)
         self.control, self.shape, self.group = self._split_to_control_and_group(name)
 
     @staticmethod
     def _fetch_control(obj):
-        if "shape" in obj.lower():
+        if "shape" in obj.lower() and cmds.objectType(obj) == "nurbsCurve":
             return cmds.listRelatives(obj, parent=True, type="transform")[0]
-        if exists.control(obj):
+        if exists.control(obj) and cmds.objectType(obj) == "transform":
             return obj
-        return obj
-
+        else:
+            return None
 
     def _split_to_control_and_group(self, obj):
         if not exists.control(obj):
@@ -31,3 +35,4 @@ class Control:
                    cmds.listRelatives(obj, parent=True, type="transform")[0]
 
         raise ValueError(f"ERROR: {obj} does not end with '_Ctrl' or '_Grp'.")
+print(cmds.objectType(cmds.ls(sl=True)[0]))

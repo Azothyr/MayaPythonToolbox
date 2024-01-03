@@ -1,9 +1,9 @@
 import maya.cmds as cmds
-from core.maya_objects.selection_manager import Select as sl
+from core.maya_managers.selection_manager import Select as sl
 
 
 def __selection():
-    return sl().filter_selection()
+    return sl()
 
 
 def replace_selection(obj):
