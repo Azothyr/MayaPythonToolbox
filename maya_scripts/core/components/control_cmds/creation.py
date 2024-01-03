@@ -46,7 +46,7 @@ class CreateBase:
     def _create_group(self):
         self.group = cmds.group(self.control, name=f"{self.name}_Grp")
 
-    def create(self, mode: str = "all"):
+    def create_type(self, mode: str = "all"):
         match mode.lower():
             case opt if opt in ["all", "a"]:
                 self._create_control()
@@ -64,24 +64,30 @@ class CreateAdvanced:
     def __init__(self, *args, radius: float = 1, **kwargs):
         self.radius = radius
         self.names = []
-        for arg in args:
-            if isinstance(arg, str):
-                self.names.append(arg)
-            elif isinstance(arg, (list, tuple)):
-                for item in arg:
-                    if isinstance(item, str):
-                        self.names.append(item)
-                    else:
-                        print(f"ERROR: {item} is not a valid argument type.")
-                        continue
-            else:
-                print(f"ERROR: {arg} is not a valid argument type.")
-                continue
+        if args:
+            for arg in args:
+                if isinstance(arg, str):
+                    self.names.append(arg)
+                elif isinstance(arg, (list, tuple)):
+                    for item in arg:
+                        if isinstance(item, str):
+                            self.names.append(item)
+                        else:
+                            print(f"ERROR: {item} is not a valid argument type.")
+                            continue
+                else:
+                    print(f"ERROR: {arg} is not a valid argument type.")
+                    continue
+        else:
+            self.names = sl()
+
+    def __call__(self, mode: str = "all"):
+        self._at_selection(mode)
 
     def _at_selection(self, selction_type: str = None):
         match selction_type.lower():
             case opt if opt in ["any", "all", "a", "sel", "selection", "s"]:
-                typ = sl()
+                typ = sl(self.names)
             case opt if opt in ["joint", "jnt", "j"]:
                 typ = sl().filter_selection(joint=True)
             case _:

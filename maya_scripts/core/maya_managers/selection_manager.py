@@ -4,26 +4,25 @@ from utilities.kwarg_option_menu import Menu
 
 
 class SelectBase:
-    def __init__(self, selection: list[str] = None, default: str = "none"):
-        if default == "none":
-            default = []
-        self.selection = selection if selection is not None else\
-            cmds.ls(selection=True) if cmds.ls(selection=True) else default
+    def __init__(self, selection: list[str] = None):
+        if selection is not None:
+            self.selection = selection
+        else:
+            self.selection = cmds.ls(sl=True) or []
 
     def __str__(self):
-        if self.selection is None:
-            self.selection = []
-        return f"{self.selection!s}"
+        return str(self.selection)
 
     def __repr__(self):
-        if self.selection is None:
-            self.selection = []
-        return f"{self.__class__.__name__}(SELECTION: {self.selection!r})"
+        return f"{self.__class__.__name__}(SELECTION: {repr(self.selection)})"
+
+    def __iter__(self):
+        return iter(self.selection)
 
 
 class SelectAdvanced(SelectBase):
-    def __init__(self, selection=None, **kwargs):
-        super().__init__(selection, **kwargs)
+    def __init__(self, selection=None):
+        super().__init__(selection)
         self.options = Menu({
             'controls': (['control', 'ctrls', 'ctrl', 'c'], self._filter_controls),
             "joints": (['joint', 'jnts', 'jnt', 'j'], self._filter_joints)})
@@ -69,16 +68,16 @@ class SelectAdvanced(SelectBase):
 
 
 class Select(SelectAdvanced):
-    def __init__(self, selection=None, **kwargs):
-        super().__init__(selection, **kwargs)
+    def __init__(self, selection=None):
+        super().__init__(selection)
 
 
 if __name__ == "__main__":
-    # selection = Select()
-    # print(selection)
-    # print(selection.__repr__())
-    selection = Select().filter_selection(joints=True)
+    selection = Select()
     print(selection)
+    # print(selection.__repr__())
+    # selection = Select().filter_selection(joints=True)
+    # print(selection)
     # selection = Select().filter_selection(controls=True)
     # print(selection)
     # selection = Select().filter_selection(joints=True, controls=True)
