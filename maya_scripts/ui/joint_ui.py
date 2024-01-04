@@ -17,31 +17,29 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
     """
     global center_locations
 
-    def add(mode: str, *_):
+    def add(*_):
         """
-        Adds the center of the selection to the list.
-
-        :param mode: Mode to add the center in.
-        :param _: Unused
+        Adds the center of the selection to the list based on the selected radio button.
         """
-        match mode:
-            case opt if opt in ["all", "a"]:
-                add_center_to_list()
-            case opt if opt in ["each", "e"]:
-                add_selection_to_list()
+        mode = cmds.radioButtonGrp('mode_radio', query=True, select=True)
+        if mode == 1:
+            add_any_or_all()
+        elif mode == 2:
+            add_iter()
 
-    def add_center_to_list(*_):
+    def add_any_or_all(passed_objs=None, *_):
         """
         Calls center_locator module and adds the center to the list.
         """
         global center_locations
-        center = center_locator.get_center(cmds.ls(sl=True))
+        passed_objs = passed_objs if passed_objs else cmds.ls(sl=True)
+        center = center_locator.get_center(passed_objs)
         center_locations.append(center)
         center_txt = str(center)
         cmds.textScrollList('position_list', edit=True, append=f'{len(center_locations)}: {center_txt}')
         cmds.text(center_label, edit=True, label=f"Joint Positions ({len(center_locations)}):")
 
-    def add_selection_to_list(*_):
+    def add_iter(*_):
         """
         Calls center_locator module and adds the center to the list.
 
@@ -50,7 +48,7 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
         """
         selection = sl()
         for item in selection:
-            add_center_to_list(item)
+            add_any_or_all(item)
 
     def move_center_item_up(*_):
         global center_locations
@@ -111,15 +109,30 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
         cmds.rowColumnLayout(dependant, edit=True,
                              enable=update_input_enable(), noBackground=update_input_enable())
 
+    # _tab = cmds.formLayout(f'{tool}_base', bgc=[.3, .5, .55], p=parent_ui)
+    #
+    # # Add your UI elements to the formLayout
+    # description_frame = cmds.frameLayout('description_frame', label='Description', collapse=True, collapsable=True,
+    #                                      parent=_tab)
+    # settings_frame = cmds.frameLayout('settings_frame', label='Tool Settings', collapsable=True, parent=_tab)
+    #
+    # # Position the frames within the formLayout
+    # cmds.formLayout(_tab, edit=True,
+    #                 attachForm=[(description_frame, 'top', 5), (description_frame, 'left', 5),
+    #                             (description_frame, 'right', 5),
+    #                             (settings_frame, 'left', 5), (settings_frame, 'right', 5)],
+    #                 attachControl=(settings_frame, 'top', 5, description_frame))
+
     _tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.3, .5, .55], p=parent_ui)
 
     cmds.frameLayout('description_frame', label='Description', collapsable=True,
                      collapse=True, parent=f'{tool}_base')
-    cmds.text('This tool allows you to Create, Name, parent Joints ',
+    cmds.text('This tool allows you to Create, Name, parent Joints',
               parent='description_frame', font='smallPlainLabelFont', backgroundColor=[0, 0, 0])
     cmds.frameLayout('settings_frame', label='Tool Settings', collapsable=True, parent=f'{tool}_base')
     cmds.columnLayout('base_column', adjustableColumn=True, parent='settings_frame')
     cmds.columnLayout('list_column', adjustableColumn=True, parent='base_column')
+    cmds.columnLayout('pos_radio_column', adjustableColumn=True, parent='list_column')
     cmds.rowColumnLayout('list_upper_buttons_columns', numberOfColumns=3,
                          columnWidth=[(1, 125), (2, 125), (3, 125)],
                          adjustableColumn=True,
@@ -139,7 +152,7 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
     cmds.rowColumnLayout('name_columns', numberOfColumns=2,
                          columnAttach=(1, 'both', 20),
                          columnWidth=[(1, 125), (2, 175)],
-                         adjustableColumn=True,
+                         adjustableColumn=True, bgc=[0, 0, 0],
                          enable=False, parent='name_column_lower')
     cmds.columnLayout('parent_column_group', adjustableColumn=True, parent='base_column')
     cmds.columnLayout('parent_column_lower', adjustableColumn=True, parent='base_column')
@@ -147,18 +160,19 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
                          columnWidth=[(1, 80), (2, 80), (3, 80)],
                          columnAlign=[1, 'center'],
                          columnSpacing=(30, 0),
-                         adjustableColumn=True,
+                         adjustableColumn=True, bgc=[.3, .3, .3],
                          enable=False, parent='parent_column_lower')
     cmds.columnLayout('lower_column', adjustableColumn=True, parent='base_column')
 
-    cmds.button(label='Add CENTER OF ALL SELECTED', command=add_center_to_list,
-                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
-    cmds.button(label='Add CENTER OF EACH IN SELECTION', command=add_selection_to_list,
-                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
-    cmds.button(label='Remove', command=remove_center_item,
-                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
-    cmds.button(label='Clear', command=clear_center_list,
-                backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
+    cmds.radioButtonGrp('mode_radio', label='Create at the center of:', bgc=[.3, 0, .3],
+                        labelArray2=['All Selected', 'Each Selected'],
+                        numberOfRadioButtons=2, select=1, parent='pos_radio_column')
+
+    cmds.button(label='Add', command=add, backgroundColor=[0, 0, 0], parent='list_upper_buttons_columns')
+    cmds.button(label='Remove', command=remove_center_item, backgroundColor=[0, 0, 0],
+                parent='list_upper_buttons_columns')
+    cmds.button(label='Clear', command=clear_center_list, backgroundColor=[0, 0, 0],
+                parent='list_upper_buttons_columns')
     center_label = cmds.text(label='Joint Positions (0):', align='center', parent='list_visualized_column')
     cmds.textScrollList('position_list', numberOfRows=6, parent='list_visualized_column')
     cmds.button(label='Move Up', command=move_center_item_up,
@@ -179,7 +193,7 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
                                 parent='name_column_upper')
     cmds.text(label='Naming Scheme Input', parent='name_columns')
     name_input = cmds.textField('name_input_field', parent='name_columns', bgc=[.1, .1, .1])
-    cmds.text(label='Optional Quick Selection', parent='name_columns')
+    cmds.text(label='Naming Presets:', parent='name_columns')
     naming_option = cmds.optionMenu("NamingOpMenu", changeCommand=update_name_field,
                                     backgroundColor=[.5, .5, .5], parent='name_columns')
     cmds.menuItem(label='User Input', parent="NamingOpMenu")
@@ -196,25 +210,25 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
     def update_joint_list(*_):
         cmds.optionMenu('parent_menu', edit=True, deleteAllItems=True)
         cmds.menuItem(label='None', parent='parent_menu')
-        selected_joints = cmds.ls(type='joint')
-        for _ in selected_joints:
+        scene_joints = cmds.ls(type='joint')
+        for _ in scene_joints:
             cmds.menuItem(label=_, parent='parent_menu')
 
     parent_checkbox = cmds.checkBox('parent_bool', label='Parent Objects on Creation', value=False,
                                     changeCommand=partial(grey_field, 'parent_bool', 'parent_columns'),
                                     parent='parent_column_group')
-    selected_joints = cmds.ls(type='joint')
-    parent_option: None = cmds.optionMenu('parent_menu', label='Optional Parent Joint',
-                                          bgc=[.5, .5, .5], parent='parent_columns')
+    scene_joints = cmds.ls(type='joint')
+    parent_opt_label = cmds.text(label='Parent To:', parent='parent_columns', align='right')
+    parent_option: None = cmds.optionMenu('parent_menu', bgc=[.5, .5, .5], parent='parent_columns')
     cmds.menuItem(label='None', parent='parent_menu')
-    for joint in selected_joints:
+    for joint in scene_joints:
         cmds.menuItem(label=joint, parent='parent_menu')
     cmds.button(label='Update List', command=update_joint_list,
                 backgroundColor=[.2, 1, .2], parent='parent_columns')
 
     def on_execute(*_):
         global center_locations
-        # add a check box for clearing list on execute
+        # add a checkbox for clearing list on execute
         rename = cmds.checkBox(rename_bool, query=True, value=True)
         naming_input = cmds.textField(name_input, query=True, text=True)
         name_choice = cmds.optionMenu(naming_option, query=True, value=True)
@@ -222,8 +236,8 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
         parent_name = cmds.optionMenu(parent_option, query=True, value=True)
         radius = float(cmds.textField(radius_input, query=True, text=True))
 
-        selected_joints = joint_creator.create_joints_xyz(center_locations, radius)
-        joint_axis_vis_toggle.toggle_visibility(selected_joints)
+        scene_joints = joint_creator.create_joints_xyz(center_locations, radius)
+        joint_axis_vis_toggle.toggle_visibility(scene_joints)
 
         if rename:
             if name_choice == 'User Input':
@@ -233,19 +247,20 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
             if name_schema[0].isdigit() or name_schema.startswith('_'):
                 cmds.error('Naming Schema starts with an invalid character.')
                 cmds.delete(cmds.ls(sl=True))
-            selected_joints = selection_renamer.perform_rename(name_schema, selected_joints)
+            scene_joints = selection_renamer.perform_rename(name_schema, scene_joints)
 
         if parent_bool:
-            selected_joints.reverse()
+            scene_joints.reverse()
             if parent_name != 'None':
-                selected_joints.append(str(parent_name))
-            parent_cmds.parent_selected(selected_joints)
+                scene_joints.append(str(parent_name))
+            parent_cmds.parent_selected(scene_joints)
 
-    update_joint_list()
+        update_joint_list()
 
     cmds.button(label='Execute', command=on_execute,
                 backgroundColor=[1, 0, 0], parent='lower_column')
     clear_center_list()
+    update_joint_list()
     return _tab
 
 
