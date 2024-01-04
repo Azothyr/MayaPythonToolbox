@@ -34,10 +34,11 @@ def _ui_setup(parent_ui, tool):
     color_option_menu = OptionMenu('control_color_opt_menu', p=sel_col_2, bgc=[.5, .2, .2])
     color_m_items = MenuItem.create_menu_items_from_iter(color_options, color_option_menu)
     scale_txt = Text('scale_txt', l='Control Scale:', bgc=[.7, .7, .7], p=rad_col_1)
-    radius_input = TextField('radius_input', tx='10', bgc=[.1, .1, .1], p=rad_col_2)
+    radius_input = TextField('radius_input', tx='5', bgc=[.1, .1, .1], p=rad_col_2)
 
     def on_execute(*_):
-        controls = control_tool(radius=radius_input.query('text'))
+        creator = control_tool(radius=radius_input.query('text'))
+        controls = creator()
         color_tool.change_color(color_option_menu.query('value'), controls)
 
     exec_button = Button(f'{tool}_button', l="Create Control", p=button_col,

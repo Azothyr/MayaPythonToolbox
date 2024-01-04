@@ -8,9 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/creation.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/creation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/core/maya_managers/control_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/maya_managers/control_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/maya_managers/selection_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/maya_managers/selection_manager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,14 +90,25 @@
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\components\constraint_cmds" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="Maya" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
+  <component name="RunManager" selected="MayaCharm.Maya-Main">
+    <configuration name="Maya-Laptop" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
       <option name="executionType" value="FILE" />
       <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
       <option name="scriptCodeText" value="" />
       <option name="scriptFilePath" value="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\manual_tool_runner.py" />
       <method v="2" />
     </configuration>
+    <configuration name="Maya-Main" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
+      <option name="executionType" value="FILE" />
+      <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
+      <option name="scriptCodeText" value="" />
+      <option name="scriptFilePath" value="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\manual_tool_runner.py" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="MayaCharm.Maya-Laptop" />
+      <item itemvalue="MayaCharm.Maya-Main" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -137,6 +146,7 @@
       <workItem from="1704247113251" duration="418000" />
       <workItem from="1704247539733" duration="3135000" />
       <workItem from="1704312938125" duration="15510000" />
+      <workItem from="1704340545570" duration="5610000" />
     </task>
     <servers />
   </component>

@@ -1,13 +1,14 @@
 import maya.cmds as cmds
 from core.maya_managers.selection_manager import Select as sl
 from core.components.validate_cmds import exists_maya as exists
-from core.components.control_cmds import Create as create
+from core.components.control_cmds import Create as ctrlCreate
 
 
 class ControlManager:
     def __init__(self, *args, radius=1.0, **kwargs):
         self.radius = radius
         self.selection = sl() if not args else self._process_args(args)
+        self.controls = []
 
     def __call__(self, mode="all"):
         return self._at_selection(mode)
@@ -51,16 +52,17 @@ class ControlManager:
                     processing = f"{name}_Ctrl" if not name.endswith("_Ctrl") else name
                     new_sel.append(processing)
                     xform_objs.append(name)
-        self.selection = self._process_args(new_sel)
-        return self.create(selection, xform_objs)
+        self.controls = self._process_args(new_sel)
+        return self.create(new_sel, xform_objs)
 
     def create(self, objects: list[str] = None, xform_objs: list[str] = None):
-        objects = objects if len(objects) > 1 else cmds.ls(sl=True)[0]
+        objects = objects if len(objects) > 1 else [objects] if isinstance(objects, str) else self.selection
+        if not objects:
+            raise ValueError("ERROR: No objects to create controls from!")
 
         control_list = []
         for i, obj in enumerate(objects):
-            new_control = create()
-            new_control(obj, self.radius)
+            new_control = ctrlCreate(obj, radius=self.radius, create=True)
             control_list.append(new_control)
             if xform_objs:
                 new_control.set_xform(xform_objs[i])
