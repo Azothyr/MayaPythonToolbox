@@ -1,4 +1,4 @@
-from core.components.control_cmds import creation as control_tool
+from core.maya_managers.control_manager import ControlManager as control_tool
 from core.components import color_changer as color_tool
 from core.components.color_library import ColorIndex as ColorLib
 from ui.components.window_base import WindowBase as Window
@@ -37,7 +37,7 @@ def _ui_setup(parent_ui, tool):
     radius_input = TextField('radius_input', tx='10', bgc=[.1, .1, .1], p=rad_col_2)
 
     def on_execute(*_):
-        controls = control_tool.create_at_joint(radius_input.query('text'))
+        controls = control_tool(radius=radius_input.query('text'))
         color_tool.change_color(color_option_menu.query('value'), controls)
 
     exec_button = Button(f'{tool}_button', l="Create Control", p=button_col,

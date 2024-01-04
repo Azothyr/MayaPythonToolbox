@@ -184,7 +184,7 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
                                     backgroundColor=[.5, .5, .5], parent='name_columns')
     cmds.menuItem(label='User Input', parent="NamingOpMenu")
     sequential_schemas = ['Spine', 'Arm', 'L_Arm', 'R-Arm', 'L_Clav', 'R_Clav', 'Finger_##_knuckle',
-                          'L_Finger_##_knuckle', 'R_Finger_##_knuckle', 'Leg', 'L_Leg', 'R_Leg', 'L_FT_Leg',
+                          'L_Finger_##', 'R_Finger_##', 'Leg', 'L_Leg', 'R_Leg', 'L_FT_Leg',
                           'R_FT_Leg', 'L_BK_Leg', 'R_BK_Leg', 'L_Toe', 'R_Toe', 'Head', 'Neck', 'Tail', 'L_Tail',
                           'R_Tail', 'Eye', 'L_Eye', 'R_Eye']
     single_schemas = ['ROOT_JNT', 'COG_Jnt', 'Hip_Jnt']

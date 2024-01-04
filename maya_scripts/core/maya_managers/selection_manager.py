@@ -11,13 +11,28 @@ class SelectBase:
             self.selection = cmds.ls(sl=True) or []
 
     def __str__(self):
-        return str(self.selection)
+        return f"{self.__class__.__name__}(SELECTION: {str(self.selection)})"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(SELECTION: {repr(self.selection)})"
+        return self.selection
 
     def __iter__(self):
         return iter(self.selection)
+
+    def __len__(self):
+        return len(self.selection)
+
+    def __getitem__(self, item):
+        return self.selection[item]
+
+    def __setitem__(self, key, value):
+        self.selection[key] = value
+
+    def __delitem__(self, key):
+        del self.selection[key]
+
+    def __contains__(self, item):
+        return item in self.selection
 
 
 class SelectAdvanced(SelectBase):
@@ -27,15 +42,23 @@ class SelectAdvanced(SelectBase):
             'controls': (['control', 'ctrls', 'ctrl', 'c'], self._filter_controls),
             "joints": (['joint', 'jnts', 'jnt', 'j'], self._filter_joints)})
 
+    def __call__(self, *args, **kwargs):
+        return self.filter_selection(**kwargs)
+
     def update_selection(self, _selection=None):
         if not self.selection:
             raise ValueError("No objects selected in Maya!")
+        if _selection is not None:
+            self.selection = _selection
 
     def filter_selection(self, **kwargs):
         if kwargs:
             for key, value in kwargs.items():
                 if value:
                     self.selection = self.options(key, self.selection)
+        return self.selection
+
+    def get(self):
         return self.selection
 
     @staticmethod
