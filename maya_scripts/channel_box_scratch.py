@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from core.components.validate_cmds.maya_exist_cmds import Exists as ex
+from core.components.validate_cmds.maya_existence import Exists as ex
 
 
 def create_attr(node, attr_name, attr_type="float", min_val=0, max_val=1, default_val=0):

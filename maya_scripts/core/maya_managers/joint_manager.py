@@ -50,7 +50,7 @@ class JointManager:
         # Initialize a defaultdict for joint types
         count_dict = defaultdict(lambda: {'count': 0, 'joints': []})
         if self.combine:
-            pattern = re.compile(r'_[0-9]+$')  # Regular expression to remove numerical suffix
+            pattern = re.compile(r"_[0-9]+$")  # Regular expression to remove numerical suffix
 
         for string in self.selection:
             _, joint_type = self._split(string)

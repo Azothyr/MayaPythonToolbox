@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from core.components.validate_cmds.maya_exist_cmds import Exists as exists
+from core.components.validate_cmds.maya_existence import Exists as exists
 from core.components.xform_handler import XformHandler as xform
 
 

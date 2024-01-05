@@ -1,5 +1,5 @@
 from maya import cmds
-from core.components.validate_cmds.maya_exist_cmds import Exists as ex
+from core.components.validate_cmds.maya_existence import Exists as ex
 
 
 class RemoveBase:

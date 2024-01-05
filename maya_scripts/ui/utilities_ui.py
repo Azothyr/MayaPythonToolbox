@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 from core.components import constraint_cmds, history_cmds, parent_cmds
-from core.components.joint_cmds import joint_axis_vis_toggle
+from core.components.joint_cmds import axis_vis_toggle
 from ui.components.window_base import WindowBase as Window
 
 
