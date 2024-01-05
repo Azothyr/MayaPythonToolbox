@@ -5,6 +5,7 @@ will determine the centers.
 """
 import maya.cmds as cmds
 import ast
+from core.maya_managers.selection_manager import Select
 
 
 def _calculate_object_center(obj):
@@ -65,10 +66,11 @@ def get_center(_input=None):
             pass
 
     # Check if _input is a list or a single object
-    if isinstance(_input, list):
+    if isinstance(_input, list) or isinstance(_input, Select):
         return _get_selection_centers(_input)
     elif isinstance(_input, str):
         return _calculate_object_center(_input)
     else:
-        cmds.warning("input must be a selected object or a list of selected objects.")
+        cmds.warning("input must be a selected object or a list of selected objects.\n"
+                     "Received: %s" % type(_input))
         return

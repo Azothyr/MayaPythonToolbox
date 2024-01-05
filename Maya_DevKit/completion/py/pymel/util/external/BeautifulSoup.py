@@ -557,7 +557,7 @@ class BeautifulStoneSoup(Tag, SGMLParser):
         This method fixes a bug in Python's SGMLParser.
         """
         pass
-    def endData(self, containerClass='"<class \'pymel.util.external.BeautifulSoup.NavigableString\'>"'): pass
+    def endData(self, containerClass='"<class \'pymel.utils.external.BeautifulSoup.NavigableString\'>"'): pass
     def handle_charref(self, ref):
         """
         Handle character references as data.

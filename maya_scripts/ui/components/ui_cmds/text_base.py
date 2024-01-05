@@ -1,5 +1,5 @@
 from config.arg_lib_info.text_arg_map import text_arg_map as _map_src
-from ui.components.maya_cmds_base import CmdsBase
+from ui.components.ui_cmds.maya_cmds_base import CmdsBase
 
 
 class TextBase(CmdsBase):

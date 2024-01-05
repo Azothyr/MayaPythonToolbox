@@ -30,7 +30,7 @@ class Condition(object):
     def __rand__(self, other): pass
     def __ror__(self, other): pass
     def __str__(self): pass
-    def eval(self, data='"<class \'pymel.util.conditions.NO_DATA\'>"'): pass
+    def eval(self, data='"<class \'pymel.utils.conditions.NO_DATA\'>"'): pass
     __dict__ = None
     
     
@@ -40,13 +40,13 @@ class Condition(object):
 class Inverse(Condition):
     def __init__(self, toInvert): pass
     def __str__(self): pass
-    def eval(self, data='"<class \'pymel.util.conditions.NO_DATA\'>"'): pass
+    def eval(self, data='"<class \'pymel.utils.conditions.NO_DATA\'>"'): pass
 
 
 class AndOrAbstract(Condition):
     def __init__(self, *args): pass
     def __str__(self): pass
-    def eval(self, data='"<class \'pymel.util.conditions.NO_DATA\'>"'): pass
+    def eval(self, data='"<class \'pymel.utils.conditions.NO_DATA\'>"'): pass
 
 
 class Or(AndOrAbstract):

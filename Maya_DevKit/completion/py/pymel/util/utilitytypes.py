@@ -3,7 +3,7 @@ import exceptions
 
 """
 Defines common types and type related utilities:  Singleton, etc.
-These types can be shared by other utils modules and imported into util main namespace for use by other pymel modules
+These types can be shared by other utils modules and imported into utils main namespace for use by other pymel modules
 """
 
 

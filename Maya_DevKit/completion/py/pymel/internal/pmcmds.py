@@ -34102,7 +34102,7 @@ def getMelRepresentation(args, recursionLimit='None', maintainDicts='True'):
     
         maintainDicts : bool
             In general, all iterables will be converted to tuples in the returned copy - however, if maintainDicts==True,
-            then iterables for which ``util.isMapping()`` returns True will be returned as dicts.
+            then iterables for which ``utils.isMapping()`` returns True will be returned as dicts.
     """
     pass
 def JointToolOptions(*args, **kwargs): pass

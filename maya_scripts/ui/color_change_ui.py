@@ -1,14 +1,14 @@
 from core.components import color_changer as color_tool
 from core.components.color_library import ColorIndex as ColorLib
 from core.maya_managers.selection_manager import Select as sl
-from ui.components.window_base import WindowBase as Window
-from ui.components.button_base import ButtonBase as Button
-from ui.components.optionMenu_base import OptionMenuBase as OptionMenu
-from ui.components.menuItem_base import MenuItemBase as MenuItem
-from ui.components.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
-from ui.components.tabLayout_base import TabLayoutBase as TabLayout
-from ui.components.text_base import TextBase as Text
-from ui.components.columnLayout_base import ColumnLayoutBase as ColLayout
+from ui.components.ui_cmds.window_base import WindowBase as Window
+from ui.components.ui_cmds.button_base import ButtonBase as Button
+from ui.components.ui_cmds.optionMenu_base import OptionMenuBase as OptionMenu
+from ui.components.ui_cmds.menuItem_base import MenuItemBase as MenuItem
+from ui.components.ui_cmds.rowColumnLayout_base import RowColumnLayoutBase as RowColLayout
+from ui.components.ui_cmds.tabLayout_base import TabLayoutBase as TabLayout
+from ui.components.ui_cmds.text_base import TextBase as Text
+from ui.components.ui_cmds.columnLayout_base import ColumnLayoutBase as ColLayout
 
 
 def _ui_setup(parent_ui, tool):

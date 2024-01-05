@@ -1,6 +1,6 @@
 from config.arg_lib_info.menuItem_arg_map import menuItem_arg_map as _map_src
-from ui.components.optionMenu_base import OptionMenuBase as OptionMenu
-from ui.components.maya_cmds_base import CmdsBase
+from ui.components.ui_cmds.optionMenu_base import OptionMenuBase as OptionMenu
+from ui.components.ui_cmds.maya_cmds_base import CmdsBase
 
 
 class MenuItemBase(CmdsBase):

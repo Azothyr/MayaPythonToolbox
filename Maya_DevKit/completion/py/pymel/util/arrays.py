@@ -4389,7 +4389,7 @@ def setRange(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.setRange to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.setRange to work element-wise on iterables
     """
     pass
 def _toCompOrArrayInstance(value, cls='None'): pass
@@ -4405,7 +4405,7 @@ def hermite(*args, **kwargs):
         :rtype: float
     
         
-    This function has been overriden from pymel.util.mathutils.hermite to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.hermite to work element-wise on iterables
     """
     pass
 def length(a, axis='None'):
@@ -4481,7 +4481,7 @@ def dot(u, v):
 def imag(*args, **kwargs):
     """
     the imaginary part of x 
-    This function has been overriden from pymel.util.mathutils.imag to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.imag to work element-wise on iterables
     """
     pass
 def acosh(*args, **kwargs):
@@ -4501,7 +4501,7 @@ def linstep(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.linstep to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.linstep to work element-wise on iterables
     """
     pass
 def log(*args, **kwargs):
@@ -4552,7 +4552,7 @@ def hermiteInterp(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.hermiteInterp to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.hermiteInterp to work element-wise on iterables
     """
     pass
 def pow(*args, **kwargs):
@@ -4659,7 +4659,7 @@ def linmap(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.linmap to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.linmap to work element-wise on iterables
     """
     pass
 def asinh(*args, **kwargs):
@@ -4745,7 +4745,7 @@ def gamma(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.gamma to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.gamma to work element-wise on iterables
     """
     pass
 def _shapeInfo(value): pass
@@ -4758,7 +4758,7 @@ def round(*args, **kwargs):
         in that case rel and imaginary values are rounded separately
     
         
-    This function has been overriden from pymel.util.mathutils.round to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.round to work element-wise on iterables
     """
     pass
 def smoothstep(*args, **kwargs):
@@ -4770,7 +4770,7 @@ def smoothstep(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.smoothstep to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.smoothstep to work element-wise on iterables
     """
     pass
 def ceil(*args, **kwargs):
@@ -4893,7 +4893,7 @@ def smoothmap(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.smoothmap to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.smoothmap to work element-wise on iterables
     """
     pass
 def log1p(*args, **kwargs):
@@ -4908,7 +4908,7 @@ def log1p(*args, **kwargs):
 def real(*args, **kwargs):
     """
     the real part of x 
-    This function has been overriden from pymel.util.mathutils.real to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.real to work element-wise on iterables
     """
     pass
 def normal(a, axis='None'):
@@ -5058,7 +5058,7 @@ def blend(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.blend to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.blend to work element-wise on iterables
     """
     pass
 def modf(*args, **kwargs):
@@ -5137,7 +5137,7 @@ def dist(a, b, axis='None'):
 def conjugate(*args, **kwargs):
     """
     the conjugate part of x 
-    This function has been overriden from pymel.util.mathutils.conjugate to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.conjugate to work element-wise on iterables
     """
     pass
 def max(*args, **kwargs):
@@ -5243,7 +5243,7 @@ def clamp(*args, **kwargs):
     
         :rtype: float
         
-    This function has been overriden from pymel.util.mathutils.clamp to work element-wise on iterables
+    This function has been overriden from pymel.utils.mathutils.clamp to work element-wise on iterables
     """
     pass
 def abs(*args, **kwargs):

@@ -362,7 +362,7 @@ class MayaNodePath(NameParsed):
         Component Of: `Component`, `NodeAttribute`
     
     Example
-        >>> import pymel.util.nameparse as nameparse
+        >>> import pymel.utils.nameparse as nameparse
         >>> obj = nameparse.parse( 'group1|pCube1|pCubeShape1' )
         >>> obj.setNamespace( 'foo:' )
         >>> print obj

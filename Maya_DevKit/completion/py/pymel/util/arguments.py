@@ -1,6 +1,6 @@
 """
 Defines arguments manipulation utilities, like checking if an argument is iterable, flattening a nested arguments list, etc.
-These utility functions can be used by other util modules and are imported in util's main namespace for use by other pymel modules
+These utility functions can be used by other utils modules and are imported in utils's main namespace for use by other pymel modules
 """
 
 

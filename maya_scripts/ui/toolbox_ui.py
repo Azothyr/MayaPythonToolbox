@@ -1,6 +1,6 @@
 from ui import joint_ui, control_ui, color_change_ui, utilities_ui
-from ui.components.window_base import WindowBase as Window
-from ui.components.tabLayout_base import TabLayoutBase as TabLayout
+from ui.components.ui_cmds.window_base import WindowBase as Window
+from ui.components.ui_cmds.tabLayout_base import TabLayoutBase as TabLayout
 
 
 def create_ui_window(manual_run=False):
