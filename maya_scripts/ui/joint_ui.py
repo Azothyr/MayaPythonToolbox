@@ -38,7 +38,7 @@ def _ui_setup(parent_ui: str, tool: str) -> str:
     parent_options = ParentMenu("parent_block", "parent_opt_menu", create=True)
     loc_list = JointList("pos_list_block", "Creation_List", create=True)
     cmds.text(l="Joint Radius:", bgc=[.7, .7, .7], p="radius_block")
-    radius_input = cmds.textField("joint_radius", tx="1", bgc=[.1, .1, .1], p="radius_block")
+    radius_input = cmds.textField("joint_radius", tx="1", bgc=[.1, .1, .1], p="radius_block", width=100)
 
     rename_bool = cmds.checkBox("name_bool", label="Name Joints", value=False,
                                 changeCommand=partial(toggle_state, "name_bool", "name_input_section"),
@@ -108,7 +108,7 @@ def create_ui_window(*_):
 
 
 def main():
-    create_ui_window(True)
+    create_ui_window()
 
 
 if __name__ == "__main__":

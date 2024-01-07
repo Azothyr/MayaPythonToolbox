@@ -8,30 +8,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/internal/pmcmds.py" beforeDir="false" afterPath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/internal/pmcmds.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/arguments.py" beforeDir="false" afterPath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/arguments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/arrays.py" beforeDir="false" afterPath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/arrays.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/conditions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/conditions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/external/BeautifulSoup.py" beforeDir="false" afterPath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/external/BeautifulSoup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/nameparse.py" beforeDir="false" afterPath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/nameparse.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/utilitytypes.py" beforeDir="false" afterPath="$PROJECT_DIR$/Maya_DevKit/completion/py/pymel/util/utilitytypes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/center_locator.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/center_locator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/color_change_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/color_change_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/button_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/button_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/columnLayout_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/columnLayout_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/maya_cmds_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/maya_cmds_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/menuItem_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/menuItem_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/optionMenu_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/optionMenu_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/rowColumnLayout_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/rowColumnLayout_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/tabLayout_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/tabLayout_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/textField_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/textField_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/text_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/text_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/window_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/ui_cmds/window_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/option_menu_frame.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/option_menu_frame.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/toolbox_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/toolbox_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/utilities/test_components.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/utilities/test_components.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +47,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "MayaCharm.Maya-Laptop.executor": "Run",
     "MayaCharm.Maya-Main.executor": "Run",
     "MayaCharm.Maya.executor": "Run",
     "Python._main_ui_.executor": "Run",
@@ -123,7 +102,7 @@
       <command value="f&quot;{self.name}_add_mode&quot;" />
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="MayaCharm.Maya-Laptop">
     <configuration name="Maya-Laptop" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
       <option name="executionType" value="FILE" />
       <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
@@ -182,6 +161,7 @@
       <workItem from="1704340545570" duration="9333000" />
       <workItem from="1704390763661" duration="2867000" />
       <workItem from="1704396299383" duration="16388000" />
+      <workItem from="1704579648442" duration="1258000" />
     </task>
     <servers />
   </component>

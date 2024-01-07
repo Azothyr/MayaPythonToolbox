@@ -11,16 +11,14 @@ class MainUI(BaseUI):
         super().__init__(*super_args)
 
         # Variables
-        self.selected_option = None
+        self.text = None
 
         # Sub UIs
-        self.top_section = f"{self.name}_top"
-        self.bot_section = f"{self.name}_bot"
+        self.section = f"{self.name}_section"
 
         # Sub UI Components
-        self.input_columns = f"{self.name}_columns"
-        self.toggle = f"{self.name}_bool"
-        self.menu = f"{self.name}_menu"
+        self.input = f"{self.name}_columns"
+        self.label = f"{self.name}_bool"
 
         if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
             self._create_ui()
@@ -73,3 +71,43 @@ if __name__ == "__main__":
     win = cmds.window("test_win")
     cmds.showWindow(win)
     test = MainUI(win, "test_win", create=True)
+
+class BaseUI(ABC):
+    def __init__(self, parent_ui: str, name: str, width=300, **kwargs):
+        # Variables
+        self.name = name
+        self.readable_name = name.replace("_", " ").capitalize()
+        self.window_width = width
+
+        # Top level UI
+        self.form = f"ui_form_{name}"
+        self.frame = f"frame_{name}"
+        self.parent_ui = parent_ui
+        self.collapsible: bool = kwargs.get("collapsible", False)
+        self.start_collapsed: bool = kwargs.get("collapsed", False)
+
+    def _create_ui(self):
+        cmds.formLayout(
+            self.form,
+            bgc=[.5, .5, .5],
+            p=self.parent_ui
+        )
+        cmds.frameLayout(
+            self.frame,
+            label=self.readable_name,
+            collapsable=self.collapsible,
+            collapse=self.start_collapsed,
+            parent=self.form
+        )
+        self._setup_main_ui()
+        self._setup_ui_components()
+
+    @abstractmethod
+    def _setup_main_ui(self): ...
+
+    @abstractmethod
+    def _setup_ui_components(self): ...
+
+
+cmds.text(l="Joint Radius:", bgc=[.7, .7, .7], p="radius_block")
+    radius_input = cmds.textField("joint_radius", tx="1", bgc=[.1, .1, .1], p="radius_block", width=100)
