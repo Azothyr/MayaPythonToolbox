@@ -17,17 +17,16 @@ class MainUI(BaseUI):
         self.section = f"{self.name}_section"
 
         # Sub UI Components
-        self.input = f"{self.name}_columns"
-        self.label = f"{self.name}_bool"
+        self.input = f"{self.name}_input"
+        self.label = f"{self.name}_label"
 
         if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
             self._create_ui()
 
-    def __bool__(self):
-        return cmds.checkBox(self.toggle, query=True, value=True)
-
     def get(self):
         return cmds.optionMenu(self.menu, query=True, value=True)
+        cmds.text(l=f"{self.readable_name}:", bgc=[.7, .7, .7], p=self.section)
+        radius_input = cmds.textField("joint_radius", tx="1", bgc=[.1, .1, .1], p="radius_block", width=100)
 
     def _setup_main_ui(self):
         cmds.columnLayout(self.top_section, adjustableColumn=True, p=self.frame)
@@ -101,13 +100,3 @@ class BaseUI(ABC):
         )
         self._setup_main_ui()
         self._setup_ui_components()
-
-    @abstractmethod
-    def _setup_main_ui(self): ...
-
-    @abstractmethod
-    def _setup_ui_components(self): ...
-
-
-cmds.text(l="Joint Radius:", bgc=[.7, .7, .7], p="radius_block")
-    radius_input = cmds.textField("joint_radius", tx="1", bgc=[.1, .1, .1], p="radius_block", width=100)

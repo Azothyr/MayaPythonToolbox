@@ -5,11 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MayaPythonToolbox.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/option_menu_frame.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/option_menu_frame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/channel_box_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/channel_box_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/coordinate_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/coordinate_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/fk_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ik_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/ik_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ik_to_fk_driven_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/ik_to_fk_driven_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/joint_to_mesh_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/joint_to_mesh_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/limb_twist_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/limb_twist_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/maya_scripts_inserter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/point_contraint_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/point_contraint_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/reverse_foot_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/reverse_foot_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/rig_finish_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/rig_finish_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/rk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/rk_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/stretchy_ik_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/stretchy_ik_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/mod_blocks/advanced_mod/labeled_textfield.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/mod_blocks/advanced_mod/labeled_textfield.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/weight_paint_time_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/weight_paint_time_scratch.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,56 +56,56 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "MayaCharm.Maya-Laptop.executor": "Run",
-    "MayaCharm.Maya-Main.executor": "Run",
-    "MayaCharm.Maya.executor": "Run",
-    "Python._main_ui_.executor": "Run",
-    "Python.arg_lib.executor": "Run",
-    "Python.assignment_filler_school.executor": "Run",
-    "Python.cmds_class_builder.executor": "Run",
-    "Python.color_change_ui.executor": "Run",
-    "Python.color_library.executor": "Run",
-    "Python.constraint_cmds.executor": "Run",
-    "Python.joint_axis_vis_toggle.executor": "Run",
-    "Python.joint_ui.executor": "Run",
-    "Python.kwarg_option_menu.executor": "Run",
-    "Python.kwarg_parser.executor": "Run",
-    "Python.maya_exist_cmds.executor": "Run",
-    "Python.maya_exist_manager.executor": "Run",
-    "Python.maya_setup.executor": "Run",
-    "Python.selection_manager.executor": "Run",
-    "Python.text_paste.executor": "Run",
-    "Python.userSetup.executor": "Run",
-    "Python.utilities_ui.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last.edited.regexp": "Sample Text",
-    "last_opened_file_path": "C:/Users/Demon/Documents/PythonToolboxForge/generic_utilities/functions/assignment_filler_school.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PythonContentEntriesConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;MayaCharm.Maya-Laptop.executor&quot;: &quot;Run&quot;,
+    &quot;MayaCharm.Maya-Main.executor&quot;: &quot;Run&quot;,
+    &quot;MayaCharm.Maya.executor&quot;: &quot;Run&quot;,
+    &quot;Python._main_ui_.executor&quot;: &quot;Run&quot;,
+    &quot;Python.arg_lib.executor&quot;: &quot;Run&quot;,
+    &quot;Python.assignment_filler_school.executor&quot;: &quot;Run&quot;,
+    &quot;Python.cmds_class_builder.executor&quot;: &quot;Run&quot;,
+    &quot;Python.color_change_ui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.color_library.executor&quot;: &quot;Run&quot;,
+    &quot;Python.constraint_cmds.executor&quot;: &quot;Run&quot;,
+    &quot;Python.joint_axis_vis_toggle.executor&quot;: &quot;Run&quot;,
+    &quot;Python.joint_ui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.kwarg_option_menu.executor&quot;: &quot;Run&quot;,
+    &quot;Python.kwarg_parser.executor&quot;: &quot;Run&quot;,
+    &quot;Python.maya_exist_cmds.executor&quot;: &quot;Run&quot;,
+    &quot;Python.maya_exist_manager.executor&quot;: &quot;Run&quot;,
+    &quot;Python.maya_setup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.selection_manager.executor&quot;: &quot;Run&quot;,
+    &quot;Python.text_paste.executor&quot;: &quot;Run&quot;,
+    &quot;Python.userSetup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.utilities_ui.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last.edited.regexp&quot;: &quot;Sample Text&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Demon/Documents/PythonToolboxForge/generic_utilities/functions/assignment_filler_school.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PythonContentEntriesConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\core\components\control_cmds" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\scratch" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\frames\base" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\base_frames" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\ui_cmds" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\maya_objects" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -102,7 +113,7 @@
       <command value="f&quot;{self.name}_add_mode&quot;" />
     </option>
   </component>
-  <component name="RunManager" selected="MayaCharm.Maya-Laptop">
+  <component name="RunManager" selected="MayaCharm.Maya-Main">
     <configuration name="Maya-Laptop" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
       <option name="executionType" value="FILE" />
       <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
@@ -162,6 +173,7 @@
       <workItem from="1704390763661" duration="2867000" />
       <workItem from="1704396299383" duration="16388000" />
       <workItem from="1704579648442" duration="1258000" />
+      <workItem from="1704597977391" duration="2324000" />
     </task>
     <servers />
   </component>
