@@ -27,6 +27,4 @@ ExportedObj/
 *.pdb
 *.opendb
 
-*.idea
-
 *.pyc
