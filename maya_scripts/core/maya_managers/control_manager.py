@@ -1,76 +1,59 @@
-import maya.cmds as cmds
-from core.maya_managers.selection_manager import Select as sl
-from core.components.validate_cmds import exists_maya as exists
-from core.components.control_cmds import Create as ctrlCreate
+from core.components.control_cmds import Create as cr
+from core.components.validate_cmds.maya_existence import Exists as exists
+from core.components.control_cmds import check_and_fix as control_name
+from core.components.xform_handler import XformHandler as xform
 
 
 class ControlManager:
-    def __init__(self, *args, radius=1.0, **kwargs):
-        self.radius = radius
-        self.selection = sl() if not args else self._process_args(args)
-        self.controls = []
+    def __init__(self, name: str, **kwargs):
+        self.name = None
+        self.control = None
+        self.group = None
+        self.shape = None
+        self.ctrl_xform = None
+        self.group_xform = None
+        self.shape_xform = None
+        self.radius = kwargs.get("radius", 1.0)
+        self.pos = None
+        self.rot = None
+        self.exists = False
 
-    def __call__(self, mode="all"):
-        return self._at_selection(mode)
+        if exists.control(name):
+            self.__setup(name, **kwargs)
+        else:
+            self.create(name, **kwargs)
 
-    def __iter__(self):
-        return iter(self.selection)
+    def __setup(self, name: str, **kwargs):
+        self.exists = True
+        self.name = control_name(name)
+        self.control = self.name
+        self.group = control_name(name, "_Ctrl_Grp")
+        self.shape = control_name(name, "_CtrlShape")
+        self.ctrl_xform = xform(self.control)
+        self.group_xform = xform(self.group)
+        self.shape_xform = xform(self.shape)
+        self.pos = self.group_xform.get_world_space_position()
+        self.rot = self.group_xform.get_world_space_rotation()
 
-    @staticmethod
-    def _process_args(args):
-        valid_args = [arg for arg in args if isinstance(arg, str)]
-        return sl(valid_args)
+    def get_control_and_group(self):
+        return self.control, self.group
 
-    @staticmethod
-    def _process_selection(orig_sel, mode):
-        new_sel = []
+    def create(self, *args, **kwargs):
+        if not kwargs.get("create", False):
+            kwargs["create"] = True
 
-        for name in orig_sel:
-            if mode == "joint":
-                if exists.joint(name):
-                    processing = name.replace("Jnt", "Ctrl") if name.endswith("_Jnt") else f"{name}_Ctrl"
-                    new_sel.append(processing)
-                else:
-                    cmds.warning(f"{name} is not a joint.")
-            else:
-                processing = f"{name}_Ctrl" if not name.endswith("_Ctrl") else name
-                new_sel.append(processing)
-        return
+        return cr(self.name, self.radius, **kwargs)
 
-    def _at_selection(self, selction_type: str = None):
-        selection = self.selection()
-        new_sel = []
-        xform_objs = []
-        match selction_type.lower():
-            case opt if opt in ["joint", "jnt", "j"]:
-                for name in selection(joint=True):
-                    processing = name.replace("Jnt", "Ctrl")
-                    new_sel.append(processing)
-                    xform_objs.append(name)
-            case _:
-                for name in selection:
-                    processing = f"{name}_Ctrl" if not name.endswith("_Ctrl") else name
-                    new_sel.append(processing)
-                    xform_objs.append(name)
-        self.controls = self._process_args(new_sel)
-        return self.create(new_sel, xform_objs)
+    def set_xform(self, match_obj: str = None, translate: tuple[float, float, float] = None,
+                  rotate: tuple[float, float, float] = None):
+        if match_obj:
+            self.group_xform.match_xform(match_obj, ["translate", "rotate"])
+            self.ctrl_xform.match_xform(match_obj, ["translate", "rotate"])
+        elif translate and rotate:
+            translate if translate is not None else self.pos if self.pos is not None else (0, 0, 0)
+            rotate if rotate is not None else self.rot if self.rot is not None else (1, 0, 0)
+            self.group_xform.set_world_space_position(self.pos)
+            self.group_xform.set_world_space_rotation(self.rot)
+            self.ctrl_xform.set_world_space_position(self.pos)
+            self.ctrl_xform.set_world_space_rotation(self.rot)
 
-    def create(self, objects: list[str] = None, xform_objs: list[str] = None):
-        objects = objects if len(objects) > 1 else [objects] if isinstance(objects, str) else self.selection
-        if not objects:
-            raise ValueError("ERROR: No objects to create controls from!")
-
-        control_list = []
-        for i, obj in enumerate(objects):
-            new_control = ctrlCreate(obj, radius=self.radius, create=True)
-            control_list.append(new_control)
-            if xform_objs:
-                new_control.set_xform(xform_objs[i])
-
-        return control_list
-
-
-if __name__ == "__main__":
-    selection = cmds.ls(sl=True)
-    controls = ControlManager(radius=5)
-    controls()

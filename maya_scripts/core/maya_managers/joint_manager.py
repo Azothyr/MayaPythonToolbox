@@ -2,6 +2,7 @@ import maya.cmds as cmds
 from pprint import pprint
 from collections import defaultdict
 import re
+from core.maya_managers.selection_manager import Select as sl
 
 
 class JointManager:
@@ -16,7 +17,7 @@ class JointManager:
 
     def __init__(self, selection=None, combine=True, get=None, debug=False, **kwargs):
         self.instance_allow_print = debug
-        self.selection = selection if selection is not None else cmds.ls(type="joint")
+        self.selection = sl(selection).filter_selection(joints=True)
         self.combine = combine
         if get:
             if get.lower() not in self.TYPES.keys():

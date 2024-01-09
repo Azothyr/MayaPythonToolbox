@@ -1,23 +1,6 @@
 import maya.cmds as cmds
 from core.constrainer import Main as constraint_manager
-from core.components.control_cmds
-
-
-class ControlGroup:
-    def __init__(self, control_objects):
-        self.group, self.control = self._split_to_control_and_group(control_objects)
-
-    @staticmethod
-    def _split_to_control_and_group(_object):
-        if cmds.objectType(_object) != "transform":
-            raise ValueError(f"ERROR: Incorrect object type for {_object}. Expected 'transform', got {cmds.objectType(_object)}.")
-
-        if _object.lower().endswith("_ctrl"):
-            return cmds.listRelatives(_object, parent=True, type="transform")[0], _object
-        elif _object.lower().endswith("_grp"):
-            return _object, cmds.listRelatives(_object, children=True, type="transform")[0]
-
-        raise ValueError(f"ERROR: {_object} does not end with '_Ctrl' or '_Grp'.")
+from core.maya_managers.control_manager import ControlManager
 
 
 class BrokenFkConstraintFactory:
@@ -188,8 +171,8 @@ class BrokenFkManager:
 
     def run(self, clean=False, controls=True, joints=True):
         if clean:
-            constraint_manager(mode="r", )
-        sorted_controls = [ControlGroup(control) for control in self.unsorted_selection]
+            constraint_manager(mode="r")
+        sorted_controls = [ControlManager(control) for control in self.unsorted_selection]
         constraint_order = self.create_constraint_order(sorted_controls)
         control_map = {cg.control: cg for cg in sorted_controls}
         self.create_constraints(constraint_order, control_map, control_constraints=controls, joint_constraints=joints)

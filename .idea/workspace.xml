@@ -6,6 +6,20 @@
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/attribute_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/attribute_cmds.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/attribute_cmds/remove_attr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/constraint_cmds/removal.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/constraint_cmds/removal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/creation.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/creation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/name_scheme.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/components/control_cmds/name_scheme.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/maya_managers/control_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/maya_managers/control_factory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/core/maya_managers/joint_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/core/maya_managers/joint_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/scratch/channel_box_scratch.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/scratch/coordinate_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/later/coordinate_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/scratch/fk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/fk_manager_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/scratch/joint_to_mesh_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/joint_to_mesh_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +42,9 @@
     <option name="FILTER_INFO" value="true" />
     <option name="FILTER_DEBUG" value="true" />
     <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -60,6 +77,7 @@
     &quot;Python.maya_exist_cmds.executor&quot;: &quot;Run&quot;,
     &quot;Python.maya_exist_manager.executor&quot;: &quot;Run&quot;,
     &quot;Python.maya_setup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.scratch_1.executor&quot;: &quot;Run&quot;,
     &quot;Python.selection_manager.executor&quot;: &quot;Run&quot;,
     &quot;Python.text_paste.executor&quot;: &quot;Run&quot;,
     &quot;Python.userSetup.executor&quot;: &quot;Run&quot;,
@@ -86,11 +104,11 @@
       <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\core\components\control_cmds" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\components\attribute_cmds" />
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\scratch\later" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\scratch" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\frames\base" />
       <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\base_frames" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\ui_cmds" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -98,7 +116,7 @@
       <command value="f&quot;{self.name}_add_mode&quot;" />
     </option>
   </component>
-  <component name="RunManager" selected="MayaCharm.Maya-Main">
+  <component name="RunManager" selected="MayaCharm.Maya-Laptop">
     <configuration name="Maya-Laptop" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
       <option name="executionType" value="FILE" />
       <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
@@ -159,6 +177,10 @@
       <workItem from="1704396299383" duration="16388000" />
       <workItem from="1704579648442" duration="1258000" />
       <workItem from="1704597977391" duration="2324000" />
+      <workItem from="1704765544955" duration="35000" />
+      <workItem from="1704765588643" duration="732000" />
+      <workItem from="1704774890810" duration="2081000" />
+      <workItem from="1704776990547" duration="7592000" />
     </task>
     <servers />
   </component>
@@ -170,7 +192,7 @@
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$maya_exist_manager.coverage" NAME="maya_exist_manager Coverage Results" MODIFIED="1703820039387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$color_change_ui.coverage" NAME="color_change_ui Coverage Results" MODIFIED="1703818041680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$_main_ui_.coverage" NAME="_main_ui_ Coverage Results" MODIFIED="1704098524557" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
-    <SUITE FILE_PATH="coverage/channel_box_scratch_py$scratch_1.coverage" NAME="scratch_1 Coverage Results" MODIFIED="1704764423342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/channel_box_scratch_py$scratch_1.coverage" NAME="scratch_1 Coverage Results" MODIFIED="1704776771890" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$joint_axis_vis_toggle.coverage" NAME="joint_axis_vis_toggle Coverage Results" MODIFIED="1704161173771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core/components/joint_cmds" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$kwarg_parser.coverage" NAME="kwarg_parser Coverage Results" MODIFIED="1704053122846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/utilities" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$userSetup.coverage" NAME="userSetup Coverage Results" MODIFIED="1704098389943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../maya/2024/scripts" />

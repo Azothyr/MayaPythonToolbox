@@ -45,7 +45,7 @@ class BrokenGeoConstrainer:
 
         # Constrain each mesh to its corresponding joint
         for joint_base, meshes in mesh_to_joint_mapping.items():
-            joint_name = f"{joint_base}_Jnt"  # or however the actual joint name is formed
+            joint_name = f"{joint_base}_Jnt"
             # for mesh in meshes:
             #     cmds.parentConstraint(joint_name, mesh, mo=True)
 

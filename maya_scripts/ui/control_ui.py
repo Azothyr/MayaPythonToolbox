@@ -1,4 +1,4 @@
-from core.maya_managers.control_manager import ControlManager as control_tool
+from core.maya_managers.control_factory import ControlFactory as control_tool
 from core.components import color_changer as color_tool
 from core.components.color_library import ColorIndex as ColorLib
 from ui.components.ui_cmds.window_base import WindowBase as Window

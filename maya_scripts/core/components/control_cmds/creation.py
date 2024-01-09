@@ -1,22 +1,17 @@
 import maya.cmds as cmds
 from core.components.validate_cmds.maya_existence import Exists as exists
-from core.components.xform_handler import XformHandler as xform
+from core.components.attribute_cmds import set_ as set_attr
 
 
 class CreateBase:
     def __init__(self, name=None, radius=1.0, position=(0, 0, 0), rotation=(1, 0, 0), **kwargs):
-        if name is None:
-            name = self._generate_unique_name()
         self.name, self.shape, self.group = self._setup(name)
+        self.radius = radius
 
         self.control = self.name
-        self.radius = radius
 
         self.pos = position
         self.rot = rotation
-        self.ctrl_xform = None
-        self.group_xform = None
-        self.shape_xform = None
 
         if kwargs.get("run", kwargs.get("create", False)):
             self.create_type(kwargs.get("mode", "all"))
@@ -36,7 +31,7 @@ class CreateBase:
         self.create_type()
 
     def _setup(self, name: str) -> tuple[str, str, str]:
-        if name is None or exists.control(name):
+        if name is None or not exists.control(name):
             name = self._generate_unique_name()
         if "_Ctrl" not in name:
             name = f"{name}_Ctrl"
@@ -49,29 +44,13 @@ class CreateBase:
         self.control = cmds.rename(control, self.name)
         shape = cmds.listRelatives(self.control, shapes=True)[0]
         self.shape = cmds.rename(shape, self.shape)
-        self.ctrl_xform = xform(self.control)
-        self.shape_xform = xform(self.shape)
 
     def _create_group(self, create: bool = True):
         if create:
             cmds.group(empty=True, name=self.group)
             cmds.parent(self.control, self.group)
-            self.group_xform = xform(self.group)
         else:
             self.group = None
-
-    def set_xform(self, match_obj: str = None, translate: tuple[float, float, float] = None,
-                  rotate: tuple[float, float, float] = None):
-        if match_obj:
-            self.group_xform.match_xform(match_obj, ["translate", "rotate"])
-            self.ctrl_xform.match_xform(match_obj, ["translate", "rotate"])
-        elif translate and rotate:
-            self.pos = translate if translate is not None else self.pos if self.pos is not None else (0, 0, 0)
-            self.rot = rotate if rotate is not None else self.rot if self.rot is not None else (1, 0, 0)
-            self.group_xform.set_world_space_position(self.pos)
-            self.group_xform.set_world_space_rotation(self.rot)
-            self.ctrl_xform.set_world_space_position(self.pos)
-            self.ctrl_xform.set_world_space_rotation(self.rot)
 
     @staticmethod
     def _generate_unique_name():
@@ -86,7 +65,43 @@ class CreateBase:
 
 class Create(CreateBase):
     def __init__(self, *args, radius: float = 1.0, **kwargs):
+        """
+        Required arguments:
+        args:
+            :param name:
+            :param radius:
+
+        :param kwargs:
+        """
         super().__init__(*args, radius=radius, **kwargs)
+
+    def get_control_and_group(self):
+        return self.control, self.group
+
+    @property
+    def control(self):
+        return self.control
+
+    @property
+    def name(self):
+        return self.name
+
+    @property
+    def shape(self) -> str:
+        return self.shape
+
+    @property
+    def group(self) -> str:
+        return self.group
+
+    @property
+    def radius(self) -> float:
+        return self.radius
+
+    @radius.setter
+    def radius(self, value: float):
+        set_attr(self.shape, "radius", value)
+        self.radius = value
 
 
 if __name__ == "__main__":
