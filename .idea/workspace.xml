@@ -5,22 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/channel_box_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/channel_box_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/coordinate_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/coordinate_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/fk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/fk_manager_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ik_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/ik_manager_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ik_to_fk_driven_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/ik_to_fk_driven_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/joint_to_mesh_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/joint_to_mesh_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/limb_twist_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/limb_twist_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/maya_scripts_inserter.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/point_contraint_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/point_contraint_manager_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/reverse_foot_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/reverse_foot_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/rig_finish_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/rig_finish_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/rk_manager_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/rk_manager_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/stretchy_ik_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/stretchy_ik_scratch.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/mod_blocks/advanced_mod/labeled_textfield.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/mod_blocks/advanced_mod/labeled_textfield.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/weight_paint_time_scratch.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/scratch/weight_paint_time_scratch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,6 +170,7 @@
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$maya_exist_manager.coverage" NAME="maya_exist_manager Coverage Results" MODIFIED="1703820039387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$color_change_ui.coverage" NAME="color_change_ui Coverage Results" MODIFIED="1703818041680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$_main_ui_.coverage" NAME="_main_ui_ Coverage Results" MODIFIED="1704098524557" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
+    <SUITE FILE_PATH="coverage/channel_box_scratch_py$scratch_1.coverage" NAME="scratch_1 Coverage Results" MODIFIED="1704764423342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$joint_axis_vis_toggle.coverage" NAME="joint_axis_vis_toggle Coverage Results" MODIFIED="1704161173771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core/components/joint_cmds" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$kwarg_parser.coverage" NAME="kwarg_parser Coverage Results" MODIFIED="1704053122846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/utilities" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$userSetup.coverage" NAME="userSetup Coverage Results" MODIFIED="1704098389943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../maya/2024/scripts" />
