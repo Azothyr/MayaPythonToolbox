@@ -5,16 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/maya_scripts/ui/components/modular_blocks/advanced_mod/textfield_mods/labeled_textfield.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya_scripts/utilities/set_to_text.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/ui/_main_ui_.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/_main_ui_.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/joint/creation_list_frame.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/joint/creation_list_frame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/mod_blocks/advanced_mod/labeled_textfield.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/mod_blocks/advanced_mod/visual_list.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/modular_blocks/advanced_mod/visual_list.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/mod_blocks/basic_mod/form_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/modular_blocks/basic_mod/form_base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/components/option_menu_frame.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/option_menu_frame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/color_change_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/utils/color_change_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/control/control_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/joint/joint_ui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya_scripts/ui/toolbox_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/toolbox_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/utils/utilities_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,11 +99,11 @@
       <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\core\components\control_cmds" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\utils" />
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\control" />
+      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\ui\components\joint" />
       <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\ui\components\modular_blocks\basic_mod" />
       <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\ui\components\mod_blocks\advanced_mod\textfield_mods" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\core\components\attribute_cmds" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\scratch\later" />
-      <recent name="C:\Users\Demon\Documents\MayaPythonToolbox\maya_scripts\scratch" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -111,7 +111,7 @@
       <command value="f&quot;{self.name}_add_mode&quot;" />
     </option>
   </component>
-  <component name="RunManager" selected="MayaCharm.Maya-Laptop">
+  <component name="RunManager" selected="MayaCharm.Maya-Main">
     <configuration name="Maya-Laptop" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
       <option name="executionType" value="FILE" />
       <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
@@ -180,6 +180,8 @@
       <workItem from="1704825868390" duration="18431000" />
       <workItem from="1704847244666" duration="66000" />
       <workItem from="1704847441882" duration="1866000" />
+      <workItem from="1704850362641" duration="11258000" />
+      <workItem from="1704866515096" duration="47000" />
     </task>
     <servers />
   </component>
@@ -196,7 +198,7 @@
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$kwarg_parser.coverage" NAME="kwarg_parser Coverage Results" MODIFIED="1704053122846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/utilities" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$userSetup.coverage" NAME="userSetup Coverage Results" MODIFIED="1704098389943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../maya/2024/scripts" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$maya_setup.coverage" NAME="maya_setup Coverage Results" MODIFIED="1704098400554" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/config" />
-    <SUITE FILE_PATH="coverage/channel_box_scratch_py$_main_ui_.coverage" NAME="_main_ui_ Coverage Results" MODIFIED="1704226753119" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
+    <SUITE FILE_PATH="coverage/channel_box_scratch_py$_main_ui_.coverage" NAME="_main_ui_ Coverage Results" MODIFIED="1704851538654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$utilities_ui.coverage" NAME="utilities_ui Coverage Results" MODIFIED="1704096562875" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
     <SUITE FILE_PATH="coverage/channel_box_scratch_py$assignment_filler_school.coverage" NAME="assignment_filler_school Coverage Results" MODIFIED="1704431736911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../PythonToolboxForge/generic_utilities/functions" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$constraint_cmds.coverage" NAME="constraint_cmds Coverage Results" MODIFIED="1703820054110" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core/components" />

@@ -27,3 +27,4 @@ ExportedObj/
 *.opendb
 
 *.pyc
+*.cpython-310.pyc

@@ -1,6 +1,7 @@
 import maya.cmds as cmds
-from ui import control_ui, color_change_ui, utilities_ui
-from ui.joint_ui import JointUI
+from ui.components.control import control_ui
+from ui.components.utils import utilities_ui, color_change_ui
+from ui.components.joint.joint_ui import JointUI
 from ui.components.modular_blocks.advanced_mod.window_adv import MainUI as Window
 
 

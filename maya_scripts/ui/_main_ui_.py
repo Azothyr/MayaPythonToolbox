@@ -1,8 +1,10 @@
 import maya.cmds as cmds
 import os
 from functools import partial
-from ui import color_change_ui, control_ui, toolbox_ui, utilities_ui
-from ui.joint_ui import JointUI
+from ui import toolbox_ui
+from ui.components.control import control_ui
+from ui.components.utils import utilities_ui, color_change_ui
+from ui.components.joint.joint_ui import JointUI
 from pathlib import Path
 
 
@@ -31,11 +33,14 @@ def create_tools_menu():
     cmds.menu("customToolsMenu", label="Custom Tools", parent="MayaWindow", tearOff=True, allowOptionBoxes=True)
 
     # Define the directory where the custom scripts reside
-    script_directory = str(Path(__file__).parent.parent / "ui")
-    # print("Script Directory:", script_directory)
+    ui_directory = Path(__file__).parent
+    print("UI Directory:", ui_directory)
+    joint_ui = ui_directory / "components/joint/joint_ui.py"
+    util_ui = ui_directory / "components/utils/utilities_ui.py"
+    control_ui = ui_directory / "components/control/control_ui.py"
 
     # List all scripts in the directory
-    scripts = [script for script in os.listdir(script_directory) if script.endswith(('_ui.mel', '_ui.py'))]
+    scripts = [str(item) for item in [joint_ui, util_ui, control_ui]]
 
     for script in scripts:
         print("---ADDING TO MAYA: ", script)
@@ -52,8 +57,15 @@ def create_tools_menu():
             parent="customToolsMenu"
         )
 
-    # print("Script Directory:", script_directory)
-
 
 if __name__ == "__main__":
-    create_tools_menu()
+    ui_directory = Path(__file__).parent
+    joint_ui = ui_directory / "components/joint/joint_ui.py"
+    util_ui = ui_directory / "components/utils/utilities_ui.py"
+    control_ui = ui_directory / "components/control/control_ui.py"
+    print(f"UI Directory: {ui_directory}", f"EXISTS: {ui_directory.exists()}")
+    print(f"Joint UI: {joint_ui}", f"EXISTS: {joint_ui.exists()}")
+    print(f"Util UI: {util_ui}", f"EXISTS: {util_ui.exists()}")
+    print(f"Control UI: {control_ui}", f"EXISTS: {control_ui.exists()}")
+    scripts = [str(item) for item in [joint_ui, util_ui, control_ui]]
+    print("Scripts:", scripts)
