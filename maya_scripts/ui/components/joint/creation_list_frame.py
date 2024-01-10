@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 from core.components import center_locator
 from core.maya_managers.selection_manager import Select as sl
-from ui.components.mod_blocks.advanced_mod.visual_list import MainUI as AdvUI
+from ui.components.modular_blocks.advanced_mod.visual_list import MainUI as AdvUI
 
 
 class MainUI(AdvUI):
@@ -16,13 +16,16 @@ class MainUI(AdvUI):
             width = 300
 
         super_args = [parent_ui, name, width, mode_callbacks, text_format]
-        super_kwargs = {"collapsed": False, "collapsible": False}
+        super_kwargs = {"collapsed": False, "collapsable": False}
         super().__init__(*super_args, **super_kwargs)
 
         if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
             self._create_ui()
 
     def insert(self, index, value):
+        if not isinstance(value, (tuple, list)):
+            if isinstance(value, str):
+                value = center_locator.get_center(value)
         self.list.insert(index, value)
 
     def _add_mode_any_or_all(self, passed_objs=None, *_):

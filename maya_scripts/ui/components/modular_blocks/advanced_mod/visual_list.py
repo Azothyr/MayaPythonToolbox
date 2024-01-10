@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from ui.components.mod_blocks.basic_mod.form_base import BaseUI
+from ui.components.modular_blocks.basic_mod.form_base import BaseUI
 
 
 class MainUI(BaseUI):
@@ -46,6 +46,9 @@ class MainUI(BaseUI):
     def insert(self, index, value):
         self.list.insert(index, value)
 
+    def pop(self, index=-1):
+        return self.list.pop(index)
+
     def _setup_main_ui(self):
         top_b_width = int(self.window_width / 3)
         bot_b_width = int(self.window_width / 2)
@@ -58,8 +61,7 @@ class MainUI(BaseUI):
         cmds.columnLayout(self.list_visual, adjustableColumn=True, parent=self.frame)
         cmds.rowColumnLayout(self.lower_button_grp, numberOfColumns=2,
                              columnWidth=[(1, bot_b_width), (2, bot_b_width)],
-                             adjustableColumn=True,
-                             enable=True, parent=self.frame)
+                             adjustableColumn=True, enable=True, parent=self.frame)
 
     def _setup_ui_components(self):
         self.add_selection = cmds.radioButtonGrp(label="Create at the center of:", bgc=[.3, 0, .3],

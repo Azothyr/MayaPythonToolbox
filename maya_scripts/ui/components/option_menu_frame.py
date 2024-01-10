@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 from functools import partial
 from ui.components.utils.enable_handler import toggle_state
-from ui.components.mod_blocks.basic_mod.form_base import BaseUI
+from ui.components.modular_blocks.basic_mod.form_base import BaseUI
 
 
 class MainUI(BaseUI):
