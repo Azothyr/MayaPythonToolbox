@@ -26,5 +26,7 @@ ExportedObj/
 *.pdb
 *.opendb
 
+.idea/
+
 *.pyc
 *.cpython-310.pyc

@@ -5,16 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f44d09e4-2bb4-423e-a6da-16ca56af76e3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/maya_scripts/utilities/set_to_text.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/_main_ui_.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/_main_ui_.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/color_change_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/utils/color_change_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/control/control_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/joint_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/joint/joint_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/toolbox_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/toolbox_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya_scripts/ui/utilities_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya_scripts/ui/components/utils/utilities_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,47 +45,47 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;MayaCharm.Maya-Laptop.executor&quot;: &quot;Run&quot;,
-    &quot;MayaCharm.Maya-Main.executor&quot;: &quot;Run&quot;,
-    &quot;MayaCharm.Maya.executor&quot;: &quot;Run&quot;,
-    &quot;Python._main_ui_.executor&quot;: &quot;Run&quot;,
-    &quot;Python.arg_lib.executor&quot;: &quot;Run&quot;,
-    &quot;Python.assignment_filler_school.executor&quot;: &quot;Run&quot;,
-    &quot;Python.cmds_class_builder.executor&quot;: &quot;Run&quot;,
-    &quot;Python.color_change_ui.executor&quot;: &quot;Run&quot;,
-    &quot;Python.color_library.executor&quot;: &quot;Run&quot;,
-    &quot;Python.constraint_cmds.executor&quot;: &quot;Run&quot;,
-    &quot;Python.joint_axis_vis_toggle.executor&quot;: &quot;Run&quot;,
-    &quot;Python.joint_ui.executor&quot;: &quot;Run&quot;,
-    &quot;Python.kwarg_option_menu.executor&quot;: &quot;Run&quot;,
-    &quot;Python.kwarg_parser.executor&quot;: &quot;Run&quot;,
-    &quot;Python.maya_exist_cmds.executor&quot;: &quot;Run&quot;,
-    &quot;Python.maya_exist_manager.executor&quot;: &quot;Run&quot;,
-    &quot;Python.maya_setup.executor&quot;: &quot;Run&quot;,
-    &quot;Python.scratch_1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.selection_manager.executor&quot;: &quot;Run&quot;,
-    &quot;Python.text_paste.executor&quot;: &quot;Run&quot;,
-    &quot;Python.userSetup.executor&quot;: &quot;Run&quot;,
-    &quot;Python.utilities_ui.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last.edited.regexp&quot;: &quot;Sample Text&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Demon/Documents/PythonToolboxForge/generic_utilities/functions/assignment_filler_school.py&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PythonContentEntriesConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "MayaCharm.Maya-Laptop.executor": "Run",
+    "MayaCharm.Maya-Main.executor": "Run",
+    "MayaCharm.Maya.executor": "Run",
+    "Python._main_ui_.executor": "Run",
+    "Python.arg_lib.executor": "Run",
+    "Python.assignment_filler_school.executor": "Run",
+    "Python.cmds_class_builder.executor": "Run",
+    "Python.color_change_ui.executor": "Run",
+    "Python.color_library.executor": "Run",
+    "Python.constraint_cmds.executor": "Run",
+    "Python.joint_axis_vis_toggle.executor": "Run",
+    "Python.joint_ui.executor": "Run",
+    "Python.kwarg_option_menu.executor": "Run",
+    "Python.kwarg_parser.executor": "Run",
+    "Python.maya_exist_cmds.executor": "Run",
+    "Python.maya_exist_manager.executor": "Run",
+    "Python.maya_setup.executor": "Run",
+    "Python.scratch_1.executor": "Run",
+    "Python.selection_manager.executor": "Run",
+    "Python.text_paste.executor": "Run",
+    "Python.userSetup.executor": "Run",
+    "Python.utilities_ui.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last.edited.regexp": "Sample Text",
+    "last_opened_file_path": "C:/Users/Demon/Documents/PythonToolboxForge/generic_utilities/functions/assignment_filler_school.py",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\zacst\Documents\MayaPythonToolbox\maya_scripts\core\components\control_cmds" />
@@ -111,7 +103,7 @@
       <command value="f&quot;{self.name}_add_mode&quot;" />
     </option>
   </component>
-  <component name="RunManager" selected="MayaCharm.Maya-Main">
+  <component name="RunManager">
     <configuration name="Maya-Laptop" type="MAYACHARM_RUN_CONFIGURATION" factoryName="MAYACHARM_RUN_CONFIGURATION" singleton="false">
       <option name="executionType" value="FILE" />
       <option name="mayaSdkPath" value="C:\Program Files\Autodesk\Maya2024\bin\mayapy.exe" />
@@ -182,6 +174,8 @@
       <workItem from="1704847441882" duration="1866000" />
       <workItem from="1704850362641" duration="11258000" />
       <workItem from="1704866515096" duration="47000" />
+      <workItem from="1704946199493" duration="30000" />
+      <workItem from="1704948179778" duration="5003000" />
     </task>
     <servers />
   </component>
@@ -199,6 +193,7 @@
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$userSetup.coverage" NAME="userSetup Coverage Results" MODIFIED="1704098389943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../maya/2024/scripts" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$maya_setup.coverage" NAME="maya_setup Coverage Results" MODIFIED="1704098400554" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/config" />
     <SUITE FILE_PATH="coverage/channel_box_scratch_py$_main_ui_.coverage" NAME="_main_ui_ Coverage Results" MODIFIED="1704851538654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
+    <SUITE FILE_PATH="coverage/_gitignore$scratch_1.coverage" NAME="scratch_1 Coverage Results" MODIFIED="1704952603765" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$utilities_ui.coverage" NAME="utilities_ui Coverage Results" MODIFIED="1704096562875" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/ui" />
     <SUITE FILE_PATH="coverage/channel_box_scratch_py$assignment_filler_school.coverage" NAME="assignment_filler_school Coverage Results" MODIFIED="1704431736911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../PythonToolboxForge/generic_utilities/functions" />
     <SUITE FILE_PATH="coverage/MayaPythonToolbox$constraint_cmds.coverage" NAME="constraint_cmds Coverage Results" MODIFIED="1703820054110" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maya_scripts/core/components" />
