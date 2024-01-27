@@ -39,6 +39,16 @@ class BaseUI(ABC):
         cmds.showWindow(self.window_name)
 
     def create(self, *_):
+        if self.test:
+            self.__test_setup()
+            return
+        self._window_setup()
+        self.show()
+
+    def __test_setup(self): self.show()
+
+    @abstractmethod
+    def _window_setup(self):
         self._check_window()
         self.window = cmds.window(self.window_name,
                                   t=self.readable_name,
@@ -48,15 +58,15 @@ class BaseUI(ABC):
                                   resizeToFitChildren=self.fit_children,
                                   nestedDockingEnabled=self.dockable,
                                   sizeable=self.allow_resize)
-        if self.test:
-            self.__test_setup()
-            return
-        self._window_setup()
-
-    def __test_setup(self): self.show()
-
-    @abstractmethod
-    def _window_setup(self): self.show()
 
     @abstractmethod
     def _ui_setup(self, parent_ui: str, tool: str) -> str: ...
+
+
+if __name__ == "__main__":
+    if cmds.window("test_win", exists=True):
+        cmds.deleteUI("test_win")
+    win = cmds.window("test_win")
+    cmds.showWindow(win)
+    test = BaseUI("test_win", create=True)
+    test()

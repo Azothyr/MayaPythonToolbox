@@ -73,6 +73,9 @@ class Create(CreateBase):
 
         :param kwargs:
         """
+        if "radius" in kwargs:
+            radius = kwargs.get("radius", radius)
+            kwargs.pop("radius")
         super().__init__(*args, radius=radius, **kwargs)
 
     def get_control_and_group(self):

@@ -16,7 +16,7 @@ class MainUI(BaseUI, ABC):
         self.type = type
 
         if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
-            self._window_setup()
+            self.create()
 
     def _setup_secondary_ui(self):
         match self.type:
@@ -41,12 +41,12 @@ class MainUI(BaseUI, ABC):
         return self.window
     
     def _tab_type(self):
-        return cmds.tabLayout(f"{self.name}_tab", innerMarginWidth=5, innerMarginHeight=5)
+        return cmds.tabLayout(f"{self.name}_tab", innerMarginWidth=5, innerMarginHeight=5, p=self.window)
 
     def _window_setup(self):
+        super()._window_setup()
         self.ui = self._setup_secondary_ui()
-        self._ui_setup(self.parent_ui, self.tool_name)
-        self.show()
+        self._ui_setup(self.ui, self.tool_name)
 
     @abstractmethod
     def _ui_setup(self, parent_ui: str | None, tool: str) -> str: ...

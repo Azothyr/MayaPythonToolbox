@@ -3,7 +3,8 @@ from ui.components.modular_blocks.basic_mod.form_base import BaseUI
 
 
 class MainUI(BaseUI):
-    def __init__(self, parent_ui: str, name: str, width=300, default=None, align_text="center", **kwargs):
+    def __init__(self, parent_ui: str, name: str, default=None, align_text="center", ui_align="center", width=300,
+                 **kwargs):
         super_args = [parent_ui, name, width]
         # SUPER: self.name, self.readable_name, self.window_width, self.form, self.frame, self.parent_ui
         super().__init__(*super_args)
@@ -18,6 +19,7 @@ class MainUI(BaseUI):
         # Sub UI Components
         self.input = f"{self.name}_input"
         self.label = f"{self.name}_label"
+        self.column_align = ui_align
         self.align_text = align_text
 
         if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
@@ -31,9 +33,10 @@ class MainUI(BaseUI):
 
         self.section = cmds.columnLayout(self.section, adjustableColumn=True, p=self.frame)
         self.columns = cmds.rowColumnLayout(self.columns, numberOfColumns=2,
-                             columnWidth=[(1, col_width), (2, col_width)],
-                             adjustableColumn=True,
-                             enable=True, parent=self.section)
+                                            columnWidth=[(1, col_width), (2, col_width)],
+                                            columnAlign=[1, self.column_align],
+                                            adjustableColumn=True,
+                                            enable=True, parent=self.section)
 
     def _setup_ui_components(self):
         cmds.text(l=f"{self.readable_name}:", bgc=[.7, .7, .7], p=self.columns, align=self.align_text)

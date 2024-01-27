@@ -86,7 +86,7 @@ def freeze_del_history_ui(_parent_ui, tool):
     return freeze_tab
 
 
-def _setup_ui(_parent_ui):
+def _ui_setup(_parent_ui):
     main_layout = cmds.formLayout('util_form', p=_parent_ui)
 
     # Create each UI for components

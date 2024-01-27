@@ -32,8 +32,14 @@ def _sequential_renamer(txt, lyst):
     return new_names
 
 
-def perform_rename(txt, selection=None):
-    sl(selection).filter_selection()
+def perform_rename(txt, selection=None) -> list[str]:
+    """
+    Renames selected objects.
+    :param txt:
+    :param selection:
+    :return new_names (list[str]):
+    """
+    sl(selection)
     if len(selection) > 1 and "#" not in txt:
         txt = txt + "##"
     if "#" in txt:
@@ -48,7 +54,7 @@ def rename_selected():
     """
     Renames selected objects.
     """
-    selection = selection_check.filter_selection()
+    selection = sl()
     new_name = cmds.promptDialog(
         title='Rename',
         message='Enter Name:',

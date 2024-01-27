@@ -7,6 +7,8 @@
 /dataSources.local.xml
 
 
+
+
 # Visual Studio cache directory
 .vs/
 
@@ -30,3 +32,4 @@ ExportedObj/
 
 *.pyc
 *.cpython-310.pyc
+*.xml
