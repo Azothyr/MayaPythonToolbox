@@ -126,7 +126,8 @@ class MainUI(FrameBase):
         cmds.columnLayout(self.lower_button_col2, adjustableColumn=True, parent=self.lower_button_grp)
 
     def _setup_ui_components(self):
-        self.add_selection = cmds.radioButtonGrp(label=self.radio_label, bgc=[.3, 0, .3], parent=self.add_opt_section)
+        self.add_selection = cmds.radioButtonGrp(self.add_selection, label=self.radio_label, bgc=[.3, 0, .3],
+                                                 parent=self.add_opt_section, numberOfRadioButtons=4)
         self.update_callbacks(self.mode_callbacks)
         self.add_button = cmds.button(
             label="Add", command=self._add_mode_query, backgroundColor=[0, 0, 0], parent=self.upper_button_col1)
@@ -149,11 +150,11 @@ class MainUI(FrameBase):
         if options and options != {}:
             if len(options) != len(self.mode_callbacks):
                 raise ValueError("The number of options must match the number of mode callbacks.")
-            self.add_opt_section = cmds.rowColumnLayout(self.add_opt_section, edit=True, numberOfColumns=len(options))
-            kws = {f"labelArray{len(options)}": tuple(options.keys()), "numberOfRadioButtons": len(options),
+            self.add_opt_section = cmds.rowColumnLayout(self.add_opt_section, edit=True, numberOfColumns=3)
+            kws = {f"labelArray{len(options)}": tuple(options.keys()),
                    "select": 1, "parent": self.add_opt_section}
-            self.add_selection = cmds.radioButtonGrp(self.add_selection, edit=True, **kws)
-
+            for key, value in kws.items():
+                cmds.radioButtonGrp(self.add_selection, edit=True, **{key: value})
         else:
             return
 
@@ -219,9 +220,9 @@ if __name__ == "__main__":
         "main_window",
         "visual_list",
         {},
-        label="Bold Test Frame",
+        label="Bold_Test_Frame",
         label_visible=False,
-        raido_label="Add Mode:",
+        radio_label="Add Mode:",
         font="boldLabelFont",
         width=350,
         height=200,
@@ -231,7 +232,7 @@ if __name__ == "__main__":
         visible=True,
         collapsable=False,
         collapsed=False,
-        color=[0.6, 0.5, 0.6],
+        color=[0.6, 0.4, 0.6],
         annotation="This is a test frame.",
         create=True)
 
