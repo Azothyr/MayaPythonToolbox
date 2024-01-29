@@ -3,14 +3,12 @@ from functools import partial
 from ui.components.utils.query_ui_value import query
 from ui.components.utils.enable_handler import toggle_state
 from ui.components.utils.enable_handler import toggle_layouts
-from ui.components.modular_blocks import FormBase
+from ui.components.modular_blocks import FrameBase
 
 
-class MainUI(FormBase):
-    def __init__(self, parent_ui: str, name: str, width=300, **kwargs):
-        super_args = [parent_ui, name, width]
-        # SUPER: self.name, self.readable_name, self.window_width, self.form, self.frame, self.parent_ui
-        super().__init__(*super_args)
+class MainUI(FrameBase):
+    def __init__(self, parent_ui: str, name: str, **kwargs):
+        self.name = self._parse_init_name(name, before_super=True)
 
         # Static Options
         self.input_collection = [
@@ -36,15 +34,25 @@ class MainUI(FormBase):
             "spine",
             "clav",
             "arm",
+            "hand",
             "pelvis",
             "leg",
             "front leg",
             "back leg",
             "tail",
+            "foot",
             "finger",
-            "finger ##",
             "toe",
-            "toe ##",
+            "finger 01",
+            "finger 02",
+            "finger 03",
+            "finger 04",
+            "finger 05",
+            "toe 01",
+            "toe 02",
+            "toe 03",
+            "toe 04",
+            "toe 05",
         ]
         self.singles = [
             "root",
@@ -54,7 +62,7 @@ class MainUI(FormBase):
             "FK",
             "IK",
             "RK",
-            "FK, IK, RK",
+            "FK IK RK",
             "helper",
             "twist",
             "corrective",
@@ -64,7 +72,7 @@ class MainUI(FormBase):
         ]
 
         # Variables
-        self.single_bool = False
+        self.single_bool = True
         self.active_layout = None
         self._look = None
         self._schema = None
@@ -93,15 +101,25 @@ class MainUI(FormBase):
         self.joint_type_menu = f"{self.name}_j_type_menu"
         self.suffix_menu = f"{self.name}_suf_menu"
         self.example_text = f"{self.name}_example_text"
-
-        if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
-            self._create_ui()
+        
+        super_args = [parent_ui, name]
+        super().__init__(*super_args, **kwargs)
 
     def __str__(self):
         return self._schema
 
     def __bool__(self):
         return query(self.toggle, "checkbox")
+
+    def check_count(self, count, *_):
+        if count > 1:
+            self.single_bool = False
+        else:
+            self.single_bool = True
+        self._get_schema()
+
+    def _create_frame(self):
+        super()._create_frame()
 
     def _get_collection_type(self):
         return query(self.collection_type_grp, "radioButtonGrp")
@@ -154,7 +172,7 @@ class MainUI(FormBase):
         self._suffix = self._get_value(item, type)
         if self._suffix != "_":
             self._suffix = self._apply_look(self._suffix)
-            start = "." if self._joint_type else "." if self._side and "." not in self._side else ""
+            start = "." if self._joint_type or self._prefix else "." if self._side and "." not in self._side else ""
             self._suffix = f"{start}{self._suffix}"
             if self.single_bool is False:
                 start = ".##." if self._suffix and "." not in self._suffix else ".##"
@@ -210,43 +228,47 @@ class MainUI(FormBase):
         partial(toggle_state, self.toggle, self.bot_section)()
 
     def _setup_main_ui(self):
-        self.enable_section = cmds.columnLayout(self.enable_section, adjustableColumn=True, p=self.frame)
+        _3_column_width = self.width / 3
+        _8_column_width = self.width / 8
+        _8_lrg_width = _8_column_width * 1.2 - 5
+        _8_sml_width = _8_column_width * .8 - 5
+        self.enable_section = cmds.columnLayout(self.enable_section, adjustableColumn=False, p=self.frame)
         self.top_section = cmds.columnLayout(self.top_section, adjustableColumn=True, p=self.frame, enable=False)
         self.mid_section = cmds.columnLayout(self.mid_section, adjustableColumn=True, p=self.frame, enable=False)
         self.bot_section = cmds.columnLayout(self.bot_section, adjustableColumn=True, p=self.frame, enable=False)
-        self.single_input_columns = cmds.rowColumnLayout(self.single_input_columns, numberOfColumns=3,
-                                                         columnWidth=[(1, 80), (2, 80), (3, 80)],
-                                                         columnAlign=[1, "center"],
-                                                         columnSpacing=(30, 0),
-                                                         adjustableColumn=True, bgc=[.3, .3, .3],
-                                                         parent=self.mid_section)
+        self.single_input_columns = cmds.rowColumnLayout(
+            self.single_input_columns, numberOfColumns=3,
+            columnWidth=[(1, _3_column_width), (2, _3_column_width), (3, _3_column_width)],
+            columnAlign=[1, "center"],
+            adjustableColumn=True, bgc=[.3, .3, .3],
+            parent=self.mid_section)
 
-        self.assisted_input_columns = cmds.rowColumnLayout(self.assisted_input_columns, numberOfColumns=3,
-                                                           columnWidth=[(1, 80), (2, 80), (3, 80)],
-                                                           columnAlign=[1, "center"],
-                                                           columnSpacing=(30, 0),
-                                                           adjustableColumn=True, bgc=[.3, .3, .3],
-                                                           parent=self.mid_section)
+        self.assisted_input_columns = cmds.rowColumnLayout(
+            self.assisted_input_columns, numberOfColumns=3,
+            columnWidth=[(1, _3_column_width), (2, _3_column_width), (3, _3_column_width)],
+            columnAlign=[(1, "left"), (2, "center"), (3, "right")],
+            adjustableColumn=True, bgc=[.3, .3, .3],
+            parent=self.mid_section)
 
-        self.preset_columns = cmds.rowColumnLayout(self.preset_columns, numberOfColumns=8,
-                                                   columnWidth=[(1, 40), (2, 80), (3, 40), (4, 80),
-                                                                (5, 40), (6, 80), (7, 40), (8, 80)],
-                                                   columnSpacing=[(1, 0), (2, 0), (3, 0), (4, 0),
-                                                                  (5, 0), (6, 0), (7, 0), (8, 0)],
-                                                   # rowSpacing=[(1, 50), (2, 50)],
-                                                   bgc=[.3, .3, .3],
-                                                   parent=self.mid_section)
+        self.preset_columns = cmds.rowColumnLayout(
+            self.preset_columns, numberOfColumns=8,
+            columnWidth=[(1, _8_sml_width), (2, _8_lrg_width), (3, _8_sml_width), (4, _8_lrg_width),
+                         (5, _8_sml_width), (6, _8_lrg_width), (7, _8_sml_width), (8, _8_lrg_width)],
+            columnSpacing=[(1, 0), (2, 0), (3, 0), (4, 0),
+                           (5, 0), (6, 0), (7, 0), (8, 0)],
+            bgc=[1, .3, .3],
+            parent=self.mid_section)
 
-        self.output_row = cmds.rowColumnLayout(self.output_row, numberOfColumns=1,
-                                               columnWidth=[(1, 500)],
-                                               columnAlign=[1, "center"],
-                                               columnSpacing=[(1, 20)],
-                                               bgc=[.3, .3, .3],
-                                               parent=self.bot_section)
+        self.output_row = cmds.rowColumnLayout(
+            self.output_row, numberOfColumns=1,
+            columnWidth=[(1, self.width)],
+            columnAlign=[1, "center"],
+            bgc=[.3, .3, .3],
+            parent=self.bot_section)
 
     def _setup_ui_components(self):
         cmds.checkBox(self.toggle, label="Name Joints?", value=False,
-                      bgc=[.4, .4, .4],
+                      bgc=[.2, .5, .2],
                       changeCommand=self._toggle_block,
                       parent=self.enable_section)
         self._create_radio_ui(self.top_section)
@@ -256,19 +278,25 @@ class MainUI(FormBase):
         self.example_text = cmds.text(self.example_text, label="Example Output:", align="left", parent=self.output_row)
 
     def _create_radio_ui(self, parent):
-        self.collection_type_grp = cmds.radioButtonGrp(self.collection_type_grp, label="Layouts: ",
-                                                       bgc=[.3, .3, .3],
-                                                       numberOfRadioButtons=len(self.input_collection),
-                                                       labelArray3=[idx.title() for idx in self.input_collection],
-                                                       select=1, parent=parent,
-                                                       onCommand=self._update_layout)
+        self.collection_type_grp = cmds.radioButtonGrp(
+            self.collection_type_grp, label="Layouts: ",
+            bgc=[.3, .3, .3],
+            numberOfRadioButtons=len(self.input_collection),
+            labelArray3=[idx.title() for idx in self.input_collection],
+            select=1, parent=parent,
+            columnWidth=[(1, self.width / 8)],
+            columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left")],
+            onCommand=self._update_layout)
 
-        self.look_menu_grp = cmds.radioButtonGrp(self.look_menu_grp, label="Text Look: ",
-                                                 bgc=[.4, .4, .4],
-                                                 numberOfRadioButtons=len(self.text_look_options),
-                                                 labelArray3=[idx.title() for idx in self.text_look_options],
-                                                 select=1, parent=parent,
-                                                 onCommand=self._update_example_text)
+        self.look_menu_grp = cmds.radioButtonGrp(
+            self.look_menu_grp, label="Text Look: ",
+            bgc=[.4, .4, .4],
+            numberOfRadioButtons=len(self.text_look_options),
+            labelArray3=[idx.title() for idx in self.text_look_options],
+            select=1, parent=parent,
+            columnWidth=[(1, self.width / 8)],
+            columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left")],
+            onCommand=self._update_example_text)
 
     def _create_single_input_ui(self, parent):
         pass
@@ -311,11 +339,12 @@ class MainUI(FormBase):
         conditions = {layout: (label == current) for label, layout in layouts.items()}
         self.active_layout = toggle_layouts(conditions)
 
-    def result(self, passed_objs: list[str], *_):
+    def result(self, count=1, *_):
+        self.check_count(count)
         self._get_schema()
         if self._schema[0].isdigit() or self._schema.startswith("_"):
             cmds.error("Naming Schema starts with an invalid character.")
-            cmds.delete(passed_objs)
+            cmds.delete()
             return
         return self._schema
 

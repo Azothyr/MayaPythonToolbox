@@ -1,15 +1,13 @@
 import maya.cmds as cmds
 from functools import partial
 from ui.components.utils.enable_handler import toggle_state
-from ui.components.modular_blocks import FormBase
+from ui.components.modular_blocks import FrameBase
 
 
-class MainUI(FormBase):
-    def __init__(self, parent_ui: str, name: str, width=300, **kwargs):
-        super_args = [parent_ui, name, width]
-        # SUPER: self.name, self.readable_name, self.window_width, self.form, self.frame, self.parent_ui
-        super().__init__(*super_args)
-
+class MainUI(FrameBase):
+    def __init__(self, parent_ui: str, name: str, **kwargs):
+        self.name = self._parse_init_name(name, before_super=True)
+        
         # Variables
         self.selected_option = None
 
@@ -21,9 +19,12 @@ class MainUI(FormBase):
         self.input_columns = f"{self.name}_columns"
         self.toggle = f"{self.name}_bool"
         self.menu = f"{self.name}_menu"
+        
+        super_args = [parent_ui, name]
+        super().__init__(*super_args, **kwargs)
 
-        if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
-            self._create_ui()
+    def _create_frame(self):
+        super()._create_frame()
 
     def __bool__(self):
         return cmds.checkBox(self.toggle, query=True, value=True)
@@ -32,12 +33,14 @@ class MainUI(FormBase):
         return cmds.optionMenu(self.menu, query=True, value=True)
 
     def _setup_main_ui(self):
-        cmds.columnLayout(self.top_section, adjustableColumn=True, p=self.frame)
+        _3_col_width = self.width / 3
+        center_width = _3_col_width * 2
+        side_width = _3_col_width / 2
+        cmds.columnLayout(self.top_section, adjustableColumn=False, p=self.frame)
         self.bot_section = cmds.columnLayout(self.bot_section, adjustableColumn=True, p=self.frame)
         cmds.rowColumnLayout(self.input_columns, numberOfColumns=3,
-                             columnWidth=[(1, 80), (2, 80), (3, 80)],
-                             columnAlign=[1, "center"],
-                             columnSpacing=(30, 0),
+                             columnWidth=[(1, side_width), (2, center_width), (3, side_width)],
+                             columnAlign=[2, "center"],
                              adjustableColumn=True, bgc=[.3, .3, .3],
                              enable=False, parent=self.bot_section)
 

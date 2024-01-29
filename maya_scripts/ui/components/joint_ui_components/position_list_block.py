@@ -1,26 +1,18 @@
 import maya.cmds as cmds
 from core.components import center_locator
 from core.maya_managers.selection_manager import Select as sl
-from ui.components.modular_blocks.advanced_mod.visual_list import MainUI as AdvUI
+from ui.components.modular_blocks import VisualList
 
 
-class MainUI(AdvUI):
-    def __init__(self, parent_ui: str, name: str, width: int = None, **kwargs):
+class MainUI(VisualList):
+    def __init__(self, parent_ui: str, name: str, **kwargs):
         mode_callbacks = {
             "All Selected": self._add_mode_any_or_all,
             "Each Selected": self._add_mode_iter,
         }
-        text_format = "({:.3f}, {:.3f}, {:.3f})"
-
-        if not width:
-            width = 300
-
-        super_args = [parent_ui, name, width, mode_callbacks, text_format]
-        super_kwargs = {"collapsed": False, "collapsable": False}
-        super().__init__(*super_args, **super_kwargs)
-
-        if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
-            self._create_ui()
+        kwargs["text_format"] = "({:.3f}, {:.3f}, {:.3f})"
+        super_args = [parent_ui, name, mode_callbacks]
+        super().__init__(*super_args, **kwargs)
 
     def insert(self, index, value):
         if not isinstance(value, (tuple, list)):
@@ -44,10 +36,25 @@ class MainUI(AdvUI):
 
 if __name__ == "__main__":
     # Example usage:
-    if cmds.window("main_window", exists=True):
-        cmds.deleteUI("main_window")
-    cmds.window("main_window")
-    cmds.showWindow("main_window")
-    MainUI("main_window", "test", create=True)
+    if cmds.window("test_win", exists=True):
+        cmds.deleteUI("test_win")
+    cmds.window("test_win")
+
+    MainUI(
+        "test_win",
+        "pos_list",
+        label="Bold Test Frame",
+        label_visible=False,
+        font="boldLabelFont",
+        width=300,
+        height=100,
+        border=True,
+        marginWidth=5,
+        marginHeight=5,
+        visible=True,
+        collapsable=False,
+        collapsed=False,
+        color=[0.6, 0.5, 0.6],
+        annotation="This is a test frame.",
+        create=True)
     cmds.showWindow()
-    print("DUNDER COMPLETED")

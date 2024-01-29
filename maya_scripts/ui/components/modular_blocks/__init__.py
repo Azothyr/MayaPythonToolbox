@@ -1,4 +1,5 @@
 from .basic_mod.form_base import BaseUI as FormBase
+from .basic_mod.frame_base import BaseUI as FrameBase
 from .basic_mod.window_base import BaseUI as WindowBase
 from .advanced_mod.window_adv import MainUI as WindowAdv
 from .advanced_mod.visual_list import MainUI as VisualList
@@ -7,6 +8,7 @@ from .advanced_mod.textfield_mods.labeled_textfield import MainUI as LabeledText
 
 __all__ = [
     "FormBase",
+    "FrameBase",
     "WindowBase",
     "WindowAdv",
     "VisualList",

@@ -1,5 +1,5 @@
 def confirm(name, suffix="_Ctrl"):
-    if name.endswith(suffix):
+    if name.lower().endswith(suffix.lower()):
         return True
     return False
 

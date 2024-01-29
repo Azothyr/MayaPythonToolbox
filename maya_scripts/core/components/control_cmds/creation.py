@@ -4,31 +4,34 @@ from core.components.attribute_cmds import set_ as set_attr
 
 
 class CreateBase:
-    def __init__(self, name=None, radius=1.0, position=(0, 0, 0), rotation=(1, 0, 0), **kwargs):
-        self.name, self.shape, self.group = self._setup(name)
-        self.radius = radius
-
-        self.control = self.name
-
-        self.pos = position
-        self.rot = rotation
-
+    def __init__(self, name=None, **kwargs):
+        self.__orig_obj = None
+        self.__orig_obj = name
+        _name, _shape, _group = self._setup(name)
+        self.__name = _name
+        self.__shape = _shape
+        self.__group = _group
+        self.__radius = kwargs.get("radius", 1.0)
+        if "radius" in kwargs:
+            kwargs.pop("radius")
+        self.__group_bool = kwargs.get("group", kwargs.get("grp", kwargs.get("g", True)))
+        
         if kwargs.get("run", kwargs.get("create", False)):
-            self.create_type(kwargs.get("mode", "all"))
+            self.create_type(self.__group_bool)
 
     def __str__(self):
-        return f"{self.control!s}"
+        return f"{self.name!s}"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(CONTROL: {self.control!r}, SHAPE: {self.shape!r}, GROUP: {self.group!r}, " \
-                  f"RADIUS: {self.radius!r})"
+        return (f"{self.__class__.__name__}, SHAPE: {self.__shape!r},"
+                f" GROUP: {self.__group!r}, RADIUS: {self.__radius!r}), CREATED FROM: {self.__orig_obj!r}")
 
     def __call__(self, name: str = None, radius: float = None):
-        self.name = name if name is not None else self.name if self.name is not None else None
-        self.radius = radius if radius is not None else self.radius if self.radius is not None else 1
+        self.__name = name if name is not None else self.__name if self.__name is not None else None
+        self.__radius = radius if radius is not None else self.__radius if self.__radius is not None else 1
         if name is None:
             raise ValueError("Name must be provided for the control to be created.")
-        self.create_type()
+        self.create_type(self.__group_bool)
 
     def _setup(self, name: str) -> tuple[str, str, str]:
         if name is None or not exists.control(name):
@@ -40,17 +43,17 @@ class CreateBase:
         return name, shape, group
 
     def _create_control(self):
-        control = cmds.circle(normal=(0, 1, 0), radius=self.radius)[0]
-        self.control = cmds.rename(control, self.name)
-        shape = cmds.listRelatives(self.control, shapes=True)[0]
-        self.shape = cmds.rename(shape, self.shape)
+        control = cmds.circle(normal=(0, 1, 0), radius=self.__radius)[0]
+        cmds.rename(control, self.__name)
+        shape = cmds.listRelatives(self.__name, shapes=True)[0]
+        self.__shape = cmds.rename(shape, self.__shape)
 
     def _create_group(self, create: bool = True):
         if create:
-            cmds.group(empty=True, name=self.group)
-            cmds.parent(self.control, self.group)
+            cmds.group(empty=True, name=self.__group)
+            cmds.parent(self.__name, self.__group)
         else:
-            self.group = None
+            self.__group = None
 
     @staticmethod
     def _generate_unique_name():
@@ -58,53 +61,65 @@ class CreateBase:
         count = str(sum("ctrl" in obj.lower() for obj in objects) + 1).zfill(2)
         return f"Control_{count}_Ctrl"
 
-    def create_type(self, mode="all"):
+    def create_type(self, create_grp: bool):
         self._create_control()
-        self._create_group(mode in ["all", "a"])
-
-
-class Create(CreateBase):
-    def __init__(self, *args, radius: float = 1.0, **kwargs):
-        """
-        Required arguments:
-        args:
-            :param name:
-            :param radius:
-
-        :param kwargs:
-        """
-        if "radius" in kwargs:
-            radius = kwargs.get("radius", radius)
-            kwargs.pop("radius")
-        super().__init__(*args, radius=radius, **kwargs)
-
-    def get_control_and_group(self):
-        return self.control, self.group
+        self._create_group(create_grp)
 
     @property
-    def control(self):
-        return self.control
+    def orig_name(self):
+        return self.__orig_obj
+
+    @orig_name.setter
+    def orig_name(self, value: str):
+        self.__orig_obj = value
 
     @property
     def name(self):
-        return self.name
+        return self.__name
+
+    @name.setter
+    def name(self, value: str):
+        self.__name = value
 
     @property
     def shape(self) -> str:
-        return self.shape
+        return self.__shape
+
+    @shape.setter
+    def shape(self, value: str):
+        self.__shape = value
 
     @property
     def group(self) -> str:
-        return self.group
+        return self.__group
+
+    @group.setter
+    def group(self, value: str):
+        self.__group = value
 
     @property
     def radius(self) -> float:
-        return self.radius
+        return self.__radius
 
     @radius.setter
     def radius(self, value: float):
-        set_attr(self.shape, "radius", value)
-        self.radius = value
+        set_attr(self.__shape, "radius", value)
+        self.__radius = value
+
+
+class Create(CreateBase):
+    def __init__(self, *args, **kwargs):
+        """
+        Required arguments:
+        :param name:
+        :param radius:
+
+        :param kwargs:
+        """
+        super().__init__(*args, **kwargs)
+
+    def get_control_and_group(self):
+        return self.__name, self.__group
 
 
 if __name__ == "__main__":

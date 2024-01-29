@@ -6,12 +6,12 @@ from ui.components import JointUI, control_ui_create
 from pathlib import Path
 
 
-def run_script(script_path, name, script_name, *_):
+def run_script(script_path, script_name, name, *_):
     ui_build = {
         "toolbox_ui": toolbox_ui.create_ui_window,
         "color_change_ui": color_change_ui.create_ui_window,
         "control_ui": control_ui_create,
-        "joint_ui": JointUI(script_name, name, "default"),
+        "joint_ui": partial(JointUI, name, width=500, height=525, create=True),
         "utilities_ui": utilities_ui.create_ui_window
     }
     print(f"---RUNNING:  {script_path}")
@@ -45,7 +45,7 @@ def create_tools_menu():
         name = script_name.replace("ui", "tool").replace("_", " ").title()
         print("---ADDING TO MAYA: ", script_name)
         # print("Script name:", script_name)
-        command_callback = partial(run_script, script, name, script_name)
+        command_callback = partial(run_script, script, script_name, name)
         print(command_callback)
         cmds.menuItem(
             label=name,
@@ -74,4 +74,5 @@ def _menu_debug_print():
 if __name__ == "__main__":
     __file__ = Path().home() / "Documents" / "GitRepos" / "MayaPythonToolbox" / "maya_scripts" / "ui" / "_main_ui_.py"
     create_tools_menu()
-    _menu_debug_print()
+    # _menu_debug_print()
+

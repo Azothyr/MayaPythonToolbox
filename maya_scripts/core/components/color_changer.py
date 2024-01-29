@@ -2,7 +2,14 @@ import maya.cmds as cmds
 from core.components.color_library import ColorIndex
 
 
-def change_color(_color, obj_lyst):
+def change_color(_color: str, obj_lyst: list[str]):
+    """
+    Get the color index from the color library and set the color of each passed object to that index.
+
+    :param _color:
+    :param obj_lyst:
+    :return _:
+    """
     library = ColorIndex()
     if isinstance(_color, str):
         color_index = library.get_cvalue_from_color(_color)
@@ -10,6 +17,12 @@ def change_color(_color, obj_lyst):
         color_index = library.get_color_from_index(_color)
     else:
         raise TypeError(f"Expected _color to be a string or integer, got {type(_color)} instead.")
+
+    if not isinstance(obj_lyst, list):
+        if isinstance(obj_lyst, str):
+            obj_lyst = [obj_lyst]
+        else:
+            raise TypeError(f"Expected obj_lyst to be a list or string, got {type(obj_lyst)} instead.")
 
     for obj in obj_lyst:
         if isinstance(obj, list) and len(obj) == 1:

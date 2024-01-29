@@ -1,73 +1,133 @@
 import maya.cmds as cmds
-from functools import partial
 from core.components.joint_cmds import create_joints, orient_joints, rename_joints, display_axis
-from ui.components.utils.enable_handler import toggle_state
 from ui.components.joint_ui_components import PositionListBlock, ParentBlock, NamingBlock
 from ui.components.modular_blocks import WindowAdv, DescriptionFrame, LabeledTextField
 
 
 class JointUI(WindowAdv):
-    def __init__(self, name: str, tool_name: str, type: str, width=500, height=525, **kwargs):
-        parent_ui = kwargs.get("parent_ui", kwargs.get("parent", kwargs.get("p", None)))
-        create: bool = kwargs.pop("create", kwargs.pop("cr", kwargs.pop("c", False)))
-        super_args = [parent_ui, name, tool_name, type, width, height]
-        # SUPER: self.name, self.readable_name, self.window_width, self.window_height
-        # self.parent_ui, self.tool_name, self.type, self.ui, self.window, self.window_width, self.window_height, 
-        # self.window_name, self.window_title
-        super_kwargs = self.get_kwargs_for_super(kwargs)
-        super().__init__(*super_args, **super_kwargs)
+    def __init__(self, name: str, **kwargs):
+        super().__init__(name, **kwargs)
 
         # Variables
-        self.name_block = None
-        self.parent_bool = None
-        self.parent_name = None
-        self.radius = None
-        self.loc_list = None
+        self.name_block: NamingBlock
+        self.parent_bool: bool
+        self.parent_name: str
+        self.radius: float
+        self.loc_list: PositionListBlock
+        self.settings_frame: str
 
-        if create:
-            self.create()
+    def _window_setup(self):
+        super()._window_setup()
 
-    def _ui_setup(self, parent_ui: str | None, tool: str) -> str:
-        base_ui = cmds.columnLayout(f"{tool}_base", adj=True, bgc=[.3, .5, .55])
-        if parent_ui:
-            cmds.columnLayout(base_ui, e=True, p=parent_ui)
+    def resize(self, cls, width, height):
+        cls.resize(width, height)
+        self.update_window_size()
 
-        desc = DescriptionFrame(base_ui, create=True, collapsable=True, collapsed=True)
+    def _ui_setup(self):
+        cmds.columnLayout(self.window_base, e=True, bgc=[.35, .5, .5])
+        cmds.text(label="Joint Creation Tool", font="boldLabelFont", parent=self.window_base)
+
+        block_kwargs = {"marginWidth": 1, "marginHeight": 1, "width": self.window_width, "create": True,
+                        "color": [0.3, 0.3, 0.3],}
+        tool_controls_kwargs = {"collapsable": False, "collapsed": False}
+
+        desc = DescriptionFrame(
+            self.window_base,
+            collapsable=True,
+            collapsed=True,
+            height=25,
+            **block_kwargs
+        )
+        desc.original_height = 40
         desc("This tool creates joints at the selected locations.")
-        cmds.frameLayout("settings_frame", label="Tool Settings", collapsable=True, parent=base_ui)
-        cmds.columnLayout("ui_block", adjustableColumn=True, parent="settings_frame")
-        cmds.columnLayout("pos_list_block", adjustableColumn=True, p="ui_block")
-        cmds.columnLayout("radius_block", adjustableColumn=True, p="ui_block")
-        cmds.columnLayout("naming_block", adjustableColumn=True, p="ui_block")
-        cmds.columnLayout("parent_block", adjustableColumn=True, p="ui_block")
-        cmds.columnLayout("execute_block", adjustableColumn=True, parent="ui_block")
-        self.parent_options = ParentBlock("parent_block", "parent_opt_menu", width=self.window_width, create=True)
-        self.loc_list = PositionListBlock("pos_list_block", "Creation_List", width=self.window_width, create=True)
-        self.radius_input = LabeledTextField("radius_block", "Joint Radius", 1, width=self.window_width, create=True)
-        self.name_block = NamingBlock("naming_block", "name_choice", width=self.window_width, create=True)
+        self.loc_list = PositionListBlock(
+            self.window_base,
+            "Creation_List",
+            height=200,
+            **block_kwargs,
+            **tool_controls_kwargs,
+        )
+        self.radius_input = LabeledTextField(
+            self.window_base,
+            "Joint Radius",
+            1,
+            height=50,
+            **block_kwargs,
+            **tool_controls_kwargs,
+        )
+        self.name_block = NamingBlock(
+            self.window_base,
+            "name_choice",
+            height=150,
+            **block_kwargs,
+            **tool_controls_kwargs,
+        )
+        self.parent_options = ParentBlock(
+            self.window_base,
+            "parent_opt_menu",
+            height=75,
+            **block_kwargs,
+            **tool_controls_kwargs,
+        )
 
-        cmds.button(label="Execute", command=self.on_execute, backgroundColor=[1, 0, 0], parent="execute_block")
+        cmds.button(label="Execute", command=self.on_execute, backgroundColor=[1, 0, 0], parent=self.window_base)
         self.loc_list.clear()
         self.parent_options.update()
-        return base_ui
+        super()._ui_setup()
 
     def on_execute(self, *_):
         rename = bool(self.name_block)
+        name_schema = self.name_block.result(len(self.loc_list))
         parent_bool = bool(self.parent_options)
         parent_name = None if self.parent_options.get() == "None" else self.parent_options.get()
         radius = float(self.radius_input.get())
 
-        created_joints = create_joints(self.loc_list, radius, parent_bool, parent_name)
+        if "fk ik rk" in name_schema.lower():
+            self.name_block.check_count(len(self.loc_list) * 3)
+            for type in ["FK", "IK", "RK"]:
+                to_replace = ""
+                for piece in name_schema.split("_"):
+                    if piece.lower() == "fk ik rk":
+                        to_replace = piece
+                        break
+                name = name_schema.replace(to_replace, type)
 
-        if parent_bool:
-            orient_joints(created_joints)
-        display_axis(created_joints)
+                created_joints = create_joints(self.loc_list, radius, parent_bool, parent_name)
 
-        if rename:
-            rename_joints(created_joints, self.name_block.result())
+                if parent_bool:
+                    orient_joints(created_joints)
+                display_axis(created_joints)
+
+                if rename:
+                    rename_joints(created_joints, name)
+        else:
+            created_joints = create_joints(self.loc_list, radius, parent_bool, parent_name)
+
+            if parent_bool:
+                orient_joints(created_joints)
+            display_axis(created_joints)
+
+            if rename:
+                rename_joints(created_joints, name_schema)
 
         self.parent_options.update()
 
 
 if __name__ == "__main__":
-    JointUI("Joint Tool", "joint", "tab", create=True, parent=None)
+    print("RUNNNING FROM JOINT UI CORE DUNDER MAIN")
+    JointUI("Joint Tool", width=500, height=550, create=True)
+    # "test_win",
+    # label = "Bold Test Frame",
+    # font = "boldLabelFont",
+    # width = 100,
+    # height = 10,
+    # border = True,
+    # marginWidth = 5,
+    # marginHeight = 5,
+    # visible = True,
+    # collapsable = True,
+    # collapsed = True,
+    # title_color = [0.6, 0.5, 0.6],
+    # secondary_color = [0, 0.3, 0],
+    # annotation = "This is a test frame.",
+    # create = True)

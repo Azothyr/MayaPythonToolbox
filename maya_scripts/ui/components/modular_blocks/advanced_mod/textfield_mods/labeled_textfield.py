@@ -1,13 +1,11 @@
 import maya.cmds as cmds
-from ui.components.modular_blocks.basic_mod.form_base import BaseUI
+from ui.components.modular_blocks import FrameBase
 
 
-class MainUI(BaseUI):
-    def __init__(self, parent_ui: str, name: str, default=None, align_text="center", ui_align="center", width=300,
+class MainUI(FrameBase):
+    def __init__(self, parent_ui: str, name: str, default=None, align_text="center", ui_align="center",
                  **kwargs):
-        super_args = [parent_ui, name, width]
-        # SUPER: self.name, self.readable_name, self.window_width, self.form, self.frame, self.parent_ui
-        super().__init__(*super_args)
+        self.name = self._parse_init_name(name, before_super=True)
 
         # Variables
         self.text = str(default) if default else None
@@ -22,14 +20,17 @@ class MainUI(BaseUI):
         self.column_align = ui_align
         self.align_text = align_text
 
-        if kwargs.get("create", kwargs.get("cr", kwargs.get("c", False))):
-            self._create_ui()
+        super_args = [parent_ui, name]
+        super().__init__(*super_args, **kwargs)
 
     def get(self):
         return cmds.textField(self.input, query=True, text=True)
 
+    def _create_frame(self):
+        super()._create_frame()
+
     def _setup_main_ui(self):
-        col_width = int(self.window_width / 2)
+        col_width = int(self.width / 2)
 
         self.section = cmds.columnLayout(self.section, adjustableColumn=True, p=self.frame)
         self.columns = cmds.rowColumnLayout(self.columns, numberOfColumns=2,

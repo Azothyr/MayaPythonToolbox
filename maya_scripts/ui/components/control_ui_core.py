@@ -1,6 +1,6 @@
-from core.maya_managers.control_factory import ControlFactory as control_tool
-from core.components import color_changer as color_tool
-from core.components.color_library import ColorIndex as ColorLib
+from core.maya_managers.control_factory import ControlFactory
+from core.components.color_changer import change_color
+from core.components.color_library import ColorIndex
 from ui.components.ui_cmds.window_base import WindowBase as Window
 from ui.components.ui_cmds.button_base import ButtonBase as Button
 from ui.components.ui_cmds.optionMenu_base import OptionMenuBase as OptionMenu
@@ -18,7 +18,7 @@ def _ui_setup(parent_ui, tool):
     """
     control_tab = ColLayout(f'{tool}_base', adj=True, bgc=[.3, .35, .3], p=parent_ui)
 
-    color_options = ColorLib().get_color_order()
+    color_options = ColorIndex().get_color_order()
     select_row = RowColLayout(f'{tool}_selection_row', p=f'{tool}_base', adj=True, nc=2,
                               cal=[(1, 'center'), (2, 'left')],
                               bgc=[.5, .5, .5])
@@ -32,18 +32,18 @@ def _ui_setup(parent_ui, tool):
     button_col = ColLayout(f'{tool}_bot_button', p=control_tab, adj=True, w=200)
     sel_txt = Text("Select a color:", p=sel_col_1)  # noqa
     color_option_menu = OptionMenu('control_color_opt_menu', p=sel_col_2, bgc=[.5, .2, .2])
-    color_m_items = MenuItem.create_menu_items_from_iter(color_options, color_option_menu)  # noqa
-    scale_txt = Text('scale_txt', l='Control Scale:', bgc=[.7, .7, .7], p=rad_col_1)  # noqa
+    MenuItem.create_menu_items_from_iter(color_options, color_option_menu)
+    Text('scale_txt', l='Control Scale:', bgc=[.7, .7, .7], p=rad_col_1)
     radius_input = TextField('radius_input', tx='5', bgc=[.1, .1, .1], p=rad_col_2)
 
     def on_execute(*_):
-        creator = control_tool(radius=radius_input.query('text'))
-        controls = creator()
-        color_tool.change_color(color_option_menu.query('value'), controls)
+        factory = ControlFactory(radius=float(radius_input.query('text')))()
+        for control in factory:
+            change_color(color_option_menu.query('value'), control.name)
+            print("CREATED: ", control.name)
+        print("COLOR: ", color_option_menu.query('value'))
 
-    exec_button = Button(f'{tool}_button', l="Create Control", p=button_col,  # noqa
-                         c=on_execute,
-                         bgc=[0, 0, 0])
+    Button(f'{tool}_button', l="Create Control", p=button_col, c=on_execute, bgc=[0, 0, 0])
     return control_tab
 
 

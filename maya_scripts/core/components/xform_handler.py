@@ -293,7 +293,8 @@ class XformHandler:
     def move_relative_to_obj(self, other_xform: Union['XformHandler', str], distance):
         direction = self.calc.calculate_comparison_vector(other_xform)
         unit_vector = self.calc.normalize_vector(direction)
-        new_pos = [self.apply_threshold(self.get_world_space_position()[i] + distance * unit_vector[i]) for i in range(3)]
+        new_pos = [self.apply_threshold(self.get_world_space_position()[i] + distance * unit_vector[i]
+                                        ) for i in range(3)]
         self.set_world_space_position(new_pos)
 
     @apply_threshold_decorator
