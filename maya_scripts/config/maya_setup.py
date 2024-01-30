@@ -1,7 +1,7 @@
 import sys
 import os
 import maya.cmds as cmds
-from ui import _main_ui_  # noqa
+from ui import _main_ui_ # noqa
 from pathlib import Path
 
 
@@ -113,7 +113,10 @@ def create_user_setup(year: str = None, _open: bool = False):
             """import maya.cmds as cmds
 from config.maya_setup import set_maya_on_start
 
-cmds.evalDeferred('set_maya_on_start()', lowestPriority=True)
+try:
+    cmds.evalDeferred('set_maya_on_start()', lowestPriority=True)
+except Exception as e:
+    print('Error setting up ZP Tools during Maya startup:', str(e))
 """)
 
     if Path(user_setup).exists():
@@ -126,6 +129,6 @@ cmds.evalDeferred('set_maya_on_start()', lowestPriority=True)
 
 
 if __name__ == "__main__":
-    set_maya_on_start()
+    # set_maya_on_start()
     # refresh_tools()
-    # create_user_setup("2024", _open=True)
+    create_user_setup("2024", _open=True)
