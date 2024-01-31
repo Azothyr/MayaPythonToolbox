@@ -118,16 +118,22 @@ class LimbTwistManager:
         match aim_axis:
             case "x":
                 match up_axis:
-                    case "y": return "z"
-                    case "z": return "y"
+                    case "y":
+                        return "z"
+                    case "z":
+                        return "y"
             case "y":
                 match up_axis:
-                    case "x": return "z"
-                    case "z": return "x"
+                    case "x":
+                        return "z"
+                    case "z":
+                        return "x"
             case "z":
                 match up_axis:
-                    case "x": return "y"
-                    case "y": return "x"
+                    case "x":
+                        return "y"
+                    case "y":
+                        return "x"
 
     def set_joint_to_orientation(self, joint, orientation=None, **kwargs):
         if orientation is None:
@@ -181,18 +187,44 @@ class LimbTwistManager:
                                  name=f"scale_constraint__from_{con_jnt}")
 
     def _set_radius(self):
-        radius = int(cmds.getAttr(f"{self.rk_bot_jnt}.radius") * 0.50)
+        radius = int(cmds.getAttr(f"{self.rk_bot_jnt}.radius") * 2)
+        if radius < 0.1:
+            radius = 0.1
         return radius
 
     def _set_locator_scale(self):
-        scale = cmds.getAttr(f"{self.rk_bot_jnt}.radius")
+        orig_scale = cmds.getAttr(f"{self.rk_bot_jnt}.radius")
         sels = cmds.ls("*_Loc", type="transform")
         locators = [sel for sel in sels if "Loc_Grp" not in sel or "Constraint" not in sel]
         for loc in locators:
+            scale = orig_scale
             shape = cmds.listRelatives(loc, shapes=True)[0] if cmds.listRelatives(loc, shapes=True) else None
-            if shape:
-                for axis in "XYZ":
-                    cmds.setAttr(f"{shape}.localScale{axis}", scale)
+            if not shape:
+                continue
+            if "up_" in shape.lower() or "pv_" in shape.lower():
+                if scale < 1:
+                    scale *= 0.5
+                if scale < 0.1:
+                    scale = 0.1
+            elif "upper" in shape.lower():
+                scale *= 1.5
+                if "aim_" in shape.lower():
+                    scale *= 5.5
+                elif "mid_" in shape.lower():
+                    scale *= 5
+                elif "target_" in shape.lower():
+                    scale *= 4.5
+            elif "lower" in shape.lower() or "forearm" in shape.lower():
+                if "aim_" in shape.lower():
+                    scale *= 4.5
+                elif "mid_" in shape.lower():
+                    scale *= 5
+                elif "target_" in shape.lower():
+                    scale *= 5.5
+            else:
+                scale *= 2
+            for axis in "XYZ":
+                cmds.setAttr(f"{shape}.localScale{axis}", scale)
 
     def create_upper_twist_system(self, up_dist=None, helper_dist=None, correct_percent=None):
         self.create_upper_twist_base(up_dist=up_dist)
@@ -211,7 +243,7 @@ class LimbTwistManager:
     def create_upper_twist_base(self, up_dist=None):
         if up_dist is None:
             base_dist = self.top_jnt_xform.calc.calculate_distance(self.pivot_jnt_xform)
-            up_dist = int(base_dist * 0.9)
+            up_dist = int(base_dist * 0.7)
             if "-" in self.up_axis:
                 up_dist *= -1
             if self.get_limb() == "Arm":
@@ -222,7 +254,8 @@ class LimbTwistManager:
             obj.match_xform(self.rk_top_jnt, "translate")
         for obj in [self.upper_target_loc_xform, self.upper_up_loc_xform]:
             obj.match_xform(self.rk_pivot_jnt, "translate")
-        for obj in [self.upper_loc_grp_xform, self.upper_aim_loc_xform, self.upper_target_loc_xform, self.upper_up_loc_xform]:
+        for obj in [self.upper_loc_grp_xform, self.upper_aim_loc_xform, self.upper_target_loc_xform,
+                    self.upper_up_loc_xform]:
             obj.match_xform(self.rk_top_jnt, "rotate")
 
         up_axis = self.up_axis.replace("-", "") if "-" in self.up_axis else self.up_axis
@@ -267,7 +300,8 @@ class LimbTwistManager:
             self.help_jnt1_xform.add_in_world('translate', **{rotate_axis: helper_dist})
         # Moving the helper joint2 to be halfway between helper 1 and the pivot_jnt
         self.help_jnt2_xform.move_relative_to_obj(self.help_jnt1_xform,
-                                                  self.help_jnt2_xform.calc.calculate_distance(self.help_jnt1_xform)*0.5)
+                                                  self.help_jnt2_xform.calc.calculate_distance(
+                                                      self.help_jnt1_xform) * 0.5)
         cmds.parent(self.helper_joint2, self.helper_joint1)
         # Orienting the helper joints
         self.set_joint_to_orientation(self.helper_joint1)
@@ -325,16 +359,16 @@ class LimbTwistManager:
         self.create_lower_twist_base(up_dist=up_dist)
         cmds.select(clear=True)
         self.lower_twist_locators = self.create_falloff_twist(self.lower_name, self.pivot_jnt_xform, self.lower_aim,
-                                                          self.lower_target_loc, self.lower_loc_grp)
+                                                              self.lower_target_loc, self.lower_loc_grp)
         cmds.select(clear=True)
         self.lower_twist_joints = self.create_twist_joints(self.lower_name, self.lower_twist_locators, self.lower_aim,
-                                                       self.rk_pivot_jnt)
+                                                           self.rk_pivot_jnt)
         cmds.select(clear=True)
 
     def create_lower_twist_base(self, up_dist=None):
         if up_dist is None:
             base_dist = self.pivot_jnt_xform.calc.calculate_distance(self.bot_jnt_xform)
-            up_dist = int(base_dist / 4)
+            up_dist = int(base_dist / 2.5)
             if self.get_side() == "R":
                 up_dist *= -1
 
@@ -342,16 +376,17 @@ class LimbTwistManager:
         for obj in [self.lower_loc_grp_xform, self.lower_aim_xform, self.lower_up_loc_xform]:
             obj.match_xform(self.bot_jnt_xform, "translate")
         self.lower_target_loc_xform.match_xform(self.pivot_jnt_xform, "translate")
-        for obj in [self.lower_loc_grp_xform, self.lower_aim_xform, self.lower_target_loc_xform, self.lower_up_loc_xform]:
+        for obj in [self.lower_loc_grp_xform, self.lower_aim_xform, self.lower_target_loc_xform,
+                    self.lower_up_loc_xform]:
             obj.match_xform(self.bot_jnt_xform, "rotate")
 
         up_axis = self.up_axis.replace("-", "") if "-" in self.up_axis else self.up_axis
         if self.get_limb() == "Leg":
             up_axis = self.rotate_axis.replace("-", "") if "-" in self.rotate_axis else self.rotate_axis
         aim_axis = self.get_aim_axis(self.bot_jnt_xform, self.pivot_jnt_xform)
-        up_vector = self.calculator.get_vector_from_axis(self.up_axis) if self.get_limb() == "Arm" else\
-            self.calculator.get_vector_from_axis(f"-{self.rotate_axis}") if self.get_side() == "R" else\
-            self.calculator.get_vector_from_axis(self.rotate_axis)
+        up_vector = self.calculator.get_vector_from_axis(self.up_axis) if self.get_limb() == "Arm" else \
+            self.calculator.get_vector_from_axis(f"-{self.rotate_axis}") if self.get_side() == "R" else \
+                self.calculator.get_vector_from_axis(self.rotate_axis)
         aim_vector = self.calculator.get_vector_from_axis(aim_axis)
 
         cmds.parent(self.lower_aim, self.lower_target_loc, self.lower_up_loc, self.lower_loc_grp)
@@ -462,8 +497,10 @@ class LimbTwistManager:
         return twist_joints
 
     def clean_up(self):
-        _group = cmds.group(name="Limb_Twist_Grp", empty=True) if not cmds.objExists(
-            "Limb_Twist_Grp") else "Limb_Twist_Grp"
+        if not cmds.objExists("Limb_Twist_Grp"):
+            _group = cmds.group(name="Limb_Twist_Grp", empty=True)
+        else:
+            _group = "Limb_Twist_Grp"
 
         cmds.parent(self.lower_loc_grp, self.lower_full_grp)
         cmds.parent(self.helper_jnt_grp, self.upper_full_grp)
@@ -471,8 +508,10 @@ class LimbTwistManager:
         cmds.parent(self.lower_full_grp, self.upper_full_grp, _group)
 
         if cmds.objExists("Deformers"):
-            if "Limb_Twist_Grp" not in cmds.listRelatives("Deformers", children=True):
+            try:
                 cmds.parent(_group, "Deformers")
+            except RuntimeError:
+                pass
 
     def color_twist_system(self, twist_color="White"):
         twist_objects_to_color = (self.upper_twist_joints + self.lower_twist_joints + self.upper_twist_locators +
@@ -491,6 +530,7 @@ class LimbTwistManager:
 if __name__ == "__main__":
     from functools import partial
 
+
     def module_name():
         import inspect
         import os
@@ -499,52 +539,60 @@ if __name__ == "__main__":
         filename = inspect.getfile(frame)
         return os.path.basename(filename).split('.')[0]
 
+
     print(f"\n{'-' * 25 + '|' + ' ' * 4} RUNNING {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 25}")
+
 
     def perform_l_arm(selection, twist_count=1):
         return LimbTwistManager("L_Arm", "L_Upper_Arm", "L_ForeArm", selection[0], selection[1], selection[2],
                                 selection[3], twist_count=twist_count)
 
+
     def perform_r_arm(selection, twist_count=1):
         return LimbTwistManager("R_Arm", "R_Upper_Arm", "R_ForeArm", selection[0], selection[1], selection[2],
                                 selection[3], twist_count=twist_count)
+
 
     def perform_l_leg(selection, twist_count=1):
         return LimbTwistManager("L_Leg", "L_Upper_Leg", "L_Lower_Leg", selection[0], selection[1], selection[2],
                                 selection[3], twist_count=twist_count)
 
+
     def perform_r_leg(selection, twist_count=1):
         return LimbTwistManager("R_Leg", "R_Upper_Leg", "R_Lower_Leg", selection[0], selection[1], selection[2],
                                 selection[3], twist_count=twist_count)
 
-    def perform_func_call(excluded=None):
-        excluded = [] if not excluded else excluded
+
+    def perform_func_call(included=None):
+        included = [0, 1, 2, 3] if not included else included
 
         run_parameters = {"arm": {'correct_percent': 10},
                           "leg": {'correct_percent': 10}}
 
         functions = [partial(perform_l_arm,
-                             ["L_Arm_01_RK_Jnt", "L_Arm_02_RK_Jnt", "L_Arm_03_RK_Jnt", "L_Hand_FK_Jnt"],
+                             ["L_Arm_RK_01_Jnt", "L_Arm_RK_02_Jnt", "L_Arm_RK_03_Jnt", "L_Hand_FK_Jnt"],
                              twist_count=1),
                      partial(perform_r_arm,
-                             ["R_Arm_01_RK_Jnt", "R_Arm_02_RK_Jnt", "R_Arm_03_RK_Jnt", "R_Hand_FK_Jnt"],
+                             ["R_Arm_RK_01_Jnt", "R_Arm_RK_02_Jnt", "R_Arm_RK_03_Jnt", "R_Hand_FK_Jnt"],
                              twist_count=1),
                      partial(perform_l_leg,
-                             ["L_Leg_01_RK_Jnt", "L_Leg_02_RK_Jnt", "L_Leg_03_RK_Jnt", "L_Foot_01_RK_Jnt"],
+                             ["L_Leg_RK_01_Jnt", "L_Leg_RK_02_Jnt", "L_Leg_RK_03_Jnt", "L_Foot_RK_01_Jnt"],
                              twist_count=1),
                      partial(perform_r_leg,
-                             ["R_Leg_01_RK_Jnt", "R_Leg_02_RK_Jnt", "R_Leg_03_RK_Jnt", "R_Foot_01_RK_Jnt"],
+                             ["R_Leg_RK_01_Jnt", "R_Leg_RK_02_Jnt", "R_Leg_RK_03_Jnt", "R_Foot_RK_01_Jnt"],
                              twist_count=1)]
 
         for i, func in enumerate(functions):
-            if i not in excluded:
+            if i in included:
                 func().run(**run_parameters["arm" if i < 2 else "leg"])
+
 
     def toggle_twist_grp_visibility():
         cmds.setAttr("Limb_Twist_Grp.visibility", 1 - cmds.getAttr("Limb_Twist_Grp.visibility"))
 
-    # perform_func_call([0, 1])
-    # perform_func_call()
-    toggle_twist_grp_visibility()
+
+    # perform_func_call([0, 2])
+    perform_func_call()
+    # toggle_twist_grp_visibility()
 
     print(f"{'-' * 25 + '|' + ' ' * 4} COMPLETED {module_name()}  DUNDER MAIN {' ' * 4 + '|' + '-' * 25}\n")

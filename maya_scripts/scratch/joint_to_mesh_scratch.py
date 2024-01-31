@@ -6,8 +6,8 @@ from core.maya_managers.joint_manager import JointManager
 
 def get_part_names(data):
     output = []
-    exclude = ['COG', 'HELPER', 'Unknown']
-    base_part = [x for x in data.keys() if x not in exclude]
+    exclude = ['cog', 'helper', 'Unknown']
+    base_part = [x for x in data.keys() if x.lower() not in exclude]
     object_names = []
     [object_names.extend(data[x]['joints']) for x in base_part]
 

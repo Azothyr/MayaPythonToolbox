@@ -5,10 +5,21 @@ from typing import Union
 
 class Calculator3dSpace:
     def __init__(self, source=None, target=None):
-        self.source = source if isinstance(source, XformHandler) else\
-            XformHandler(source) if source and cmds.objExists(source) else None
-        self.target = target if isinstance(target, XformHandler) else\
-            XformHandler(target) if target and cmds.objExists(target) else None
+        # Check if the source is a valid object or XformHandler instance and assign accordingly
+        if isinstance(source, XformHandler):
+            self.source = source
+        elif source and cmds.objExists(source):
+            self.source = XformHandler(source)
+        else:
+            self.source = None
+
+        # Check if the target is a valid object or XformHandler instance and assign accordingly
+        if isinstance(target, XformHandler):
+            self.target = target
+        elif target and cmds.objExists(target):
+            self.target = XformHandler(target)
+        else:
+            self.target = None
 
     @staticmethod
     def get_axis_from_vector(vector):
@@ -18,7 +29,7 @@ class Calculator3dSpace:
             case (0.0, 1.0, 0.0): return "y"
             case (0.0, -1.0, 0.0): return "-y"
             case (0.0, 0.0, 1.0): return "z"
-            case (0.0, 0.0, -1.0):  return "-z"
+            case (0.0, 0.0, -1.0): return "-z"
             case _: raise ValueError(f"Cannot determine axis from vector: {vector}")
 
     @staticmethod
@@ -46,11 +57,12 @@ class Calculator3dSpace:
         if other_xform is None:
             other_xform = self.target
         # Calculate the world space direction vector of the source position to the target position
-        vector = self.normalize_vector(self.calculate_comparison_vector(other_xform))
+        vector = self.normalize_vector(self.calculate_comparison_vector(other_xform), self.source, other_xform)
         if relative_to_src:
             # rotation_matrix = 3x3 matrix of [translation_vector, rotation_vector, scale_vector]
             rotation_matrix = self.source.get_world_space_rotation_matrix()
-            # Multiply vector by rotation matrix (j=x|y|z, i=matrix row [0]->translationXYZ,[1]->rotationXYZ,[2]->scaleXYZ)
+            # Multiply vector by rotation matrix (j=x|y|z, i=matrix row [0]->translationXYZ,
+            # [1]->rotationXYZ,[2]->scaleXYZ)
             rotated_vector = [
                 sum(vector[j] * round(rotation_matrix[i][j]) for j in range(3)) for i in range(3)
             ]
@@ -76,11 +88,14 @@ class Calculator3dSpace:
         vector = self.calculate_comparison_vector(other_xform)
         return math.sqrt(sum([v ** 2 for v in vector]))
 
-    def normalize_vector(self, vector = None):
+    def normalize_vector(self, vector=None, src="", trgt=""):
         if vector is None:
             vector = self.calculate_comparison_vector()
         if vector[0] == vector[1] == vector[2] == 0:
-            raise ValueError("Cannot calculate aim axis vector when source and target positions are the same.")
+            src = f":\n {src}\n" if src else ""
+            trgt = f":\n {trgt}\n" if trgt else ""
+            raise ValueError(
+                f"Cannot calculate aim axis vector when source{src} and target{trgt} positions are the same.")
         magnitude = math.sqrt(sum([axis ** 2 for axis in vector]))
         if magnitude == 0:
             raise ValueError("Cannot normalize a vector with magnitude 0.")
@@ -118,14 +133,19 @@ class Calculator3dSpace:
 
 
 class XformHandler:
-    def __init__(self, obj, threshold=1e-5, precision=3):
-        self.obj = obj if cmds.objExists(obj) else cmds.spaceLocator(name=obj)[0]
+    def __init__(self, obj, threshold=1e-5, precision=3, allow_loc=True):
+        self.obj = obj if cmds.objExists(obj) else cmds.spaceLocator(name=obj)[0] if allow_loc else None
+        if not self.obj:
+            raise ValueError(f"ERROR XFORMHANDLER: Object '{obj}' does not exist.")
         self.threshold = threshold
         self.precision = precision
         self.calc = Calculator3dSpace(self)
         self.valid_attributes = self.get_all_transform_attributes()
         self.xform_attrs = [f"{self.obj}.{attr}{axis}" for attr in ['translate', 'rotate', 'scale'] for
                             axis in 'XYZ']
+        if cmds.objectType(self.obj) == 'joint':
+            for axis in 'XYZ':
+                self.xform_attrs.append(f"{self.obj}.jointOrient{axis}")
 
     def __repr__(self):
         return self.get_world_space_position()
@@ -136,33 +156,43 @@ class XformHandler:
                 f"\nRotation: {self.get_world_space_rotation()}"
                 f"\nScale: {self.get_attribute('scale')}")
 
-    def apply_threshold(self, value):
+    def apply_threshold(self, value, debug=False):
         if isinstance(value, (tuple, list, set)):
             return type(value)(self.apply_threshold(v) for v in value)
         else:
+            if value == 0:
+                debug = False
             if abs(value) < self.threshold:
+                if debug:
+                    print(f"\tValue {value} is below threshold {self.threshold}. Setting to 0.")
                 return 0
             else:
                 value = round(value, self.precision)
                 if 0.99 < abs(value) - abs(round(value)) < 0.01:
+                    if debug:
+                        print(f"\tValue {value} is close to an integer. Rounding to nearest integer.")
                     return int(round(value))
                 return value
 
-    def _fix_attribute_values(self):
+    def fix_small_values(self, debug=False):
         for attr in self.xform_attrs:
             value = cmds.getAttr(attr)
             if isinstance(value, list) or isinstance(value, tuple):
-                fixed_value = [self.apply_threshold(v) for v in value]
+                if debug:
+                    print(f"Working on {attr},\n\toriginial value: {value}")
+                fixed_value = [self.apply_threshold(v, debug=debug) for v in value]
                 cmds.setAttr(f"{attr}", *fixed_value)
             else:
-                fixed_value = self.apply_threshold(value)
+                if debug:
+                    print(f"Working on {attr},\n\toriginial value: {value}")
+                fixed_value = self.apply_threshold(value, debug=debug)
                 cmds.setAttr(f"{attr}", fixed_value)
 
     @staticmethod
     def apply_threshold_decorator(method):
         def wrapper(self, *args, **kwargs):
             result = method(self, *args, **kwargs)
-            self._fix_attribute_values()
+            self.fix_small_values()
             return result
 
         return wrapper
@@ -292,7 +322,7 @@ class XformHandler:
     @apply_threshold_decorator
     def move_relative_to_obj(self, other_xform: Union['XformHandler', str], distance):
         direction = self.calc.calculate_comparison_vector(other_xform)
-        unit_vector = self.calc.normalize_vector(direction)
+        unit_vector = self.calc.normalize_vector(direction, self.obj, other_xform)
         new_pos = [self.apply_threshold(self.get_world_space_position()[i] + distance * unit_vector[i]
                                         ) for i in range(3)]
         self.set_world_space_position(new_pos)
@@ -382,13 +412,25 @@ class XformHandler:
 
 
 if __name__ == "__main__":
-    source_xform = XformHandler("pCube1")
-    target_xform = XformHandler("pSphere1")
-    calculator = Calculator3dSpace(source_xform, target_xform)
-    print(calculator.calculate_aim_axis_vector(relative_to_src=True))
-    source_xform.add_in_local('rotate', x=45.0, y=180.0, z=45.0)
-    target_xform.match_xform(source_xform, ['rotation', 'translation'])
-    target_xform.match_xform(source_xform, 'scale')
-    source_xform.add_in_world('translate', x=0.1, y=0.1, z=0.1)
-    source_xform.move_relative_to_obj(target_xform, 5.0)
-    source_xform.set_xform({'translate': (0, 0, 0), 'rotate': (55, 55, 55)})
+    debug = False
+    # # Example of usage moving a source object relative to a target object
+    # source_xform = XformHandler("pCube1")
+    # target_xform = XformHandler("pSphere1")
+    # calculator = Calculator3dSpace(source_xform, target_xform)
+    # print(calculator.calculate_aim_axis_vector(relative_to_src=True))
+    # source_xform.add_in_local('rotate', x=45.0, y=180.0, z=45.0)
+    # target_xform.match_xform(source_xform, ['rotation', 'translation'])
+    # target_xform.match_xform(source_xform, 'scale')
+    # source_xform.add_in_world('translate', x=0.1, y=0.1, z=0.1)
+    # source_xform.move_relative_to_obj(target_xform, 5.0)
+    # source_xform.set_xform({'translate': (0, 0, 0), 'rotate': (55, 55, 55)})
+    
+    # Example of usage fixing small values on joints
+    selection = cmds.ls(type="joint")
+
+    for joint in selection:
+        jnt = XformHandler(joint, precision=2)
+        jnt.fix_small_values(debug=debug)
+
+    if debug:
+        print("COMPLETE")
