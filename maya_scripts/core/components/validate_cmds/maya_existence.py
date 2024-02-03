@@ -31,6 +31,8 @@ class Exists:
             "locator": (["l", "loc"], self.locator),
             "shape": (["s", "shp"], self.shape),
         })
+        self.warning = kwargs.get(
+            "warning", kwargs.get("w", f"WARNING: {self.name} is not valid. Please provide a valid type/object."))
         self.exists = self._init_check(**kwargs)
 
     def __str__(self) -> str:
@@ -68,9 +70,9 @@ class Exists:
             return self._invalid()
         return self.options(self.type, self.name, **kwargs)
 
-    @staticmethod
-    def _invalid() -> bool:
+    def _invalid(self) -> bool:
         """Returns False as a fallback for invalid types."""
+        cmds.warning(self.warning)
         return False
 
     @staticmethod

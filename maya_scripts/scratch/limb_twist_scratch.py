@@ -528,6 +528,9 @@ class LimbTwistManager:
 
 
 if __name__ == "__main__":
+    """
+    2/2/2024: as long as the names are correct this script will work.
+    """
     from functools import partial
 
 

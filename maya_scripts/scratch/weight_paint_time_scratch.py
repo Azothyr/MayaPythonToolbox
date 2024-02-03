@@ -1,379 +1,194 @@
 import maya.cmds as cmds
-from pprint import pprint
-# import re
-# from weight_paint_time_scratch import WeightPaintHelper
-from components.xform_handler import XformHandler
-
-debug_bool = False
+from ui.components.utils.enable_handler import toggle_layouts
 
 
-def debug(text: str, _debug: bool = False, pretty: bool = False):
-    if debug_bool or _debug:
-        if pretty:
-            pprint(f"{text}")
-        else:
-            print(f"{text}")
+def get_directional_attrs(obj, rotation_plane=None, translate_axis=None, all=True):
+    rotation_plane = rotation_plane.lower() if rotation_plane else "xyz"
+    translate_axis = translate_axis.lower() if translate_axis else "x"
+
+    if all:
+        rotation_plane = "xyz"
+        translate_axis = "xyz"
+        for attr in rotation_plane:
+            yield f"{obj}.r{attr}"
+        for attr in translate_axis:
+            yield f"{obj}.t{attr}"
+    else:
+        for attr in rotation_plane:
+            yield f"{obj}.r{attr}"
+        yield f"{obj}.t{translate_axis}"
 
 
-class WeightPaintHelper:
-    @staticmethod
-    def preset(preset_name, pose=None):
-        presets = {
-            "torso": {
-                "rotation_plane": "yz",
-                "translate_axis": "x",
-                "rotation_amount": [0, 50, -50, 0, 50, -50],
-                "translation_amount": -100,
-                "time_interval": 15,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "neck": {
-                "rotation_plane": "yz",
-                "translate_axis": "x",
-                "rotation_amount": [0, 30, -30, 0, 30, -30],
-                "translation_amount": 100,
-                "time_interval": 15,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "leg": {
-                "rotation_plane": "xyz",
-                "translate_axis": "x",
-                "rotation_amount": [0, -30, 30, 0, 50, -15, 0, 45, -45],
-                "translation_amount": 100,
-                "time_interval": 10,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "foot": {
-                "rotation_plane": "xyz",
-                "translate_axis": "y",
-                "rotation_amount": [0, -25, 30, 0, 50, -15, 0, 40, -40],
-                "translation_amount": -100,
-                "time_interval": 10,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "clav": {
-                "rotation_plane": "yz",
-                "translate_axis": "x",
-                "rotation_amount": [0, -20, 30, 0, 35, -35],
-                "translation_amount": 100,
-                "time_interval": 10,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "arm": {
-                "rotation_plane": "yz",
-                "translate_axis": "x",
-                "rotation_amount": [0, -5, 5, 0, 90, -10],
-                "translation_amount": 100,
-                "time_interval": 10,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "wrist": {
-                "rotation_plane": "xyz",
-                "translate_axis": "x",
-                "rotation_amount": [0, -90, 90, 0, -90, 90, 0, 80, -80],
-                "translation_amount": 100,
-                "time_interval": 10,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "finger": {
-                "rotation_plane": "yz",
-                "translate_axis": "x",
-                "rotation_amount": [0, -60, 60, 0, 40, -40],
-                "translation_amount": 100,
-                "time_interval": 10,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-            "thumb": {
-                "rotation_plane": "xyz",
-                "translate_axis": "x",
-                "rotation_amount": [0, -25, 30, 0, 50, -15, 0, 40, -40],
-                "translation_amount": 100,
-                "time_interval": 10,
-                "mode": "run",
-                "include": ["ctrl"],
-                "exclude": ["grp", "constraint", "jnt", "shape"],
-            },
-        } if pose is None or "t" in pose.lower() else {}
-
-        other_identifiers = {
-            "pelvis": "torso",
-            "spine": "torso",
-            "hip": "torso",
-            "shoulder": "clav",
-            "head": "neck",
-            "hand": "wrist",
-        }
+def set_keyframes(obj, primary_attr, translation_dir="x"):
+    for attr in [f"{obj}.r{axis}" for axis in "xyz"] + [f"{obj}.t{translation_dir}"]:
+        if attr != primary_attr:
+            original_value = cmds.getAttr(attr)
+            cmds.setAttr(attr, original_value)
+        cmds.setKeyframe(attr)
 
 
-        preset_name = preset_name.lower()
-        if preset_name in other_identifiers.keys():
-            preset_name = other_identifiers[preset_name]
-        if preset_name not in presets.keys():
-            raise RuntimeError(f"Preset not found: {preset_name}")
-        return presets[preset_name]
+def set_keyframes_for_weight_painting(
+        obj, rotation_amount: tuple = (45, 45, 45), translation_amount: float = 25, translation_dir: str = "x",
+        interval: int = 15):
+    sub_interval = interval
+    if interval < 4:
+        interval = 4
+    if interval % 3 == 0:
+        sub_interval += 1
+    interval *= 3
+    interval += 1
 
-    def __init__(self, control=None, skin=None, pose=None, preset=None, rotation_plane=None, translate_axis=None,
-                 rotation_amount=None, translation_amount=None, time_interval=None, mode="run", include=None,
-                 exclude=None):
-        print(f"control: {control}\n")
-
-        match control.lower():
-            case "l_arm_03":
-                preset = "hand"
-            case "l_finger_01":
-                preset = "thumb"
-            case "l_finger_01_knuckle_01":
-                preset = "thumb"
-            case "l_finger_01_knuckle_02":
-                preset = "thumb"
-            case "l_finger_01_knuckle_03":
-                preset = "thumb"
-            case "l_finger_01_knuckle_03":
-                preset = "thumb"
-            case "l_leg_clav":
-                preset = "leg"
-        if preset is None:
-            include = include if include is not None else ["ctrl"]
-            exclude = exclude if exclude is not None else ["grp", "constraint", "jnt", "shape"]
-            self.control = self.get_maya_obj(control, include=include, exclude=exclude)
-            self.rotation_amount = rotation_amount if rotation_amount is not None else self.preset('torso')[
-                'rotation_amount']
-            self.translation_amount = translation_amount if translation_amount is not None else self.preset('torso')[
-                'translation_amount']
-            self.time_interval = time_interval if time_interval is not None else self.preset('torso')['time_interval']
-            self.rotation_plane = rotation_plane.lower() if rotation_plane is not None else self.preset('torso')[
-                'rotation_plane']
-            self.translate_axis = translate_axis.lower() if translate_axis is not None else self.preset('torso')[
-                'translate_axis']
-            self.side = 1
-        else:
-            preset = self.preset(preset, pose=pose)
-            self.control = self.get_maya_obj(control, include=preset['include'], exclude=preset['exclude'])
-            self.rotation_amount = preset['rotation_amount']
-            self.translation_amount = preset['translation_amount']
-            self.time_interval = preset['time_interval']
-            self.rotation_plane = preset['rotation_plane'].lower()
-            self.translate_axis = preset['translate_axis'].lower()
-            self.side = -1 if "r_" in self.control.lower() else 1
-
-        self.__auto_run(mode)
-
-        if skin is not None:
-            self.skin = self.get_maya_obj(skin)
-            cmds.select(self.skin)
-
-    def __auto_run(self, mode):
-        valid_modes = ["run", "remove", "rem", "tool"]
-
-        match mode.lower().strip():
-            case "run":
-                self.set_keyframes_for_weight_painting()
-            case "remove":
-                self.remove_keyframes()
-            case "rem":
-                self.remove_keyframes()
-            case "tool":
-                return
-            case _:
-                valid_modes = "\n".join(valid_modes)
-                raise RuntimeError(f"Invalid mode: {mode}\n Valid modes: {valid_modes}")
-
-    @staticmethod
-    def get_maya_obj(obj: str, include=None, exclude=None):
-        if obj is None:
-            obj = cmds.ls(selection=True)[0]
-        if not obj:
-            raise RuntimeError("No object selected.")
-        cmds.select(clear=True)
-        possible_objs = cmds.ls(obj)
-        debug(f"Found objects: {possible_objs}")
-        if possible_objs:
-            obj = possible_objs[0]
-        else:
-            possible_objs = cmds.ls(f"*{obj}*")
-            debug(f"Searching through: {possible_objs}")
-            for possible_obj in possible_objs:
-                debug(f"Possible object: {possible_obj}")
-                test_obj = obj.lower()
-                test_possible = possible_obj.lower()
-                if test_obj in test_possible:
-                    if exclude is not None:
-                        if any([exclude in test_possible for exclude in exclude]):
-                            continue
-                    if include is not None:
-                        if any([include in test_possible for include in include]):
-                            obj = possible_obj
-                            debug(f"Found object: {obj}")
-                            break
-                        elif include is None:
-                            obj = possible_obj
-                            debug(f"Found object: {obj}")
-                            break
-        if not cmds.objExists(obj):
-            raise RuntimeError(f"Object does not exist: {obj}")
-        return obj
-
-    def get_ctrl_assist_attrs(self, all=False):
-        if all:
-            self.rotation_plane = "xyz"
-            self.translate_axis = "xyz"
-            for attr in self.rotation_plane:
-                yield f"{self.control}.r{attr}"
-            for attr in self.translate_axis:
-                yield f"{self.control}.t{attr}"
-        else:
-            for attr in self.rotation_plane:
-                yield f"{self.control}.r{attr}"
-            yield f"{self.control}.t{self.translate_axis}"
-
-    def _set_keyframes(self, primary_attr):
-        for attr in self.get_ctrl_assist_attrs():
-            if attr != primary_attr:
-                cmds.setAttr(attr, 0)
-            cmds.setKeyframe(attr)
-
-    def set_keyframes_for_weight_painting(self):
-        rotations = ([0, self.rotation_amount * self.side, -1 * self.rotation_amount * self.side]
-                     * len(self.rotation_plane)) if isinstance(self.rotation_amount, (int, float)) else\
-            self.rotation_amount
-
-        rotate_1 = rotations[:3]
-        rotate_2 = rotations[3:6]
-        rotate_3 = rotations[6:9]
-        debug(f"{len(rotations)}\n{rotate_1}\n{rotate_2}\n{rotate_3}\n")
-
-        time = 0
-        cmds.currentTime(time)
-        # self._set_keyframes("Initial 0 matrix")
-        # time += self.time_interval
+    time = 0
+    cmds.currentTime(time)
+    set_keyframes(obj, None, translation_dir)
+    time += interval
+    for attr in [f"{obj}.r{axis}" for axis in "xyz"] + [f"{obj}.t{translation_dir}"]:
         count = 0
-        for attr in self.get_ctrl_assist_attrs():
-            if attr.split(".")[1].startswith("r"):
-                for i in range(3):
-                    cmds.currentTime(time)
-                    if count == 0:
-                        cmds.setAttr(attr, rotate_1[i])
-                    elif count == 1:
-                        cmds.setAttr(attr, rotate_2[i])
-                    elif count == 2:
-                        cmds.setAttr(attr, rotate_3[i])
-                    else:
-                        time -= self.time_interval + 1
-                        cmds.setAttr(attr, 0)
-                    self._set_keyframes(attr)
-                    time += self.time_interval
-                count += 1
-            elif attr.split(".")[1].startswith("t"):
-                for i in range(2):
-                    cmds.currentTime(time)
-                    if i == 1:
-                        cmds.setAttr(attr, self.translation_amount)
-                    else:
-                        cmds.setAttr(attr, 0)
-                    self._set_keyframes(attr)
-                    time += self.time_interval
-        time = 0
-        cmds.currentTime(time)
+        if attr.split(".")[1].startswith("r"):
+            axis = attr.split(".")[1][1]
+            idx = "xyz".index(axis)
+            original_value = cmds.getAttr(attr)
+            cmds.currentTime(time)
+            set_keyframes(obj, axis, translation_dir)
+            cmds.currentTime(time - sub_interval * 2)
+            cmds.setAttr(attr, rotation_amount[idx])
+            set_keyframes(obj, axis, translation_dir)
+            cmds.currentTime(time - sub_interval)
+            cmds.setAttr(attr, -rotation_amount[idx])
+            set_keyframes(obj, axis, translation_dir)
+            cmds.currentTime(time)
+            cmds.setAttr(attr, original_value)
+            set_keyframes(obj, axis, translation_dir)
+            if idx == 2:
+                time += sub_interval
+            else:
+                time += interval
+            count += 1
+        elif attr.split(".")[1].startswith("t"):
+            cmds.currentTime(time - sub_interval)
+            set_keyframes(obj, attr, translation_dir)
+            cmds.currentTime(time)
+            cmds.setAttr(attr, translation_amount)
+            set_keyframes(obj, attr, translation_dir)
+    time = 0
+    cmds.currentTime(time)
 
-    def remove_keyframes(self):
-        cmds.currentTime(0)
-        end_time = self.time_interval * 100 + 1
-        for attr in self.get_ctrl_assist_attrs(all=True):
-            keyframes = cmds.keyframe(attr, q=True, time=(-10, end_time))
-            if keyframes:
-                cmds.cutKey(attr, time=(keyframes[0], keyframes[-1]))
+
+def remove_keyframes(obj, interval):
+    cmds.currentTime(0)
+    end_time = interval * 100 + 1
+    for attr in get_directional_attrs(obj, all=True):
+        keyframes = cmds.keyframe(attr, q=True, time=(-10, end_time))
+        if keyframes:
+            cmds.cutKey(attr, time=(keyframes[0], keyframes[-1]))
+
+
+def ui():
+    def execute(*_):
+        selection = cmds.ls(sl=True)
+        if not selection:
+            cmds.warning("No object selected.")
+            return
+
+        mode = cmds.radioButtonGrp("options", q=True, select=True)
+        interval = cmds.intFieldGrp("interval", q=True, value1=True)
+        translation_dir = cmds.radioButtonGrp("trans_dir", q=True, select=True)
+        translation_amount = cmds.floatFieldGrp("translation_amount", q=True, value=True)[0]
+        rotation_amount = cmds.floatFieldGrp("rotation_amount", q=True, value=True)
+
+        for obj in selection:
+            if mode == 1:
+                set_keyframes_for_weight_painting(
+                    obj,
+                    interval=interval,
+                    translation_dir="xyz"[translation_dir - 1],
+                    rotation_amount=(rotation_amount[0], rotation_amount[1], rotation_amount[2]),
+                    translation_amount=translation_amount
+                )
+            elif mode == 2:
+                remove_keyframes(
+                    obj,
+                    interval
+                )
+
+    if cmds.window("wpu_win", exists=True):
+        cmds.deleteUI("wpu_win", window=True)
+    window = cmds.window("wpu_win", title="weight Painting utility Tool", wh=(200, 100),
+                         resizeToFitChildren=True, sizeable=False)
+    cmds.rowColumnLayout("main_column", adj=True, p=window)
+    option_column = cmds.rowColumnLayout(
+        "option_col", adj=True, numberOfColumns=2, columnWidth=[[1, 150], [2, 200]],
+        columnSpacing=[[1, 1], [2, 1]], columnAlign=[[1, "center"], [2, "center"]],
+        bgc=[0.2, 0.2, 0.3], p="main_column")
+    text_spacer_col = cmds.columnLayout("text_spacer_col", adj=True, p="main_column")
+    set_column = cmds.columnLayout("set_col", adj=1, p="main_column", bgc=(0.2, 0.2, 0.3))
+    button_column = cmds.columnLayout("rem_col", adj=True, manage=True, p="main_column")
+    mode_selection = cmds.radioButtonGrp(
+        "options",
+        numberOfRadioButtons=2,
+        label="Mode:  ",
+        labelArray2=["Set", "Remove"],
+        columnWidth3=[50, 50, 50],
+        select=1,
+        p=option_column,
+        changeCommand=lambda *_: toggle_layouts(
+            {set_column: cmds.radioButtonGrp(mode_selection, q=True, select=True) == 1}
+        )
+    )
+    cmds.intFieldGrp(
+        "interval",
+        label="Interval: ",
+        numberOfFields=1,
+        value1=15,
+        columnWidth2=[60, 60],
+        columnAlign2=["left", "left"],
+        annotation="Interval",
+        p=option_column
+    )
+    cmds.text(label="Select an object to run the tool on.", bgc=(0, 0, 0), p=text_spacer_col)
+    cmds.radioButtonGrp(
+        "trans_dir",
+        label="Translation Direction",
+        numberOfRadioButtons=3,
+        labelArray3=["X", "Y", "Z"],
+        columnWidth4=[140, 35, 35, 35],
+        select=1,
+        p=set_column
+    )
+    set_2_col = cmds.rowColumnLayout("set_2_col", numberOfColumns=2, p=set_column,
+                                     columnWidth=[(1, 250), (2, 250)]
+                                     )
+    cmds.floatFieldGrp(
+        "translation_amount",
+        numberOfFields=1,
+        label="Translation Amount: ",
+        value1=15.0,
+        step=1.0,
+        precision=1.0,
+        annotation="Translation Amount",
+        p=set_2_col
+    )
+    cmds.floatFieldGrp(
+        "rotation_amount",
+        numberOfFields=3,
+        label="Rotation Amount: ",
+        value1=30.0,
+        value2=30.0,
+        value3=30.0,
+        precision=0.01,
+        annotation="Rotation Amount",
+        p=set_column
+    )
+
+    cmds.button(
+        label="Execute",
+        command=execute,
+        p=button_column,
+        bgc=(0.2, 0.3, 0.2)
+    )
+
+    cmds.showWindow(window)
 
 
 if __name__ == "__main__":
-    def module_name():
-        import inspect
-        import os
-        # Get the current frame and find the file name of the script
-        frame = inspect.currentframe()
-        filename = inspect.getfile(frame)
-        return os.path.basename(filename).split('.')[0]
-
-
-    def select(obj):
-        if cmds.objExists(obj):
-            cmds.select(obj)
-        else:
-            cmds.select(clear=True)
-            possible_objs = cmds.ls(obj)
-            debug(f"{possible_objs}")
-            if possible_objs:
-                cmds.select(possible_objs[0])
-            else:
-                for possible_obj in cmds.ls(f"*{obj}*"):
-                    if (obj in possible_obj and "constraint" not in possible_obj.lower() and
-                            "grp" not in possible_obj.lower() and "jnt" not in possible_obj.lower() and
-                            "shape" not in possible_obj.lower()):
-                        cmds.select(possible_obj)
-                        return possible_obj
-
-
-    def select_all_ctrls(key=None):
-        key = key.lower()
-        cmds.select(clear=True)
-        if key is None:
-            key = "ctrl"
-        for obj in cmds.ls("*"):
-            if key in obj.lower():
-                cmds.select(obj, add=True)
-
-
-    def run_tool(obj, skin=None, preset=None, pose=None, mode="tool"):
-        match mode:
-            case "tool":
-                WeightPaintHelper(control=obj, skin=skin, preset=preset, pose=pose, translation_amount=100)
-                debug("---WEIGHT PAINT PROCESS COMPLETE---\n")
-            case "rem":
-                debug(f"Removing keyframes for: {obj}")
-                WeightPaintHelper(control=obj, mode=mode).remove_keyframes()
-                cmds.select(clear=True)
-                debug("---REMOVE PROCESS COMPLETE---\n")
-            case "xform":
-                pass
-            case "select":
-                select(obj)
-                debug("---SELECT PROCESS COMPLETE---\n")
-
-
-    l_spacer = "-" * 25 + "|" + " " * 4
-    r_spacer = " " * 4 + "|" + "-" * 25
-    debug(f"\n{l_spacer} RUNNING {module_name()} DUNDER MAIN {r_spacer}")
-
-    ckecker_obj = lambda obj_name, fallback: select(obj_name) and obj_name or fallback
-
-    # for finger in range(2, 6):
-    #     knuckle = "_".join([i.capitalize() for i in f"l_finger_0{finger}_knuckle_02".split("_")])
-    #     # run_tool(knuckle, "Proxy_Skin_Geo", mode="tool", preset=knuckle.split("_")[0] if knuckle.split("_")[0] not in ("L", "R") else knuckle.split("_")[1])
-    #     run_tool(knuckle, "Proxy_Skin_Geo", mode="rem")
-
-    obj = "_".join([i.capitalize() for i in "l_arm_02".split("_")])
-    rem_obj = ckecker_obj(ckecker_obj("_".join([i.capitalize() for i in "l_arm_02".split("_")]), obj),
-                          None)
-
-    # run_tool(obj, mode="select")
-    run_tool(rem_obj, mode="rem")
-    # run_tool(obj, "Proxy_Skin_Geo", mode="tool", preset=obj.split("_")[0] if obj.split("_")[0] not in ("L", "R") else obj.split("_")[1])
-    # select_all_ctrls("Head")
-    # cmds.select(clear=True)
-
-    debug(f"\n{l_spacer} COMPLETED {module_name()} DUNDER MAIN {r_spacer}")
+    ui()

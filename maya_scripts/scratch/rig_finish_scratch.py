@@ -5,12 +5,12 @@ def rig_polish():
     sel = cmds.ls(type="shape")
     controls = []
     for item in sel:
-        if "CtrlShape" in item:
+        if "ctrlshape" in item.lower():
             controls.append(item)
     cmds.select(clear=True)
     cmds.select(controls)
     cmds.pickWalk(direction="up")
-    controls = cmds.ls(selection=True)
+    controls.extend(cmds.ls(selection=True))
     cmds.select(clear=True)
     for control in controls:
         cmds.setAttr(f"{control}.v", lock=True, keyable=False, channelBox=False)
