@@ -102,15 +102,16 @@ class BrokenFkManager:
     def __init__(self, selection=None):
         self.unsorted_selection = selection or cmds.ls(sl=True)
         if not self.unsorted_selection:
-            self.unsorted_selection = [x for x in cmds.ls(type="transform") if x.lower().endswith(("_grp", "_ctrl"))][:-1]
+            self.unsorted_selection = [x for x in cmds.ls(type="transform") if
+                                       x.lower().endswith(("_ctrl_grp", "_ctrl"))][:-1]
 
     @staticmethod
     def create_constraint_order(control_groups):
         constraint_order = {}
-        control_map = {cg.control: cg for cg in control_groups}
+        control_map = {cg.name: cg for cg in control_groups}
 
         for control_group in control_groups:
-            leader_control = control_group.control
+            leader_control = control_group.name
 
             # Handle special case for Transform_Ctrl
             if leader_control == "Transform_Ctrl":
@@ -174,7 +175,7 @@ class BrokenFkManager:
             constraint_manager(mode="r")
         sorted_controls = [ControlManager(control) for control in self.unsorted_selection]
         constraint_order = self.create_constraint_order(sorted_controls)
-        control_map = {cg.control: cg for cg in sorted_controls}
+        control_map = {cg.name: cg for cg in sorted_controls}
         self.create_constraints(constraint_order, control_map, control_constraints=controls, joint_constraints=joints)
 
 

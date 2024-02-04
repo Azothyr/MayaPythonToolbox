@@ -104,9 +104,10 @@ class Menu:
 
 # Example Usage
 if __name__ == "__main__":
+    """ 
+    # TEST 1
     def sample_callback(name, option):
         print(f"Callback for {name} with option {option}")
-
     mapping = {
         "transform": (["trans", "Tr"], sample_callback),
         "mesh": (["msh", "Ms"], sample_callback)
@@ -117,3 +118,36 @@ if __name__ == "__main__":
     menu("TRANS", "object_name", "option_value")
     # Executes sample_callback with "another_object" and "another_option"
     menu("Mesh", "another_object", "another_option")
+    """
+
+    """
+    # TEST 2
+    def sample_callback(name, option):
+        return f"Callback for {name} with option {option}"
+
+    def filter_selection(**kwargs):
+        options = Menu({
+            "controls": (["control", "ctrls", "ctrl", "c"], sample_callback),
+            "joints": (["joint", "jnts", "jnt", "j"], sample_callback),
+            "maya_object": (["maya_obj", "maya_objects", "maya_objs"], sample_callback),
+        })
+
+        for key, value in kwargs.items():
+            # Determine if 'value' is True (indicating the option should be treated as selected)
+            # and ensure 'sample_callback' receives the expected arguments.
+            if value:
+                # Assuming 'key' is the option, and you want to pass both 'name' and 'option' to the callback.
+                # You might need to adjust this logic based on how you expect 'filter_selection' to work.
+                # For example, if 'key' represents 'name' and 'value' represents 'option':
+                selection = options(key, key, "option_value")  # Adjust "option_value" as needed
+            else:
+                # If 'value' is False or not provided, this suggests a different handling.
+                # Adjust the logic as per your requirements.
+                selection = options(key, key, "default_option")  # Provide a default option as needed
+        return selection
+    
+
+    # Example of invoking 'filter_selection'
+    # Assuming 'maya_objects' is the option and "test" is the name (or another parameter your callback expects).
+    print(filter_selection(maya_object="test"))
+    """

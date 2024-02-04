@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 from core.components.validate_cmds.maya_existence import Exists as exists
 from core.components.attribute_cmds import set_ as set_attr
+import re
 
 
 class CreateBase:
@@ -34,12 +35,31 @@ class CreateBase:
         self.create_type(self.__group_bool)
 
     def _setup(self, name: str) -> tuple[str, str, str]:
-        if name is None or not exists.control(name):
+        original_casing = "mixed"
+        if name.islower():
+            original_casing = "lower"
+        elif name.isupper():
+            original_casing = "upper"
+        elif name.replace("_", " ").istitle():
+            original_casing = "title"
+
+        if name:
+            name = re.sub(r"_jnt", "", name, flags=re.IGNORECASE)
+        else:
             name = self._generate_unique_name()
-        if "_Ctrl" not in name:
-            name = f"{name}_Ctrl"
-        shape = f"{name}Shape".replace("_ctrl", "")
+
+        if not re.search(r"_ctrl$", name, re.IGNORECASE):
+            name += "_Ctrl"
+        shape = name + "Shape"
         group = f"{name}_Grp"
+
+        if original_casing == "lower":
+            name, shape, group = [x.lower() for x in [name, shape, group]]
+        elif original_casing == "upper":
+            name, shape, group = [x.upper() for x in [name, shape, group]]
+        elif original_casing == "title":
+            name, shape, group = [x.replace("_", " ").title().replace(" ", "_") for x in [name, shape, group]]
+
         return name, shape, group
 
     def _create_control(self):

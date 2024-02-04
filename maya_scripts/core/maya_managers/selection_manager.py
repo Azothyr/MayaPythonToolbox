@@ -1,14 +1,16 @@
 import maya.cmds as cmds
+import re
 from core.components.validate_cmds import exists_maya as exists
 from utilities.kwarg_option_menu import Menu
 
 
 class SelectBase:
-    def __init__(self, selection: list[str] = None):
+    def __init__(self, selection: list[str] = None, bypass=False, debug=False):
         if selection is not None:
             self.selection = selection
         else:
-            self.selection = cmds.ls(sl=True) or []
+            self.selection = cmds.ls(sl=True) or [] if not bypass else cmds.ls()
+        self.debug = debug
 
     def __str__(self):
         return f"{self.__class__.__name__}(SELECTION: {str(self.selection)})"
@@ -34,13 +36,19 @@ class SelectBase:
     def __contains__(self, item):
         return item in self.selection
 
+    @staticmethod
+    def _get_all_objects():
+        return cmds.ls()
+
 
 class SelectAdvanced(SelectBase):
-    def __init__(self, selection=None):
-        super().__init__(selection)
+    def __init__(self, selection=None, **kwargs):
+        super().__init__(selection, **kwargs)
         self.options = Menu({
-            'controls': (['control', 'ctrls', 'ctrl', 'c'], self._filter_controls),
-            "joints": (['joint', 'jnts', 'jnt', 'j'], self._filter_joints)})
+            "controls": (["control", "ctrls", "ctrl", "c"], self._filter_controls),
+            "joints": (["joint", "jnts", "jnt", "j"], self._filter_joints),
+            "maya_object": (["maya_obj", "maya_objects", "maya_objs"], self._filter_maya_objects),
+        })
 
     def __call__(self, *args, **kwargs):
         return self.filter_selection(**kwargs)
@@ -55,23 +63,26 @@ class SelectAdvanced(SelectBase):
         if kwargs:
             for key, value in kwargs.items():
                 if value:
-                    self.selection = self.options(key, self.selection)
+                    if isinstance(value, list):
+                        self.selection = self.options(key, value)
+                    else:
+                        self.selection = self.options(key, self.selection)
         return self.selection
 
     def get(self):
         return self.selection
 
-    @staticmethod
-    def _is_joint(obj):
+    def _is_joint(self, obj):
         if not exists.joint(obj):
-            cmds.warning(f"{obj} is not a joint.")
+            if self.debug:
+                cmds.warning(f"{obj} is not a joint.")
             return False
         return True
 
-    @staticmethod
-    def _is_control(obj):
+    def _is_control(self, obj):
         if not exists.control(obj):
-            cmds.warning(f"{obj} is not a control.")
+            if self.debug:
+                cmds.warning(f"{obj} is not a control.")
             return False
         return True
 
@@ -89,15 +100,29 @@ class SelectAdvanced(SelectBase):
             cmds.warning("No controls provided.")
         return controls
 
+    def _filter_maya_objects(self, patterns):
+        self.update_selection(self._get_all_objects())
+        result = []
+        for obj in self.selection:
+            for pattern in patterns:
+                if re.search(pattern, obj, re.IGNORECASE):
+                    result.append(obj)
+        return result
+
 
 class Select(SelectAdvanced):
-    def __init__(self, selection=None):
-        super().__init__(selection)
+    def __init__(self, selection=None, **kwargs):
+        super().__init__(selection, **kwargs)
 
 
 if __name__ == "__main__":
-    selection = Select()
-    print(selection)
+    selection = Select(bypass=True)
+    # print(selection)
+    # selection = selection.filter_selection(joints=True)
+    # print("\n".join(selection))
+
+    print(selection.filter_selection(maya_object=["transform_ctrl$"]))
+
     # print(selection.__repr__())
     # selection = Select().filter_selection(joints=True)
     # print(selection)

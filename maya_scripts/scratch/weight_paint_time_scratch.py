@@ -44,10 +44,10 @@ def set_keyframes_for_weight_painting(
     time += interval
     for attr in [f"{obj}.r{axis}" for axis in "xyz"] + [f"{obj}.t{translation_dir}"]:
         count = 0
+        original_value = cmds.getAttr(attr)
         if attr.split(".")[1].startswith("r"):
             axis = attr.split(".")[1][1]
             idx = "xyz".index(axis)
-            original_value = cmds.getAttr(attr)
             cmds.currentTime(time)
             set_keyframes(obj, axis, translation_dir)
             cmds.currentTime(time - sub_interval * 2)
@@ -68,7 +68,7 @@ def set_keyframes_for_weight_painting(
             cmds.currentTime(time - sub_interval)
             set_keyframes(obj, attr, translation_dir)
             cmds.currentTime(time)
-            cmds.setAttr(attr, translation_amount)
+            cmds.setAttr(attr, translation_amount + original_value)
             set_keyframes(obj, attr, translation_dir)
     time = 0
     cmds.currentTime(time)
