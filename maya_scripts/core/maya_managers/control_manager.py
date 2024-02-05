@@ -8,30 +8,25 @@ from core.components.xform_handler import XformHandler as xform
 try:
     class ControlManager:
         def __init__(self, name: str, **kwargs):
-            self.name: str
-            self.group: str = None
-            self.shape: str = None
-            self.nurb: str = None
+            self.name: str = name
+            self.group: str
+            self.shape: str
+            self.nurb: str
             self.ctrl_xform: xform
             self.group_xform: xform
             self.shape_xform: xform
             self.__match_xform: bool = kwargs.get("match", kwargs.get("mat", kwargs.get("m", False)))
-            self.name = name
-            self.allow_adjust: bool = kwargs.get("allow_adjust", kwargs.get("adj", False))
 
             self.radius = kwargs.get("radius", 1.0)
             self.rotation_axis = kwargs.get("rotation_axis", kwargs.get("rot_axis", "z"))
             if Exists.control(name):
-                print(f"{name} already exists in the scene.")
-                self.control = name
+                cmds.warning(f"{name} already exists in the scene.")
+                self.control = self
                 self._already_exists_setup()
             else:
                 if kwargs.get("create", False):
                     self.control = self.create(name, **kwargs)
-                    if Exists.control(self.control.name):
-                        self._doesnt_exist_setup()
-                    else:
-                        raise ValueError(name, " does not exist in the scene.".upper())
+                    self._doesnt_exist_setup()
             try:
                 if self.group:
                     self.pos = self.group_xform.get_world_space_position()
@@ -45,37 +40,40 @@ try:
                    f"Radius: {self.radius!s}"
 
         def __repr__(self):
-            return self.control
-
-        def get_control_and_group(self):
-            return self.control, self.group
+            return self.control.name
 
         def _already_exists_setup(self):
             self.name = check_and_fix(self.control, "_Ctrl")
             self.group = check_and_fix(self.control, "_Grp")
-            if self.allow_adjust:
-                self.shape = self._fetch_shape()
-                self.nurb = self._fetch_nurb()
-                if self._is_nurbs_circle():
-                    if self.shape:
-                        current_radius = self._fetch_radius()
-                        if current_radius != self.radius:
-                            cmds.setAttr(f"{self.nurb}.radius", self.radius)
+            if not Exists.obj(self.group):
+                self.group = None
+            self.shape = self._fetch_shape()
+            self.nurb = self._fetch_nurb()
+            if self._is_nurbs_circle():
+                if self.shape:
+                    current_radius = self._fetch_radius()
+                    if current_radius != self.radius:
+                        cmds.setAttr(f"{self.nurb}.radius", self.radius)
+            if not self.ctrl_xform:
                 self.ctrl_xform = xform(self.name)
+            if not self.group_xform and self.group:
                 self.group_xform = xform(self.group)
-                self.shape_xform = xform(self.shape)
 
         def _doesnt_exist_setup(self):
             self.name = self.control.name
             self.group = self.control.group
+            if not Exists.obj(self.group):
+                self.group = None
             self.shape = self._fetch_shape()
-            if self.allow_adjust:
-                self.ctrl_xform = xform(self.name, allow_loc=False)
+            self.ctrl_xform = xform(self.name, allow_loc=False)
+            if self.group:
                 self.group_xform = xform(self.group, allow_loc=False)
-                self.shape_xform = xform(self.shape, allow_loc=False)
 
             if self.__match_xform:
-                self.set_xform(match_obj=self.control.orig_name)
+                if isinstance(self.__match_xform, bool):
+                    self.set_xform(match_obj=self.control.orig_name)
+                else:
+                    self.set_xform(match_obj=self.__match_xform)  # noqa
 
         def create(self, name, **kwargs):
             kwargs["create"] = True
@@ -97,12 +95,16 @@ try:
             Fetch the shape node of the control that is a NURBS curve.
             :return: The shape node if it is a NURBS curve, None otherwise.
             """
-            shapes = cmds.listRelatives(self.name, shapes=True) or []
-            for shape in shapes:
-                if cmds.objectType(shape) == 'nurbsCurve':
-                    return shape
-            self.shape = None
-            return None
+            try:
+                shapes = cmds.listRelatives(self.name, shapes=True) or []
+                for shape in shapes:
+                    if cmds.objectType(shape) == 'nurbsCurve':
+                        return shape
+                self.shape = None
+                return None
+            except (AttributeError, TypeError, ValueError):
+                self.shape = None
+                return None
 
         def _fetch_nurb(self):
             """

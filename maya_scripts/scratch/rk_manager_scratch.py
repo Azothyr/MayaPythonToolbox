@@ -1,6 +1,10 @@
 import maya.cmds as cmds
 from core.maya_managers.joint_manager import JointManager
 import re
+"""
+2/4/204 last used on imp rig: This is jumbled up but has most of the processes needed to connect the FK and IK joints to the RK joints and set an 
+IKFK attribute on the RK controller (Transform_Ctrl).
+"""
 
 
 class RkManager:

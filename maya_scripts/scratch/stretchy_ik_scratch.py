@@ -1,67 +1,13 @@
 import maya.cmds as cmds
-from collections import defaultdict
 from functools import partial
-import re
-
-
-class JointManager:
-    TYPES = {
-        'ik': '_IK',
-        'fk': '_FK',
-        'rk': '_RK',
-    }
-
-    def __init__(self, selection=None, combine=True, get=None):
-        self.selection = selection if selection is not None else cmds.ls(type="joint")
-        self.combine = combine
-        if get:
-            if get.lower() not in ['fk', 'ik', 'rk']:
-                raise ValueError(f"get must be one of 'fk', 'ik', or 'rk'. Got {get} instead.")
-            self.selection = [joint for joint in self.selection if self.TYPES.get(get.lower()) in joint]
-        self.splitter = [value for key, value in self.TYPES.items()]
-
-        self.data = self.joint_count()
-
-    def __repr__(self):
-        output = []
-        for joint_type, sub_dict in self.data.items():
-            output.append(f"For {joint_type}:")
-            for part, info in sub_dict.items():
-                output.append(f"|--->  {part} appears {info['count']} times.\n|------->  Joints: {info['joints']}")
-        return "\n".join(output)
-
-    def _split(self, string):
-        for delimiter in self.splitter:
-            if delimiter in string:
-                return string.split(delimiter)[0], delimiter[1:]  # Return both the prefix and the matching delimiter
-        return None, None
-
-    def joint_count(self):
-        # Initialize a defaultdict of defaultdicts
-        count_dict = defaultdict(lambda: defaultdict(lambda: {'count': 0, 'joints': []}))
-        if self.combine:
-            pattern = re.compile(r'_[0-9]+$')  # Regular expression to remove numerical suffix
-
-        for string in self.selection:
-            part, joint_type = self._split(string)
-            if part is None:
-                part = string.split('_')[0]
-                joint_type = "Unknown"
-
-            if self.combine:
-                part = pattern.sub('', part)
-
-            count_dict[joint_type][part]['count'] += 1
-            count_dict[joint_type][part]['joints'].append(string)
-
-        return count_dict
+from core.maya_managers.joint_manager import JointManager
 
 
 class StretchyIkFactory:
     """
-    This class will create a stretchy IK system for a given joint chain. It will create the necessary nodes and
-    attributes to allow the user to control the stretchy IK system. It will also create the necessary locators to
-    measure the distance between the base and tip joints.
+    This class will add a stretchy IK system functionality for an already created IK joint chain.
+    It creates the necessary nodes and attributes to allow the user to control the stretchy IK system.
+    It also creates the necessary locators to measure the distance between the base and tip joints.
 
     User Input:
         primary_side: The primary side of the rig. This will be used to determine which side of the rig to create the
@@ -119,6 +65,11 @@ class StretchyIkFactory:
     def set_attributes(host, attr, value, **kwargs):
         if cmds.attributeQuery(attr, node=host, exists=True):
             cmds.setAttr(f"{host}.{attr}", value, edit=True, keyable=True, **kwargs)
+
+    @staticmethod
+    def create_attributes(host, attr, attribute_type, **kwargs):
+        if not cmds.attributeQuery(attr, node=host, exists=True):
+            cmds.addAttr(host, longName=attr, attributeType=attribute_type, **kwargs)
 
     def generate_nodes(self):
         nodes = {
@@ -350,11 +301,6 @@ class StretchyIkFactory:
         }
         return nodes
 
-    @staticmethod
-    def create_attributes(host, attr, attribute_type, **kwargs):
-        if not cmds.attributeQuery(attr, node=host, exists=True):
-            cmds.addAttr(host, longName=attr, attributeType=attribute_type, **kwargs)
-
     def generate_attributes(self):
         attributes = {
             "attributes": {
@@ -512,7 +458,6 @@ class StretchyIkFactory:
                             cmds.connectAttr(f"{self.tip_joint}.translateX", f"{host}.input1Y", force=True)
                             cmds.disconnectAttr(f"{self.pv_joint}.translateX", f"{host}.input1X")
                             cmds.disconnectAttr(f"{self.tip_joint}.translateX", f"{host}.input1Y")
-
 
                         for func in details.get('set'):
                             func(host=host)

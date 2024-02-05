@@ -3,6 +3,10 @@ from pprint import pprint
 from collections import defaultdict
 import re
 from core.maya_managers.selection_manager import Select as sl
+"""
+This seems to only manage counts and naming conventions for joints. With one method to duplicate and clean up a joint 
+chain.
+"""
 
 
 class JointManager:

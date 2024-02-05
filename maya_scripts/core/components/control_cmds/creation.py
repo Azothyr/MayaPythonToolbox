@@ -1,13 +1,11 @@
 import maya.cmds as cmds
-from core.components.validate_cmds.maya_existence import Exists as exists
 from core.components.attribute_cmds import set_ as set_attr
 import re
 
 
 class CreateBase:
     def __init__(self, name=None, **kwargs):
-        self.__orig_obj = None
-        self.__orig_obj = name
+        self.__orig_obj = kwargs.get("orig_name", name)
         _name, _shape, _group = self._setup(name)
         self.__name = _name
         self.__shape = _shape
@@ -45,6 +43,9 @@ class CreateBase:
 
         if name:
             name = re.sub(r"_jnt", "", name, flags=re.IGNORECASE)
+            if cmds.objExists(name):
+                count = str(len(cmds.ls(name)) + 1).zfill(2)
+                name = name + count
         else:
             name = self._generate_unique_name()
 
@@ -137,9 +138,6 @@ class Create(CreateBase):
         :param kwargs:
         """
         super().__init__(*args, **kwargs)
-
-    def get_control_and_group(self):
-        return self.__name, self.__group
 
 
 if __name__ == "__main__":

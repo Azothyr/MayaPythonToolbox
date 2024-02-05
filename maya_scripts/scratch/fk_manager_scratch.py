@@ -1,7 +1,9 @@
 import maya.cmds as cmds
 from core.constrainer import Main as constraint_manager
 from core.maya_managers.control_manager import ControlManager
-
+"""
+This works as of 2/4/2024 on the imp character and correctly performs the Broken FK system.
+"""
 
 class BrokenFkConstraintFactory:
     @staticmethod

@@ -1,9 +1,423 @@
+import maya.cmds as cmds
+from math import ceil
+import re
+from core.components.xform_handler import XformHandler, Calculator3dSpace
+from core.maya_managers.control_manager import ControlManager
+from core.components.error_handling import safe_select
+from functools import partial
+
+
+class IKFactory:
+    def __init__(self, name: str, ik_joints: list[str] | list[object]):
+        self.name = name
+        self.part = None
+        self.base_control: ControlManager
+        self.pv_control: ControlManager
+        self.tip_control: ControlManager
+        self.base_group = None
+        self.pv_group = None
+        self.pv_offset_group = None
+        self.tip_group = None
+        self.handle = None
+
+        if isinstance(ik_joints, str):
+            ik_joints = [ik_joints]
+        if not isinstance(ik_joints, list):
+            raise ValueError(f"Expected a list of joints. Got {type(ik_joints)} instead.")
+        self.joints = ik_joints
+        self.count = len(ik_joints)
+
+        self.base, self.pv, self.tip = self._parse_joints()
+        self._update_part()
+        self.base_xform = XformHandler(self.base, threshold=0.1, precision=1)
+        self.pv_xform = XformHandler(self.pv, threshold=0.1, precision=1)
+        self.tip_xform = XformHandler(self.tip, threshold=0.1, precision=1)
+        self.offset_amount = self.__calculate_offset()
+
+        self.base_control, self.pv_control, self.tip_control = self._parse_control_names_front()
+
+        self._setup_scene()
+
+    def __str__(self):
+        return f"IKFactory: {self.name} - {self.base} - {self.pv} - {self.tip}"
+
+    def __repr__(self):
+        return self.name
+
+    def __calculate_offset(self):
+        from_base_calc = Calculator3dSpace(self.base_xform)
+        from_tip_calc = Calculator3dSpace(self.tip_xform)
+        upper_dist = from_base_calc.calculate_distance(other_xform=self.tip_xform)
+        lower_dist = from_tip_calc.calculate_distance(other_xform=self.tip_xform)
+        return self.base_xform.apply_threshold(abs((upper_dist + lower_dist) / 2 + (upper_dist + lower_dist) * 0.25))
+
+    # def _confirm_straight(self):
+    #     base_pos = self.base_xform.get_translation()
+    #     pv_pos = self.pv_xform.get_translation()
+    #     tip_pos = self.tip_xform.get_translation()
+    #     base_pv = Calculator3dSpace(base_pos, pv_pos)
+    #     pv_tip = Calculator3dSpace(pv_pos, tip_pos)
+    #     base_tip = Calculator3dSpace(base_pos, tip_pos)
+    #     return base_pv.distance + pv_tip.distance == base_tip.distance
+
+    def _parse_joints(self):
+        ik_joints = self.joints
+        last_idx = self.count - 1
+        mid_idx = ceil(last_idx / 2)
+        base_joint = ik_joints[0]
+        mid_joint = ik_joints[mid_idx]
+        last_joint = ik_joints[-1]
+
+        if not all(["ik" in joint.lower() for joint in ik_joints]):
+            raise NameError(
+                "IKFACTORY-LINE(50) --- "
+                "The joints selected do not seem to be IK joints. It is recommended that you rename them to "
+                f"reflect their function. {joints}")
+
+        if "1" not in ik_joints[0]:
+            cmds.warning(f"IKFACTORY-LINE(55) --- The base joint should be the first joint in the selection. "
+                         f"CURRENT ORDER: {joints}")
+
+        if self.count >= 2:
+            if f"{last_idx+1}" not in last_joint:
+                cmds.warning(
+                    "IKFACTORY-LINE(61) --- The tip joint should be the last joint in the selection."
+                    f" CURRENT ORDER: {joints}"
+                )
+            if self.count >= 3:
+                if f"{mid_idx+1}" not in mid_joint:
+                    cmds.warning(
+                        "IKFACTORY-LINE(67) --- The pole vector joint should be the middle joint in the selection."
+                        f" CURRENT ORDER: {joints}"
+                    )
+                return base_joint, mid_joint, last_joint
+            else:
+                return base_joint, None, last_joint
+        else:
+            raise ValueError(f"Expected at least 2 joints. Got {self.count} instead.")
+
+    def _update_part(self):
+        self.part = self._get_obj_part(self.base)
+    
+    @staticmethod
+    def _get_obj_part(name):
+        ik_pattern = re.compile(r"_ik", re.IGNORECASE)
+        ik_pattern_num_start = re.compile(r"_[0-9][0-9]_ik", re.IGNORECASE)
+        ik_pattern_num_end = re.compile(r"_ik_[0-9][0-9]", re.IGNORECASE)
+        
+        if ik_pattern_num_start.search(name):
+            return ik_pattern_num_start.split(name)[0].strip()
+        elif ik_pattern_num_end.search(name):
+            return ik_pattern_num_end.split(name)[0].strip()
+        else:
+            return ik_pattern.split(name)[0].strip()
+
+    def _parse_control_names_front(self):
+        ik_pattern = re.compile(r"_ik", re.IGNORECASE)
+        underscore_pattern = re.compile(r"_", re.IGNORECASE)
+
+        if not ik_pattern.search(self.base):
+            raise NameError("IKFACTORY-LINE(84) --- One of the joints does not have the expected naming convention."
+                            f" {self.joints}")
+
+        schema = underscore_pattern.split(self.part)[1]
+        base_parts = f"{self.part} ik base"
+        pv_parts = f"{self.part} ik pv"
+        tip_parts = f"{self.part} ik tip"
+        case = "lower"
+        if not schema.islower():
+            if schema.isupper():
+                base_parts = base_parts.upper()
+                pv_parts = pv_parts.upper()
+                tip_parts = tip_parts.upper()
+                case = "upper"
+            elif schema.istitle():
+                base_parts = base_parts.title()
+                pv_parts = pv_parts.title()
+                tip_parts = tip_parts.title()
+                case = "title"
+            else:
+                base_parts = base_parts.capitalize()
+                pv_parts = pv_parts.capitalize()
+                tip_parts = tip_parts.capitalize()
+                case = "mixed"
+
+        if case != "lower":
+            ik = re.compile(r"ik", re.IGNORECASE)
+            base_parts = ik.sub("IK", base_parts)
+            pv_parts = ik.sub("IK", re.sub("pv", "PV", pv_parts, flags=re.IGNORECASE))
+            tip_parts = ik.sub("IK", tip_parts)
+
+        base = base_parts.replace(" ", "_")
+        pv = pv_parts.replace(" ", "_")
+        tip = tip_parts.replace(" ", "_")
+
+        return base, pv, tip
+
+    def _setup_scene(self):
+        if self.base_control and not cmds.objExists(self.base_control):
+            self.base_control = ControlManager(self.base_control, create=True, m=self.base)
+        if self.pv_control and not cmds.objExists(self.pv_control):
+            self.pv_control = ControlManager(self.pv_control, create=True, m=self.pv)
+        if self.tip_control and not cmds.objExists(self.tip_control):
+            self.tip_control = ControlManager(self.tip_control, create=True, m=self.tip)
+
+        if not isinstance(self.base_control, ControlManager):
+            self.base_control: str
+            self.base_control = ControlManager(self.base_control)
+        if not isinstance(self.pv_control, ControlManager):
+            self.pv_control: str
+            self.pv_control = ControlManager(self.pv_control)
+        if not isinstance(self.tip_control, ControlManager):
+            self.tip_control: str
+            self.tip_control = ControlManager(self.tip_control)
+
+        self.controls = [self.base_control, self.pv_control, self.tip_control]
+
+        if not self.base_group and self.base_control:
+            self.base_group = self.base_control.group
+        if not self.pv_group and self.pv_control:
+            self.pv_group = self.pv_control.group
+        if not self.tip_group and self.tip_control:
+            self.tip_group = self.tip_control.group
+
+        self._set_ctrls_in_heirarchy()
+
+    def _set_ctrls_in_heirarchy(self):
+        top_level_group = re.compile(r"^{}_ik_ctrl_grp$".format(self.part.lower()), re.IGNORECASE)
+
+        for obj in cmds.ls(type="transform"):
+            if top_level_group.search(obj):
+                top_level_group = obj
+                break
+        if not cmds.objExists(top_level_group):
+            return
+
+        if self.base_group and self.pv_group:
+            groups = [self.base_group, self.tip_group]
+            if self.pv_group:
+                groups.append(self.pv_group)
+
+            for group in groups:
+                if cmds.objExists(group):
+                    cmds.parent(group, top_level_group)
+
+    def create_ik(self, ik_type, **kwargs):
+        cmds.select(clear=True)
+        match ik_type:
+            case "ik":
+                self.create_ik_handle(kwargs.get("solver", "ikRPsolver"))
+            case "pole":
+                self.create_pole_vector()
+            case "ik_chain":
+                if not kwargs.get("size"):
+                    raise ValueError("Expected a size for the ik chain. Got None instead.")
+                self.execute_ik_chain(**kwargs)
+            case _:
+                pass
+
+    def create_ik_handle(self, solver="ikRPsolver"):
+        self.handle = cmds.ikHandle(startJoint=self.base, endEffector=self.tip, solver=solver,
+                                    name=f"{self.part}_IK_Handle")[0]
+
+    def create_pole_vector(self):
+        cmds.poleVectorConstraint(self.pv_control.name, f"{self.part}_IK_Handle")
+
+    def execute_ik_chain(self, size: int = 3, rot_axis="z", _continue=False):
+        if not _continue:
+            if size < 3:
+                raise ValueError(f"Expected a size of 3 or more. Got {size} instead.")
+            if not self.base_group or not self.pv_group or not self.tip_group:
+                cmds.warning(f"Missing one or more control groups for IKFACTORY: {self.name}.")
+            if not cmds.objExists(self.base) or not cmds.objExists(self.pv) or not cmds.objExists(self.tip):
+                cmds.warning(f"Missing one or more joints for IKFACTORY in maya: {self.name}.")
+            if not self.pv_offset_group and self.pv_control:
+                cmds.select(clear=True)
+                pv_offset_group = f"{self.part}_pv_offset_ctrl_grp"
+                cmds.Group(pv_offset_group, empty=True)
+                cmds.rename(self.pv_offset_group, f"{self.part}_pv_offset_ctrl_grp")
+                offset_xform = XformHandler(pv_offset_group, threshold=0.1, precision=1)
+                offset_xform.match_xform(self.pv_xform, ["translation", "rotation"])
+                cmds.parent(pv_offset_group, self.pv_group)
+                cmds.parent(self.pv_control.name, pv_offset_group)
+                self.pv_offset_group = pv_offset_group
+
+            rot_dir = 1
+            if "-" in rot_axis:
+                rot_axis = rot_axis.replace("-", "")
+                rot_dir = -1
+            if rot_axis not in ["x", "y", "z"]:
+                raise ValueError(f"Expected a rotation axis of x, y, or z. Got {rot_axis} instead.")
+            x_value = self.offset_amount * rot_dir if rot_axis == "x" else 0
+            y_value = self.offset_amount * rot_dir if rot_axis == "y" else 0
+            z_value = self.offset_amount * rot_dir if rot_axis == "z" else 0
+            self.pv_offset_group = XformHandler(str(self.pv_offset_group), threshold=0.1, precision=1)
+            self.pv_offset_group.add_in_world("translate", x=x_value, y=y_value, z=z_value)
+            cmds.xform(self.pv_control.name, os=True, translation=(0, 0, 0), rotation=(0, 0, 0))
+            objects = self.joints
+            objects.extend([self.base_control.name, self.pv_control.name, self.tip_control.name])
+            cmds.select(clear=True)
+            for obj in objects:
+                cmds.select(obj, add=True)
+
+            self.continue_ui(_continue=True, size=size, rot_axis=rot_axis)
+        else:
+            self.create_ik("ik",)
+            self.create_ik("pole")
+            if not self.handle:
+                raise ValueError(f"Failed to create an IK handle for {self.name}.")
+            cmds.select(clear=True)
+            cmds.parent(self.handle, self.tip_control.name)
+            cmds.pointConstraint(self.base_control.name, self.base, maintainOffset=False)
+
+            for control in self.controls:
+                if control:
+                    control = control.name
+                    if "base" in control.lower() or "pv" in control.lower():
+                        cmds.setAttr(f"{control}.rx", lock=True, channelBox=False, keyable=False)
+                        cmds.setAttr(f"{control}.ry", lock=True, channelBox=False, keyable=False)
+                        cmds.setAttr(f"{control}.rz", lock=True, channelBox=False, keyable=False)
+                    cmds.setAttr(f"{control}.sx", lock=True, channelBox=False, keyable=False)
+                    cmds.setAttr(f"{control}.sy", lock=True, channelBox=False, keyable=False)
+                    cmds.setAttr(f"{control}.sz", lock=True, channelBox=False, keyable=False)
+                    cmds.setAttr(f"{control}.v", lock=True, channelBox=False, keyable=False)
+
+    def continue_ui(self, **kwargs):
+        passing_kwargs = kwargs
+
+        def execute(*_, **kwargs):
+            self.execute_ik_chain(**kwargs)
+            cmds.deleteUI("wait_for_response_ui", window=True)
+        if cmds.window("wait_for_response_ui", exists=True):
+            cmds.deleteUI("wait_for_response_ui", window=True)
+        cmds.window("wait_for_response_ui", title="IK Factory", widthHeight=(500, 200), resizeToFitChildren=True)
+        cmds.columnLayout(adjustableColumn=True)
+        cmds.text(label="Please confirm the following settings for the IK chain and hit continue when you are ready:")
+        cmds.text(label=f"Base: {self.base}")
+        cmds.text(label=f"Pole Vector: {self.pv}")
+        cmds.text(label=f"Tip: {self.tip}")
+        cmds.text(label=f"Base Control: {self.base_control.name}")
+        cmds.text(label=f"Pole Vector Control: {self.pv_control.name}")
+        cmds.text(label=f"Tip Control: {self.tip_control.name}")
+        cmds.text(label=f"Base Group: {self.base_group}")
+        cmds.text(label=f"Pole Vector Group: {self.pv_group}")
+        cmds.text(label=f"Tip Group: {self.tip_group}")
+        cmds.text(label=f"Pole Vector Offset Group: {self.pv_offset_group}")
+        cmds.text(label=f"Controls: {self.controls}")
+        cmds.text(label=f"Joints: {self.joints}")
+        cmds.text(label=f"Part: {self.part}")
+        cmds.text(label=f"Name: {self.name}")
+        cmds.text(label=f"Count: {self.count}")
+        cmds.text(label="Please also look at the transforrm values of the controls and groups to ensure "
+                        "they are correct.")
+        cmds.button(label="Continue", command=partial(execute, **passing_kwargs))
+        cmds.showWindow("wait_for_response_ui")
+
+
+if __name__ == "__main__":
+    """
+    steps for a 3 joint ik chain:
+    3 joints in heirarchy must be completely straight
+        (STRAIGHT = only the (primary axis) forward axis (I normally use the x-axis) on all 3 holds a translation value 
+        with the base able to have tx ty and tz values as well as , the pv and tip have only tx. And their rotations 
+        are 0 0 0 but their joint orient only has a value (secondary axis) rotation axis (I normally use the z-axis)
+        with rotation values the others are 0)
+    
+    create 3 controls with groups
+    a base (Ex: shoulder), a pole vector (Ex: elbow), and a tip (Ex: wrist)
+    that have 3 primary groups (base and tip (parented: ctrl_grp > ctrl)
+    with 1 offset group (PV gets an offset group (parented: ctrl_grp > offset_grp > ctrl))
+    
+    all control groups should match all transforms of their respective joints and carry those values
+    while the controls themselves should have 0 0 0 for their transforms
+    
+    the pv offset grp should be moved along the rotation axis of the pv joint to the desired position
+    (if it is an arm it is normally -rot axis and if it is a leg it is normally +rot axis)
+    
+    create an ik handle from base to tip joints
+        SETTINGS:
+            solver: Rotate-Plane Solver (ikRPsolver)
+            name: <side>_<body part>_IK_Handle
+            Autopriority: False
+            Solver enable: True
+            Snap enable: True
+            Sticky: False
+            Priority: 1
+            Weight: 1
+            POWeight: 1
+            
+    Point constrain the base control to the base joint (constrains tx ty tz)
+    
+    Pole vector constraint the pole vector control to the ik handle
+        NOTE: if there is shifting in the chain when you execute the constraint, it is because your chain is not straight
+    
+    Parent the base, pv, and tip controls to their top level control group
+    parent the ik handle to the tip control
+    end heirarchy should look like:
+        |-- <side>_<body part>_IK_ctrl_grp
+            |-- <side>_<body part>_base_IK_ctrl_grp
+                |-- <side>_<body part>_base_IK_ctrl
+            |-- <side>_<body part>_pv_IK_ctrl_grp
+                |-- <side>_<body part>_pv_IK_offsest_ctrl_grp
+                    |-- <side>_<body part>_pv_IK_ctrl
+            |-- <side>_<body part>_tip_IK_ctrl_grp
+                |-- <side>_<body part>_tip_IK_ctrl
+                    |-- <side>_<body part>_IK_Handle
+            
+    lock the following attributes on the controls:
+        base: rx ry rz sx sy sz vis
+        pv: rx ry rz sx sy sz vis
+        tip: sx sy sz vis
+    """
+
+    # cmds.select("L_Arm_IK_01_Jnt", replace=True)
+    # cmds.select("L_Arm_IK_02_Jnt", add=True)
+    # cmds.select("L_Arm_IK_03_Jnt", add=True)
+    # joints = cmds.ls(sl=True)
+    # l_arm = IKFactory("l_arm", joints)
+    # r_arm.create_ik("ik_chain", size=3, rot_axis="-z")
+    cmds.select("R_Arm_IK_01_Jnt", replace=True)
+    cmds.select("R_Arm_IK_02_Jnt", add=True)
+    cmds.select("R_Arm_IK_03_Jnt", add=True)
+    joints = cmds.ls(sl=True)
+    r_arm = IKFactory("r_arm", joints)
+    r_arm.create_ik("ik_chain", size=3, rot_axis="-z")
+    # cmds.select("L_Leg_IK_01_Jnt", replace=True)
+    # cmds.select("L_Leg_IK_02_Jnt", add=True)
+    # cmds.select("L_Leg_IK_03_Jnt", add=True)
+    # joints = cmds.ls(sl=True)
+    # l_leg = IKFactory("l_leg", joints)
+    # r_arm.create_ik("ik_chain", size=3, rot_axis="z")
+    # cmds.select("R_Leg_IK_01_Jnt", replace=True)
+    # cmds.select("R_Leg_IK_02_Jnt", add=True)
+    # cmds.select("R_Leg_IK_03_Jnt", add=True)
+    # joints = cmds.ls(sl=True)
+    # r_leg = IKFactory("r_leg", joints)
+    # r_arm.create_ik("ik_chain", size=3, rot_axis="z")
+
+"""
+cmds.select("L_Arm_IK_01_Jnt", replace=True)
+cmds.select("R_Arm_IK_01_Jnt", add=True)
+cmds.select("L_Leg_IK_01_Jnt", add=True)
+cmds.select("R_Leg_IK_01_Jnt", add=True)
+cmds.isolateSelect("modelPanel4", state=True)
+
+cmds.select(clear=True)
+cmds.isolateSelect("modelPanel4", state=False)
+"""
+
+"""
 from collections import deque
 import traceback
+from traceback import FrameSummary
 from typing import Type
 import inspect
+import re
 from maya import cmds
+from core.components.error_handling import safe_get_parent, safe_get_children
 
+# This does not create IK joints but instead seems to be my attempt at getting the hierarchy of the selected objects
+# for all the objects in the scene and maintain them through a tree queue structure.
 
 debug_level = 0  # 0 - 10
 style_presets = {
@@ -56,7 +470,7 @@ def debug_print(message, style=None, **kwargs):
     def __get_traceback_line_num(__stack: traceback) -> str:
         return __stack.lineno
 
-    def __get_traceback_stack() -> dict[str]:
+    def __get_traceback_stack() -> dict[str, FrameSummary | str]:
         _result = {}
         __stack = traceback.extract_stack()[-3]
         _result['stack'] = __stack
@@ -124,9 +538,17 @@ class IkManager:
                  root_type=None, _type=None, _all=False):
         debug_print("START OF IK MANAGER INITIALIZATION", style="SECTION", header="IkManager",
                     level=10)  # DEBUGGER
+        if not excluded_types:
+            excluded_types = [
+                "parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint",
+                "ikHandle", "ikEffector", "ikSolver", "ikRPsolver", "ikSCsolver", "ikSplineSolver", "ikSpringSolver",
+                "nurbCircle", "nurbCurve", "nurbCylinder", "nurbPlane", "nurbSphere", "nurbSquare", "nurbTorus",
+
+            ]
         self.__selector = MayaSelectionOperator(excluded_types=excluded_types,
                                                 included_types=included_types,
                                                 root=root_name)
+        exit(f"EXIT LINE 139 --- {self.__selector}")
         self.selection = self.__selector.selection
 
         self.mapped_selection = self.__selector.map_hierarchy(self.selection)
@@ -229,53 +651,22 @@ class NameParser:
             return join_symbol.join(parts[index:]) if index == -1 else join_symbol.join(parts[index:])
 
 
-class IkCreator:
-    def __init__(self, name: str, base_joint: object, tip_joint: object, ik_type: str):
-        self.name = name
-        self.base = base_joint
-        self.tip = tip_joint
-        self.ik_type = ik_type
-
-    def create_ik(self):
-        match self.ik_type:
-            case "ik":
-                self.create_ik_handle()
-            case "pole":
-                self.create_pole_vector()
-            case "spring":
-                self.create_spring_ik()
-            case "stretchy":
-                self.create_stretchy_ik()
-            case "stretchy_spline":
-                self.create_stretchy_spline_ik()
-            case _:
-                pass
-
-    def create_ik_handle(self):
-        cmds.ikHandle(startJoint=self.base, endEffector=self.tip)
-
-    def create_pole_vector(self):
-        pass
-
-    def create_spring_ik(self):
-        pass
-
-    def create_stretchy_ik(self):
-        pass
-
-    def create_stretchy_spline_ik(self):
-        pass
-
-
 class MayaSelectionOperator:
     selection = cmds.ls(sl=True)
 
     def __init__(self, excluded_types=None, included_types=None, _type=None, _all=False, **kwargs):
         debug_print("INITIALIZING SELECTION OPERATOR", style="SECTION", header="MayaSelectionOperator",
                     level=10)
+        self.hierarchy = None
+
+        if not excluded_types and _type:
+            excluded_types = [x for x in cmds.ls(type=_type) if x != _type]
         self.excluded_types = excluded_types
         self.include_types = included_types
         self.forced_root = kwargs.get("root", None)
+
+    def __str__(self):
+        return f"\nMayaSelectionOperator: \n\tSELECTED: {self.selection}\n\tHIERRACHY: {self.hierarchy}"
 
     @staticmethod
     def generic_getter(func):
@@ -309,7 +700,7 @@ class MayaSelectionOperator:
 
     @staticmethod
     def __get_selection(_type=None, long=False, _all=False):
-        if _all and _type is not None:
+        if _type is not None:
             return cmds.ls(exactType=_type)
         else:
             return cmds.ls(sl=True, long=long) if _type is None else cmds.ls(sl=True, type=_type, long=long)
@@ -350,10 +741,19 @@ class MayaSelectionOperator:
                     level=5)
 
         def find_top_parent(_node: str):
+            debug_print(f"PASSED: {_node}", header="MayaSelectionOperator", level=5)
+            print(f"LINE 357 - object: {_node} of type: {cmds.objectType(_node)}".upper())
             if self.forced_root and _node == self.forced_root:
                 debug_print(f"RETURNING: {_node} AS ROOT", header="MayaSelectionOperator", level=5)
                 return _node
-            if _node is None or not cmds.objExists(_node) or cmds.objectType(_node) in self.excluded_types:
+            if _node is None:
+                debug_print(f"RETURNING: None AS ROOT", header="MayaSelectionOperator", level=5)
+                return None
+            if self.excluded_types:
+                if cmds.objectType(_node) in self.excluded_types:
+                    debug_print(f"RETURNING: None AS ROOT", header="MayaSelectionOperator", level=5)
+                    return None
+            if not cmds.objExists(_node):
                 debug_print(f"RETURNING: None AS ROOT", header="MayaSelectionOperator", level=5)
                 return None
             parent = cmds.listRelatives(_node, parent=True)
@@ -362,11 +762,21 @@ class MayaSelectionOperator:
         def get_hierarchy(_root):
             debug_print(f"GETTING HIERARCHY OF: {_root}", style="CONTAINER", header="MayaSelectionOperator",
                         level=5)
+            issues = []
             _hierarchy = {}
             queue = deque([(_root, _hierarchy)])
             while queue:
                 current, parent_dict = queue.popleft()
-                children = cmds.listRelatives(current, children=True) or []
+                try:
+                    children = cmds.listRelatives(current, children=True) or []
+                except ValueError as val_err:
+                    debug_print(f"ERROR: {val_err}", level=5)
+                    issues.append(val_err)
+                    if "More than one" in str(val_err):
+                        children = []
+                    else:
+                        raise val_err
+
                 debug_print(f"CHILDREN OF: {current} ARE: {children}\n{current}'S SIBLINGS ARE {parent_dict}",
                             header="MayaSelectionOperator", level=5)
                 parent_dict[current] = child_dict = {}
@@ -403,7 +813,7 @@ class MayaSelectionOperator:
 
         if len(result) > 1:
             result = {"multiple_roots": result}
-
+        self.hierarchy = result
         return result
 
 
@@ -431,6 +841,10 @@ class TreeNode:
         return f"{self.__class__}({self._identity})"
 
     def __name__(self):
+        return self._identity
+
+    def __call__(self, *args, **kwargs):
+        self.__init__(*args, **kwargs)
         return self._identity
 
     @property
@@ -495,28 +909,40 @@ class MayaObject(TreeNode):
     @staticmethod
     def generic_getter(func):
         def wrapper(self, _object, *args, **kwargs):  # noqa
-            expected_args = len(inspect.signature(func).parameters)
-            debug_print(f"GETTING: {func} FROM: MayaObject EXPECTS {expected_args} ARGS", level=1)
+            try:
+                # First, check if the object exists to avoid operations on non-existent objects
+                if not cmds.objExists(_object):
+                    raise ValueError(f"Object {_object} does not exist in the scene.")
 
-            # Check if the function expects just one argument, and call accordingly
-            if expected_args == 1:
-                debug_print(f"CALLING: {func} WITH 1 ARG: {_object}", level=1)
-                return func(_object)
-            else:
-                debug_print(f"CALLING: {func} WITH ARGS: {_object}, {args}, {kwargs}", level=1)
-                return func(_object, *args, **kwargs)
+                # Then, check if the object's name or type disqualifies it from the operation
+                if re.search(r"shape", _object, re.IGNORECASE):
+                    debug_print(f"Operation not applicable for shapes: {_object}", level=1)
+                    return None  # or an appropriate default value
+
+                # If passed all checks, proceed with the intended operation
+                expected_args = len(inspect.signature(func).parameters)
+                debug_print(f"GETTING: {func} FROM: MayaObject EXPECTS {expected_args} ARGS", level=1)
+
+                if expected_args == 1:
+                    debug_print(f"CALLING: {func} WITH 1 ARG: {_object}", level=1)
+                    return func(_object)
+                else:
+                    debug_print(f"CALLING: {func} WITH ARGS: {_object}, {args}, {kwargs}", level=1)
+                    return func(_object, *args, **kwargs)
+            except (RuntimeError, ValueError):
+                return None
 
         return wrapper
 
     def get_parent(self, _object):
         debug_print(f"GETTING PARENT OF: {self.name}", header="MayaObjectTree", level=2)  # DEBUGGER
-        parent = cmds.listRelatives(_object, parent=True)
+        parent = safe_get_parent(_object)
         return self.strip_path(parent) if parent else None
 
     def get_children(self, _object):
         debug_print(f"GETTING CHILDREN OF: {self.name}", header="MayaObjectTree", level=2)  # DEBUGGER
-        parent = cmds.listRelatives(_object, children=True)
-        return self.strip_path(parent) if parent else None
+        children = safe_get_children(_object)
+        return self.strip_path(children) if children else None
 
     def center(self):
         debug_print(f"GETTING CENTER OF: {self.name}", header="MayaObjectTree", level=1)  # DEBUGGER
@@ -621,7 +1047,7 @@ class BaseTree:
         self.roots = {}
         self.leaves = {}
         self.nodes = {}
-        self.node_class = node_class if node_class else TreeNode
+        self.node_class: MayaObject | TreeNode = node_class if node_class else TreeNode
         self.nodes = self.initialize(item_list) if item_list else None
         self._sorted_nodes = None
         debug_print("SORTED NODES:", to_format=self.sorted_nodes, style="CONTAINER", header="base tree",
@@ -694,10 +1120,10 @@ class MayaObjectTree(BaseTree):
             if node_name == "multiple_roots":
                 debug_print(f"NODE: {node_name} IS A MULTIPLE ROOTS DICT", style="CONTAINER",
                             header="MayaObjectTree", level=1)  # DEBUGGER
-                for root, children in node_map["multiple_roots"].items():
+                for root, _children in node_map["multiple_roots"].items():
                     debug_print(f"NODE: {node_name} HAS ROOT: {root}", header="MayaObjectTree",
                                 level=3)  # DEBUGGER
-                    self.__instance_nodes_dict(children, self.node_class(root), collector)
+                    self.__instance_nodes_dict(_children, self.node_class(root), collector)
                     if self.node_class(root).get("object_exists"):
                         collector[root] = self.node_class(root)
             else:
@@ -807,12 +1233,12 @@ class MayaObjectTree(BaseTree):
         result = {"NODES": {}, "ENDS": {"LEAVES": {}, "ROOTS": {}}}
         for key, value in return_dict.items():
             result["NODES"].update({key: self.node_class(key)})
-        #     result["DATA"]{key: 'parent'} = self.node_class(value).parent_node.name if value.parent_node else None
-        #     result["DATA"]{key: 'children'} = [child for child in self.node_class(key).children_nodes]
-        #     result["DATA"]{key: 'type'} = value.type
-        #     result["DATA"]{key: 'world_position'} = value.world_position
-        #     result["DATA"]{key: 'rotation'} = value.rotation
-        #     result["DATA"]{key: 'scale'} = value.scale
+            #     result["DATA"]{key: 'parent'} = self.node_class(value).parent_node.name if value.parent_node else None
+            #     result["DATA"]{key: 'children'} = [child for child in self.node_class(key).children_nodes]
+            #     result["DATA"]{key: 'type'} = value.type
+            #     result["DATA"]{key: 'world_position'} = value.world_position
+            #     result["DATA"]{key: 'rotation'} = value.rotation
+            #     result["DATA"]{key: 'scale'} = value.scale
             if value.parent_node:
                 result["NODES"][key].parent_node = value.parent_node.name
 
@@ -833,7 +1259,7 @@ class MayaObjectTree(BaseTree):
                 debug_print(f"Error while processing item: {node_name}. Error: {str(e)}", header="MayaObjectTree",
                             level=8)  # DEBUGGER
 
-    def initialize(self, node_map: list | str | dict):
+    def initialize(self, node_map: list | str | dict):  # override
         debug_print(f"INITIALIZING TREE WITH: {node_map}", style="CONTAINER", header="MayaObjectTree",
                     level=2)
         if isinstance(node_map, dict):
@@ -871,7 +1297,7 @@ if __name__ == "__main__":
                        "ikHandle", "ikEffector", "ikSolver", "ikRPsolver", "ikSCsolver", "ikSplineSolver"]
     # selection = MayaSelectionOperator().selection
     # ik = IkManager(selection, excluded_types=type_to_exclude)
-
     joint_list = MayaSelectionOperator().get(_type="joint", _all=True)
     ik = IkManager(joint_list)
     # ChannelBox().create_coor_ui()
+"""

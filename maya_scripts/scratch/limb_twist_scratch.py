@@ -2,6 +2,9 @@ import maya.cmds as cmds
 from core.components.xform_handler import XformHandler, Calculator3dSpace
 from core.components.color_changer import change_color
 
+"""
+2/2/2024 last used on imp rig: as long as the names are correct this script will work.
+"""
 
 class LimbTwistManager:
     def __init__(self, limb_name, upper_name, lower_name, rk_top_jnt, rk_pivot_jnt, rk_bot_jnt, rk_bot2_jnt,
@@ -147,7 +150,7 @@ class LimbTwistManager:
 
     @staticmethod
     def get_aim_vector(src_xform: XformHandler, target_xform: XformHandler):
-        return src_xform.calc.calculate_aim_axis_vector(target_xform, True)
+        return src_xform.calc.calculate_aim_axis_vector(other_xform=target_xform, relative_to_src=True)
 
     def get_aim_axis(self, src_xform: XformHandler, target_xform: XformHandler):
         return src_xform.calc.get_axis_from_vector(self.get_aim_vector(src_xform, target_xform))
@@ -242,7 +245,7 @@ class LimbTwistManager:
 
     def create_upper_twist_base(self, up_dist=None):
         if up_dist is None:
-            base_dist = self.top_jnt_xform.calc.calculate_distance(self.pivot_jnt_xform)
+            base_dist = self.top_jnt_xform.calc.calculate_distance(other_xform=self.pivot_jnt_xform)
             up_dist = int(base_dist * 0.7)
             if "-" in self.up_axis:
                 up_dist *= -1
@@ -285,7 +288,7 @@ class LimbTwistManager:
 
     def create_upper_limb_helpers(self, helper_dist=None):
         if helper_dist is None:
-            base_dist = self.top_jnt_xform.calc.calculate_distance(self.pivot_jnt_xform)
+            base_dist = self.top_jnt_xform.calc.calculate_distance(other_xform=self.pivot_jnt_xform)
             helper_dist = int(base_dist + (base_dist * 0.15)) * -1
 
         up_axis = self.up_axis.replace("-", "") if "-" in self.up_axis else self.up_axis
@@ -301,7 +304,7 @@ class LimbTwistManager:
         # Moving the helper joint2 to be halfway between helper 1 and the pivot_jnt
         self.help_jnt2_xform.move_relative_to_obj(self.help_jnt1_xform,
                                                   self.help_jnt2_xform.calc.calculate_distance(
-                                                      self.help_jnt1_xform) * 0.5)
+                                                      other_xform=self.help_jnt1_xform) * 0.5)
         cmds.parent(self.helper_joint2, self.helper_joint1)
         # Orienting the helper joints
         self.set_joint_to_orientation(self.helper_joint1)
@@ -367,7 +370,7 @@ class LimbTwistManager:
 
     def create_lower_twist_base(self, up_dist=None):
         if up_dist is None:
-            base_dist = self.pivot_jnt_xform.calc.calculate_distance(self.bot_jnt_xform)
+            base_dist = self.pivot_jnt_xform.calc.calculate_distance(other_xform=self.bot_jnt_xform)
             up_dist = int(base_dist / 2.5)
             if self.get_side() == "R":
                 up_dist *= -1
@@ -528,9 +531,6 @@ class LimbTwistManager:
 
 
 if __name__ == "__main__":
-    """
-    2/2/2024: as long as the names are correct this script will work.
-    """
     from functools import partial
 
 
