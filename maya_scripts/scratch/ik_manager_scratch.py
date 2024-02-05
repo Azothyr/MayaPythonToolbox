@@ -17,6 +17,7 @@ class IKFactory:
         self.base_group = None
         self.pv_group = None
         self.pv_offset_group = None
+        self.pv_offset_xform = None
         self.tip_group = None
         self.handle = None
 
@@ -236,8 +237,8 @@ class IKFactory:
                 pv_offset_group = f"{self.part}_pv_offset_ctrl_grp"
                 cmds.Group(pv_offset_group, empty=True)
                 cmds.rename(self.pv_offset_group, f"{self.part}_pv_offset_ctrl_grp")
-                offset_xform = XformHandler(pv_offset_group, threshold=0.1, precision=1)
-                offset_xform.match_xform(self.pv_xform, ["translation", "rotation"])
+                self.pv_offset_xform = XformHandler(pv_offset_group, threshold=0.1, precision=1)
+                self.pv_offset_xform.match_xform(self.pv_xform, ["translation", "rotation"])
                 cmds.parent(pv_offset_group, self.pv_group)
                 cmds.parent(self.pv_control.name, pv_offset_group)
                 self.pv_offset_group = pv_offset_group
@@ -251,14 +252,8 @@ class IKFactory:
             x_value = self.offset_amount * rot_dir if rot_axis == "x" else 0
             y_value = self.offset_amount * rot_dir if rot_axis == "y" else 0
             z_value = self.offset_amount * rot_dir if rot_axis == "z" else 0
-            self.pv_offset_group = XformHandler(str(self.pv_offset_group), threshold=0.1, precision=1)
-            self.pv_offset_group.add_in_world("translate", x=x_value, y=y_value, z=z_value)
+            self.pv_offset_xform.add_in_local("translate", x=x_value, y=y_value, z=z_value)
             cmds.xform(self.pv_control.name, os=True, translation=(0, 0, 0), rotation=(0, 0, 0))
-            objects = self.joints
-            objects.extend([self.base_control.name, self.pv_control.name, self.tip_control.name])
-            cmds.select(clear=True)
-            for obj in objects:
-                cmds.select(obj, add=True)
 
             self.continue_ui(_continue=True, size=size, rot_axis=rot_axis)
         else:
@@ -282,35 +277,21 @@ class IKFactory:
                     cmds.setAttr(f"{control}.sz", lock=True, channelBox=False, keyable=False)
                     cmds.setAttr(f"{control}.v", lock=True, channelBox=False, keyable=False)
 
+            cmds.setAttr(self.handle + ".v", 0)
+
     def continue_ui(self, **kwargs):
         passing_kwargs = kwargs
+        cmds.select(self.pv_offset_group, replace=True)
 
         def execute(*_, **kwargs):
             self.execute_ik_chain(**kwargs)
             cmds.deleteUI("wait_for_response_ui", window=True)
         if cmds.window("wait_for_response_ui", exists=True):
             cmds.deleteUI("wait_for_response_ui", window=True)
-        cmds.window("wait_for_response_ui", title="IK Factory", widthHeight=(500, 200), resizeToFitChildren=True)
+        cmds.window("wait_for_response_ui", title="IK Factory", widthHeight=(10, 20), resizeToFitChildren=True)
         cmds.columnLayout(adjustableColumn=True)
-        cmds.text(label="Please confirm the following settings for the IK chain and hit continue when you are ready:")
-        cmds.text(label=f"Base: {self.base}")
-        cmds.text(label=f"Pole Vector: {self.pv}")
-        cmds.text(label=f"Tip: {self.tip}")
-        cmds.text(label=f"Base Control: {self.base_control.name}")
-        cmds.text(label=f"Pole Vector Control: {self.pv_control.name}")
-        cmds.text(label=f"Tip Control: {self.tip_control.name}")
-        cmds.text(label=f"Base Group: {self.base_group}")
-        cmds.text(label=f"Pole Vector Group: {self.pv_group}")
-        cmds.text(label=f"Tip Group: {self.tip_group}")
-        cmds.text(label=f"Pole Vector Offset Group: {self.pv_offset_group}")
-        cmds.text(label=f"Controls: {self.controls}")
-        cmds.text(label=f"Joints: {self.joints}")
-        cmds.text(label=f"Part: {self.part}")
-        cmds.text(label=f"Name: {self.name}")
-        cmds.text(label=f"Count: {self.count}")
-        cmds.text(label="Please also look at the transforrm values of the controls and groups to ensure "
-                        "they are correct.")
-        cmds.button(label="Continue", command=partial(execute, **passing_kwargs))
+        cmds.text(label="Please adjust the pivot offset group as needed and then click continue.", bgc=[0, 0, 0])
+        cmds.button(label="Continue", bgc=[0.1, 0.3, 0.1], command=partial(execute, **passing_kwargs))
         cmds.showWindow("wait_for_response_ui")
 
 
@@ -369,33 +350,54 @@ if __name__ == "__main__":
         pv: rx ry rz sx sy sz vis
         tip: sx sy sz vis
     """
+    def left_arm():
+        cmds.select("L_Arm_IK_01_Jnt", replace=True)
+        cmds.select("L_Arm_IK_02_Jnt", add=True)
+        cmds.select("L_Arm_IK_03_Jnt", add=True)
+        joints = cmds.ls(sl=True)
+        l_arm = IKFactory("l_arm", joints)
+        l_arm.create_ik("ik_chain", size=3, rot_axis="-y")
 
-    # cmds.select("L_Arm_IK_01_Jnt", replace=True)
-    # cmds.select("L_Arm_IK_02_Jnt", add=True)
-    # cmds.select("L_Arm_IK_03_Jnt", add=True)
-    # joints = cmds.ls(sl=True)
-    # l_arm = IKFactory("l_arm", joints)
-    # r_arm.create_ik("ik_chain", size=3, rot_axis="-z")
-    cmds.select("R_Arm_IK_01_Jnt", replace=True)
-    cmds.select("R_Arm_IK_02_Jnt", add=True)
-    cmds.select("R_Arm_IK_03_Jnt", add=True)
-    joints = cmds.ls(sl=True)
-    r_arm = IKFactory("r_arm", joints)
-    r_arm.create_ik("ik_chain", size=3, rot_axis="-z")
-    # cmds.select("L_Leg_IK_01_Jnt", replace=True)
-    # cmds.select("L_Leg_IK_02_Jnt", add=True)
-    # cmds.select("L_Leg_IK_03_Jnt", add=True)
-    # joints = cmds.ls(sl=True)
-    # l_leg = IKFactory("l_leg", joints)
-    # r_arm.create_ik("ik_chain", size=3, rot_axis="z")
-    # cmds.select("R_Leg_IK_01_Jnt", replace=True)
-    # cmds.select("R_Leg_IK_02_Jnt", add=True)
-    # cmds.select("R_Leg_IK_03_Jnt", add=True)
-    # joints = cmds.ls(sl=True)
-    # r_leg = IKFactory("r_leg", joints)
-    # r_arm.create_ik("ik_chain", size=3, rot_axis="z")
+    def right_arm():
+        cmds.select("R_Arm_IK_01_Jnt", replace=True)
+        cmds.select("R_Arm_IK_02_Jnt", add=True)
+        cmds.select("R_Arm_IK_03_Jnt", add=True)
+        joints = cmds.ls(sl=True)
+        r_arm = IKFactory("r_arm", joints)
+        r_arm.create_ik("ik_chain", size=3, rot_axis="y")
+
+    def left_leg():
+        cmds.select("L_Leg_IK_01_Jnt", replace=True)
+        cmds.select("L_Leg_IK_02_Jnt", add=True)
+        cmds.select("L_Leg_IK_03_Jnt", add=True)
+        joints = cmds.ls(sl=True)
+        l_leg = IKFactory("l_leg", joints)
+        l_leg.create_ik("ik_chain", size=3, rot_axis="-y")
+
+    def right_leg():
+        cmds.select("R_Leg_IK_01_Jnt", replace=True)
+        cmds.select("R_Leg_IK_02_Jnt", add=True)
+        cmds.select("R_Leg_IK_03_Jnt", add=True)
+        joints = cmds.ls(sl=True)
+        r_leg = IKFactory("r_leg", joints)
+        r_leg.create_ik("ik_chain", size=3, rot_axis="y")
+
+    # left_arm()
+    # right_arm()
+    # left_leg()
+    # right_leg()
 
 """
+cmds.select("L_Arm_RK_01_Jnt", replace=True)
+cmds.select("R_Arm_RK_01_Jnt", add=True)
+cmds.select("L_Leg_RK_01_Jnt", add=True)
+cmds.select("R_Leg_RK_01_Jnt", add=True)
+
+cmds.select("L_Arm_FK_01_Jnt", replace=True)
+cmds.select("R_Arm_FK_01_Jnt", add=True)
+cmds.select("L_Leg_FK_01_Jnt", add=True)
+cmds.select("R_Leg_FK_01_Jnt", add=True)
+
 cmds.select("L_Arm_IK_01_Jnt", replace=True)
 cmds.select("R_Arm_IK_01_Jnt", add=True)
 cmds.select("L_Leg_IK_01_Jnt", add=True)
