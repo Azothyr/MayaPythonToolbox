@@ -73,23 +73,23 @@ class IKFactory:
             raise NameError(
                 "IKFACTORY-LINE(50) --- "
                 "The joints selected do not seem to be IK joints. It is recommended that you rename them to "
-                f"reflect their function. {joints}")
+                f"reflect their function. {self.joints}")
 
         if "1" not in ik_joints[0]:
             cmds.warning(f"IKFACTORY-LINE(55) --- The base joint should be the first joint in the selection. "
-                         f"CURRENT ORDER: {joints}")
+                         f"CURRENT ORDER: {self.joints}")
 
         if self.count >= 2:
             if f"{last_idx+1}" not in last_joint:
                 cmds.warning(
                     "IKFACTORY-LINE(61) --- The tip joint should be the last joint in the selection."
-                    f" CURRENT ORDER: {joints}"
+                    f" CURRENT ORDER: {self.joints}"
                 )
             if self.count >= 3:
                 if f"{mid_idx+1}" not in mid_joint:
                     cmds.warning(
                         "IKFACTORY-LINE(67) --- The pole vector joint should be the middle joint in the selection."
-                        f" CURRENT ORDER: {joints}"
+                        f" CURRENT ORDER: {self.joints}"
                     )
                 return base_joint, mid_joint, last_joint
             else:

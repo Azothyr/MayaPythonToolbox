@@ -2,13 +2,13 @@ import maya.cmds as cmds
 from core.components.validate_cmds import exists_maya
 
 
-def exists_or_error(obj, line, func, attr=None, connection=None):
+def exists_or_error(obj, func, attr=None, connection=None):
     if not exists_maya.obj(obj):
-        raise ValueError(f"WARNING-{func}-LINE({line}): {obj} does not exist.")
+        raise ValueError(f"WARNING-{func}: {obj} does not exist.")
     if attr and not exists_maya.attr(obj, attr):
-        raise ValueError(f"WARNING-{func}-LINE({line}): {obj} does not have an {attr} attribute.")
+        raise ValueError(f"WARNING-{func}: {obj} does not have an {attr} attribute.")
     if connection and not exists_maya.attr(obj, connection):
-        raise ValueError(f"WARNING-{func}-LINE({line}): {obj} does not have an {connection} attribute.")
+        raise ValueError(f"WARNING-{func}: {obj} does not have an {connection} attribute.")
 
 
 def create_attr_proxy(proxy_holder, holder_to_copy, attr_name):
@@ -25,7 +25,7 @@ def create_attr_proxy(proxy_holder, holder_to_copy, attr_name):
 
 
 def drawing_overrides_state(obj, state):
-    exists_or_error(obj, 24, "drawing_overrides_state")
+    exists_or_error(obj,"drawing_overrides_state")
     if cmds.getAttr(f"{obj}.overrideEnabled") == state:
         return
     cmds.setAttr(f"{obj}.overrideEnabled", state)
@@ -37,40 +37,25 @@ def is_connected(driving_attr, recieving_attr):
     src_attr = driving_attr.split(".")[-1]
     dest_attr = recieving_attr.split(".")[-1]
 
-    exists_or_error(source, 36, src_attr)
-    exists_or_error(desitination, 37, dest_attr)
+    exists_or_error(source, src_attr)
+    exists_or_error(desitination, dest_attr)
 
     return cmds.isConnected(driving_attr, recieving_attr)
 
 
 def connect_display_type(driver, attr, connection):
-    exists_or_error(driver, 43, "connect_display_type", attr)
-    exists_or_error(connection, 44, "connect_display_type", "overrideDisplayType")
+    exists_or_error(driver, "connect_display_type", attr)
+    exists_or_error(connection, "connect_display_type", "overrideDisplayType")
 
     if not is_connected(f"{driver}.{attr}", f"{connection}.overrideDisplayType"):
         cmds.connectAttr(f"{driver}.{attr}", f"{connection}.overrideDisplayType", f=True)
 
 
 def connect_visibility(driver, attr, connection):
-    exists_or_error(driver, 51, "connect_visibility", attr)
-    exists_or_error(connection, 52, "connect_visibility", "visibility")
+    exists_or_error(driver,"connect_visibility", attr)
+    exists_or_error(connection, "connect_visibility", "visibility")
     if not is_connected(f"{driver}.{attr}", f"{connection}.visibility"):
         cmds.connectAttr(f"{driver}.{attr}", f"{connection}.visibility", f=True)
-
-
-def connect_to_controller(driver, obj, attr):
-    exists_or_error(driver, 58, "connect_display", attr)
-    exists_or_error(obj, 59, "connect_display")
-
-    uniqifier = attr.split("_")[0]
-    condition_node = f"{driver}_{uniqifier}_display_conditional"
-    pma_node = f"{driver}_{uniqifier}_adj_to_display_type_PMA"
-
-    drawing_overrides_state(obj, 1)
-    if not cmds.objExists(condition_node) or not cmds.objExists(pma_node):
-        create_display_conditional(driver, attr)
-    connect_display_type(condition_node, "colorIfTrueG", obj)
-    connect_visibility(condition_node, "colorIfTrueR", obj)
 
 
 def create_display_conditional(driver, attr):

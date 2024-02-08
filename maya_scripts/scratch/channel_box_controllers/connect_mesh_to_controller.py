@@ -42,8 +42,8 @@ def fetch_parent_if_in_hierarchy(obj: str, potential_parents: list = None):
 
 
 def connect_mesh_display(driver, mesh, attr):
-    exists_or_error(driver, 45, "connect_mesh_display", attr)
-    exists_or_error(mesh, 46, "connect_mesh_display")
+    exists_or_error(driver, "connect_mesh_display", attr)
+    exists_or_error(mesh, "connect_mesh_display")
 
     uniqifier = attr.split("_")[0]
     condition_node = f"{driver}_{uniqifier}_display_conditional"
