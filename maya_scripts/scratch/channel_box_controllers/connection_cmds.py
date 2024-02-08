@@ -58,7 +58,7 @@ def connect_visibility(driver, attr, connection):
         cmds.connectAttr(f"{driver}.{attr}", f"{connection}.visibility", f=True)
 
 
-def connect_display(driver, obj, attr):
+def connect_to_controller(driver, obj, attr):
     exists_or_error(driver, 58, "connect_display", attr)
     exists_or_error(obj, 59, "connect_display")
 

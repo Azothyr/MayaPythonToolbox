@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 from core.maya_managers.selection_manager import Select
 from core.maya_managers.joint_manager import JointManager
-from scratch.channel_box_controllers.connect_channel_controllers import create_attr_proxy, connect_display
+from scratch.channel_box_controllers.connection_cmds import create_attr_proxy, connect_to_controller
 
 
 def fetch_twist_system():
@@ -15,13 +15,13 @@ def fetch_twist_system():
 def run_connecting_tool(driver, attr, proxy=False):
     joints, grps, locators = fetch_twist_system()
     for joint in joints:
-        connect_display(driver, joint, attr)
+        connect_to_controller(driver, joint, attr)
     for grp in grps:
-        connect_display(driver, grp, attr)
+        connect_to_controller(driver, grp, attr)
         if proxy:
             create_attr_proxy(grp, driver, attr)
     for locator in locators:
-        connect_display(driver, locator, attr)
+        connect_to_controller(driver, locator, attr)
 
 
 def main():

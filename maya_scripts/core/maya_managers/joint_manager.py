@@ -27,7 +27,6 @@ class JointManager:
         :param combine: bool to combine joints with numerical suffixes
         :param get: str to filter the selection by joint type
         :param debug: bool to allow printing of instance
-        :param kwargs:
         """
         self.instance_allow_print = debug
         self.selection = sl(bypass=True).filter_selection(joints=True) if not selection and bypass else \
@@ -38,6 +37,8 @@ class JointManager:
                 raise ValueError(f"get must be one of {', '.join(self.TYPES)}. Got {get} instead.")
             self.selection = [
                 joint for joint in self.selection if re.search(self.TYPES.get(get.lower()), joint, re.IGNORECASE)]
+        self.base_splitter = re.compile("_")
+        self.num_splitter = re.compile(r"_[0-9]+$")
         self.splitter = [value.lower() for key, value in self.TYPES.items()]
 
         self.data = self.joint_count()
@@ -69,6 +70,16 @@ class JointManager:
     def print_data(self):
         pprint(dict(self.data))
 
+    def _fetch_joint_type(self, name_string):
+        exclude = []
+        if self.splitter == "ik":
+            exclude.append("twist")
+
+        for name_part in self.base_splitter.split(name_string):
+            if name_part.lower() in self.splitter:
+                if name_part.lower() not in exclude:
+                    return name_part
+
     def joint_count(self):
         """
         Count the number of joints in the selection and return a dictionary with the count and the joints
@@ -76,23 +87,21 @@ class JointManager:
         :returns: Dictionary with the count and the joints
         """
         count_dict = defaultdict(lambda: {'count': 0, 'joints': []})
-        if self.combine:
-            pattern = re.compile(r"_[0-9]+$")  # Regular expression to remove numerical suffix
 
         for string in self.selection:
-            joint_type = [x for x in re.split(f"_", string) if x.lower() in self.splitter][0]
+            joint_type = self._fetch_joint_type(string)
             if joint_type is None:
                 joint_type = "Unknown"
 
             if self.combine:
-                string = pattern.sub('', string)
+                string = self.num_splitter.sub('', string)
 
             count_dict[joint_type]['count'] += 1
             count_dict[joint_type]['joints'].append(string)
         return count_dict
 
     def get_part_names(self):
-        exclude = ['helper', 'unknown']
+        exclude = ["helper", "unknown"]
         base_part = [x for x in self.data.keys() if x.lower() not in exclude]
         return base_part
 
@@ -129,11 +138,10 @@ if __name__ == "__main__":
         filename = inspect.getfile(frame)
         return os.path.basename(filename).split('.')[0]
 
-
     print(f"{'-' * 10 + '|' + ' ' * 4} RUNNING {module_name()} DUNDER MAIN {' ' * 4 + '|' + '-' * 10}")
+
     # Example usage:
-    # print(selection)
-    manager = JointManager(bypass=True, combine=True, get="twist")
+    manager = JointManager(bypass=True, combine=True)
     manager.print_data()
     print(manager["twist"]["joints"])
 

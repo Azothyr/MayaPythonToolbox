@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from scratch.channel_box_controllers.connect_channel_controllers import (
+from scratch.channel_box_controllers.connection_cmds import (
     create_attr_proxy, connect_display_type, connect_visibility, exists_or_error, drawing_overrides_state,
     create_display_conditional
 )
