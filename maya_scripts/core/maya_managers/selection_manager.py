@@ -45,9 +45,11 @@ class SelectAdvanced(SelectBase):
     def __init__(self, selection=None, **kwargs):
         super().__init__(selection, **kwargs)
         self.options = Menu({
-            "controls": (["control", "ctrls", "ctrl", "c"], self._filter_controls),
-            "joints": (["joint", "jnts", "jnt", "j"], self._filter_joints),
-            "maya_object": (["maya_obj", "maya_objects", "maya_objs"], self._filter_maya_objects),
+            "joints": (["joint", "jnts", "jnt", "j"], self._filter_to_joints),
+            "controls": (["control", "ctrls", "ctrl", "c"], self._filter_to_controls),
+            "shapes": (["shape", "shp", "shps"], self._filter_to_shapes),
+            "groups": (["group", "grp", "grps"], self._filter_to_groups),
+            "maya_object": (["maya_obj", "maya_objects", "maya_objs"], self._filter_to_maya_objects),
         })
 
     def __call__(self, *args, **kwargs):
@@ -58,6 +60,8 @@ class SelectAdvanced(SelectBase):
             raise ValueError("No objects selected in Maya!")
         if _selection is not None:
             self.selection = _selection
+        elif not self.selection:
+            raise ValueError("No objects selected in Maya!")
 
     def filter_selection(self, **kwargs):
         if kwargs:
@@ -71,6 +75,10 @@ class SelectAdvanced(SelectBase):
 
     def get(self):
         return self.selection
+
+    @staticmethod
+    def _get_shapes(obj):
+        return cmds.listRelatives(obj, shapes=True)
 
     def _is_joint(self, obj):
         if not exists.joint(obj):
@@ -86,21 +94,65 @@ class SelectAdvanced(SelectBase):
             return False
         return True
 
-    def _filter_joints(self, objs=None):
+    def _is_shape(self, obj):
+        if not exists.shape(obj):
+            if self.debug:
+                cmds.warning(f"{obj} is not a shape.")
+            return False
+        return True
+
+    def _is_group(self, obj):
+        if not exists.group(obj):
+            if self.debug:
+                cmds.warning(f"{obj} is not a group.")
+            return False
+        return True
+
+    def _filter_to_joints(self, objs=None):
         self.update_selection(objs)
         joints = [obj for obj in self.selection if self._is_joint(obj)]
         if not joints:
             cmds.warning("No joints selected")
         return joints
 
-    def _filter_controls(self, objs=None):
+    def _filter_to_controls(self, objs=None):
         self.update_selection(objs)
         controls = [obj for obj in self.selection if self._is_control(obj)]
         if not controls:
             cmds.warning("No controls provided.")
         return controls
 
-    def _filter_maya_objects(self, patterns):
+    def _filter_to_shapes(self, objs=None):
+        self.update_selection(objs)
+        controls = [obj for obj in self.selection if self._is_shape(obj)]
+        if not controls:
+            cmds.warning("No controls provided.")
+        return controls
+
+    def filter_to_shapes_from_base_object(self, objs=None):
+        self.update_selection(objs)
+        shapes = []
+        for obj in self.selection:
+            shape = self._get_shapes(obj)
+            if shape:
+                if isinstance(shape, list):
+                    if len(shape) > 1:
+                        cmds.warning(f"More than one shape found for {obj}: {shape}")
+                    shape = shape[0]
+                if self._is_shape(shape):
+                    shapes.append(shape)
+        if not shapes:
+            cmds.warning("No shapes found.")
+        return shapes
+
+    def _filter_to_groups(self, objs=None):
+        self.update_selection(objs)
+        controls = [obj for obj in self.selection if self._is_group(obj)]
+        if not controls:
+            cmds.warning("No controls provided.")
+        return controls
+
+    def _filter_to_maya_objects(self, patterns):
         self.update_selection(self._get_all_objects())
         result = []
         for obj in self.selection:

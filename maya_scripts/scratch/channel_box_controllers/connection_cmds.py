@@ -13,7 +13,7 @@ def exists_or_error(obj, func, attr=None, connection=None):
 
 def create_attr_proxy(proxy_holder, holder_to_copy, attr_name):
     # print(f"proxy_holder: {proxy_holder} holder_to_copy: {holder_to_copy} attr_name: {attr_name}")
-    exists_or_error(holder_to_copy, 16, "create_attr_proxy", attr_name)
+    exists_or_error(holder_to_copy, "create_attr_proxy", attr_name)
     if not exists_maya.obj(proxy_holder):
         raise ValueError(f"WARNING-create_attr_proxy-LINE(17): {proxy_holder} does not exist.")
     if not exists_maya.attr(proxy_holder, attr_name):
@@ -25,7 +25,7 @@ def create_attr_proxy(proxy_holder, holder_to_copy, attr_name):
 
 
 def drawing_overrides_state(obj, state):
-    exists_or_error(obj,"drawing_overrides_state")
+    exists_or_error(obj, "drawing_overrides_state")
     if cmds.getAttr(f"{obj}.overrideEnabled") == state:
         return
     cmds.setAttr(f"{obj}.overrideEnabled", state)
@@ -52,20 +52,20 @@ def connect_display_type(driver, attr, connection):
 
 
 def connect_visibility(driver, attr, connection):
-    exists_or_error(driver,"connect_visibility", attr)
+    exists_or_error(driver, "connect_visibility", attr)
     exists_or_error(connection, "connect_visibility", "visibility")
     if not is_connected(f"{driver}.{attr}", f"{connection}.visibility"):
         cmds.connectAttr(f"{driver}.{attr}", f"{connection}.visibility", f=True)
 
 
 def create_display_conditional(driver, attr):
-    exists_or_error(driver, 73, "create_display_conditional", attr)
+    exists_or_error(driver, "create_display_conditional", attr)
     uniqifier = attr.split("_")[0]
     condition_node = f"{driver}_{uniqifier}_display_conditional"
     pma_node = f"{driver}_{uniqifier}_adj_to_display_type_PMA"
 
     driver_attr = f"{driver}.{attr}"
-    
+
     driver_to_condition1 = f"{condition_node}.firstTerm"
     condition2_connection_from_driver_attr = f"{condition_node}.colorIfTrueR"
 

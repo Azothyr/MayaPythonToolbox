@@ -2,12 +2,7 @@ import maya.cmds as cmds
 
 
 def main():
-    transferAttrNodes = cmds.ls(type='transferAttributes')
-
-    # Delete all listed nodes
-    if transferAttrNodes:
-        print(transferAttrNodes)
-        cmds.delete(transferAttrNodes, constructionHistory=True)
+    pass
 
 
 if __name__ == "__main__":

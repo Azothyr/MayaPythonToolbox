@@ -1,9 +1,15 @@
 import maya.cmds as cmds
 """
-No Idea what this is for
+
 """
 
 def brute_ik_to_fk_key():
+    """
+    Convert IK controls to FK controls using brute force method.
+
+    :return: None
+    :raises ValueError: If no control is selected
+    """
     selection = cmds.ls(sl=True)
     ctrl = None
     constraint = []
@@ -20,8 +26,8 @@ def brute_ik_to_fk_key():
     print(f"CONSTRAINT: {constraint}")
 
     for i in constraint:
-        print(cmds.setDrivenKeyframe(i, q=True, cd=True))
-        print(cmds.setDrivenKeyframe(i, q=True, dn=True))
+        print(cmds.setDrivenKeyframe(i, q=True, currentDriver=True))
+        print(cmds.setDrivenKeyframe(i, q=True, driven=True))
 
     driven_attr = [".Transform_CtrlW0", ".COG_FK_CtrlW1", ".ManW2"]
     check = "".join(ctrl)

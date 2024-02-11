@@ -133,7 +133,9 @@ class Exists:
 
     @staticmethod
     def control(name: str) -> bool:
-        return Exists._is_type_with_ending(name, "transform", "_ctrl")
+        return (Exists._is_type_with_ending(name, "transform", "_ctrl") and
+                not Exists.group(name) and
+                not Exists.shape(name))
 
     @staticmethod
     def locator(name: str) -> bool:
@@ -141,9 +143,15 @@ class Exists:
 
     @staticmethod
     def shape(name: str) -> bool:
-        return Exists._is_type(name, "shape")
+        result = False
+        if cmds.objectType(name) == "nurbsCurve":
+            result = True
+        elif cmds.objectType(name) == "mesh":
+            result = True
+        return result
 
 
 if __name__ == "__main__":
     print(Exists("pCube1", "object").__repr__())
     print(Exists("pCube1", "object"))
+    print(cmds.objectType("Spine_FK_01_CtrlShape"))
