@@ -1,7 +1,5 @@
 import maya.cmds as cmds
-"""
 
-"""
 
 def brute_ik_to_fk_key():
     """
