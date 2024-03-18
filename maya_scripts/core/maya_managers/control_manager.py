@@ -60,8 +60,8 @@ try:
                 self.group_xform = xform(self.group)
 
         def _doesnt_exist_setup(self):
-            self.name = self.control.name
-            self.group = self.control.group
+            self.name = check_and_fix(self.control, "_Ctrl")
+            self.group = check_and_fix(self.control, "_Grp")
             if not Exists.obj(self.group):
                 self.group = None
             self.shape = self._fetch_shape()
