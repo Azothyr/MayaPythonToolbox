@@ -29,7 +29,6 @@ def fetch_parent_if_in_hierarchy(obj: str, potential_parents: list = None):
     obj_full_path = cmds.ls(obj, long=True)[0]
     all_ancestors = cmds.listRelatives(obj, allParents=True, fullPath=True) or []
     all_ancestors.append(obj_full_path)
-    # how can I make this gen work?? [name for name for ancestor for ancestor in all_ancestors.split("|") if name]
     ancestors = [ancestor for ancestor in "|".join(all_ancestors).split("|") if ancestor]
 
     for name in ancestors:

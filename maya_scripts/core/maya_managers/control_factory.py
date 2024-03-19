@@ -39,14 +39,15 @@ class ControlFactory:
 
         self.controls = []
         for obj in objects:
-            new_control = ControlManager(obj, radius=self.radius, match=True)
+            new_control = ControlManager(obj, radius=self.radius, match=True, create=True)
             self.controls.append(new_control)
 
         return self.controls
 
 
 if __name__ == "__main__":
-    selection = cmds.ls(sl=True)
-    controls = ControlFactory(radius=5)
-    created_ctrls = controls()
-    print(created_ctrls)
+    controls = ControlFactory(radius=5)()
+    print(controls)
+
+    # created_ctrls = controls()
+    # print(created_ctrls)
