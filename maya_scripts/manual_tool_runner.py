@@ -32,5 +32,22 @@ def main2():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     # main2()
+    import re
+
+    cmds.select(clear=True)
+
+    pattern = re.compile(r"rk", re.IGNORECASE)
+    exclude = re.compile(r"twist", re.IGNORECASE)
+
+    for item in cmds.ls(type="joint"):
+        # if pattern.search(item):
+        #     if exclude.search(item):
+        #         continue
+        #     print(item)
+        #     cmds.select(item, add=True)
+        if exclude.search(item):
+            continue
+        print(item)
+        cmds.select(item, add=True)

@@ -62,7 +62,7 @@ def bind_to_skin_cluster(skin_cluster, influences, objects, **kwargs):
     cmds.select(skinned_objects, replace=True)
 
 
-def main():
+def execute():
     selection = cmds.ls(sl=True)
     find_cmd = f"findRelatedSkinCluster(\"{selection[0]}\")"
     skin_cluster = mel.eval(find_cmd)
@@ -79,4 +79,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    execute()

@@ -1,3 +1,4 @@
+import maya.cmds as cmds
 from core.components import color_changer as color_tool
 from core.components.color_library import ColorIndex as ColorLib
 from core.maya_managers.selection_manager import Select as sl
@@ -30,7 +31,7 @@ def _ui_setup(parent_ui, tool):
 
     def on_execute(*_):
         selected_color = color_option_menu.query('value')
-        objects = sl()
+        objects = sl().filter_selection(maya_object=True)
         color_tool.change_color(selected_color, objects)
 
     exec_button = Button(f'{tool}_button', l="Change Color",
@@ -39,18 +40,21 @@ def _ui_setup(parent_ui, tool):
 
 
 def create_ui_window():
-    win = Window("Color Tools",
-                 wh=[200, 100],
-                 maximizeButton=True,
-                 minimizeButton=True,
-                 backgroundColor=[.35, .3, .3],
-                 resizeToFitChildren=True)
+    if cmds.window("ColorTools", exists=True):
+        cmds.deleteUI("ColorTools")
+    cmds.window("ColorTools",
+                title="Color Tools",
+                wh=[200, 100],
+                maximizeButton=True,
+                minimizeButton=True,
+                backgroundColor=[.35, .3, .3],
+                resizeToFitChildren=True)
 
     tabs_ui = TabLayout('tabs_ui', innerMarginWidth=5, innerMarginHeight=5)
     color_tab = _ui_setup(tabs_ui, 'color')
     tabs_ui.edit(tl=(color_tab, "color creator"))
 
-    win.initialize()
+    cmds.showWindow("ColorTools")
 
 
 if __name__ == "__main__":

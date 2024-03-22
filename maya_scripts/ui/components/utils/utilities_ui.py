@@ -1,5 +1,5 @@
 import maya.cmds as cmds
-from core.components import constraint_cmds, history_cmds, parent_cmds
+from core.components import constraint_cmds, history_cmds, parent_cmds, joint_cmds
 from ui.components.ui_cmds.window_base import WindowBase as Window
 
 
@@ -25,14 +25,16 @@ def layer_cmds_ui(_parent_ui, tool):
 def axis_visibility_ui(_parent_ui, tool):
     axis_visibility_tab = cmds.columnLayout(f'{tool}_base', adj=True, bgc=[.1, .1, .3], p=_parent_ui)
 
-    cmds.rowColumnLayout(f'{tool}_top_row', p=f'{tool}_base', adj=True, bgc=[.5, .5, .5])
-    cmds.columnLayout(f'{tool}_bot_button', p=f'{tool}_base', adj=True, w=200)
-    cmds.text(l="Toggles the axis visibility of the selection (joints)", p=f'{tool}_top_row')
+    cmds.rowColumnLayout(f'{tool}_rows', p=f'{tool}_base', adj=True, bgc=[.5, .5, .5])
+    cmds.rowColumnLayout(
+        f'{tool}_bot_row', p=f'{tool}_base', numberOfColumns=2, adj=2, columnWidth=[(1, 75), (2, 170)])
+    cmds.text(l="Toggles the axis visibility of the selection (joints)", p=f'{tool}_rows')
+    cmds.checkBox('hierarchy_check', l="Hierarchy", p=f'{tool}_bot_row', v=False, bgc=[.25, .25, .25])
 
     def on_execute(*_):
-        joint_axis_vis_toggle.toggle_visibility()
+        joint_cmds.axis_vis_toggle.toggle_visibility(cmds.checkBox('hierarchy_check', query=True, v=True))
 
-    cmds.button(f'{tool}_button', l="Toggle", p=f'{tool}_bot_button', c=on_execute, bgc=[0, 0, 0])
+    cmds.button(f'{tool}_button', l="Toggle", p=f'{tool}_bot_row', c=on_execute, bgc=[0, 0, 0])
     return axis_visibility_tab
 
 
@@ -121,6 +123,8 @@ def _ui_setup(_parent_ui):
 
 
 def create_ui_window(manual_run=False):
+    if cmds.window('utility_ui_window', exists=True):
+        cmds.deleteUI('utility_ui_window', window=True)
     win = Window('utility_ui_window',
                  title="utility Tools",
                  widthHeight=(350, 500),
