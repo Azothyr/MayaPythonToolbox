@@ -64,16 +64,16 @@ def bind_to_skin_cluster(skin_cluster, influences, objects, **kwargs):
 
 def execute():
     selection = cmds.ls(sl=True)
-    find_cmd = f"findRelatedSkinCluster(\"{selection[0]}\")"
-    skin_cluster = mel.eval(find_cmd)
+    skin_cluster = mel.eval(f"findRelatedSkinCluster(\"{selection.pop(0)}\")")
 
     if skin_cluster:
         influences = cmds.skinCluster(skin_cluster, query=True, inf=True)
-        # cmds.select(influences, r=True)
     else:
         raise ValueError("No skin cluster found for the selected object.")
 
-    objects = [x for x in cmds.ls(type="transform") if x not in selection and "_geo" in x.lower() and "_grp" not in x.lower()]
+    # objects = [x for x in cmds.ls(type="transform") if x not in selection and "_geo" in x.lower() and "_grp" not in
+    #            x.lower()]
+    objects = [x for x in selection if cmds.nodeType(x) == "transform"]
     print(f"Objects to bind: {objects}")
     bind_to_skin_cluster(skin_cluster, influences, objects)
 

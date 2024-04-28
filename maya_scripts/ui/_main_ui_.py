@@ -6,20 +6,20 @@ from ui.components import JointUI, control_ui_create
 from pathlib import Path
 
 
-def run_script(script_path, script_name, name, *_):
+def run_script(script_name, tool_name, *_):
     ui_build = {
         "toolbox_ui": toolbox_ui.create_ui_window,
-        "color_change_ui": color_change_ui.create_ui_window,
+        "color_ui": color_change_ui.create_ui_window,
         "control_ui": control_ui_create,
-        "joint_ui": partial(JointUI, name, width=500, height=525, create=True),
+        "joint_ui": partial(JointUI, tool_name, width=500, height=525, create=True),
         "utilities_ui": utilities_ui.create_ui_window
     }
-    print(f"---RUNNING:  {script_path}")
     if script_name in ui_build:
         # Call the corresponding function
         ui_build[script_name]()
+        print(f"Running script: {script_name}")
     else:
-        print(f"No UI function found for {script_path}")
+        print(f"Script: {script_name} not found.")
 
 
 def create_tools_menu():
@@ -33,46 +33,27 @@ def create_tools_menu():
     # Define the directory where the custom scripts reside
     ui_directory = Path(__file__).parent
     print("UI Directory:", ui_directory)
-    joint_ui = ui_directory / "components/joint/joint_ui.py"
-    util_ui = ui_directory / "components/utils/utilities_ui.py"
-    control_ui = ui_directory / "components/control/control_ui.py"
+    joint_ui = "joint_ui"
+    control_ui = "control_ui"
+    color_ui = "color_ui"
+    util_ui = "utilities_ui"
 
     # List all scripts in the directory
-    scripts = [str(item) for item in [joint_ui, util_ui, control_ui]]
+    scripts = [str(item) for item in [joint_ui, color_ui, control_ui, util_ui]]
 
     for script in scripts:
-        script_name = script.rsplit("\\", 1)[1].rsplit(".", 1)[0]
-        name = script_name.replace("ui", "tool").replace("_", " ").title()
-        print("---ADDING TO MAYA: ", script_name)
-        # print("Script name:", script_name)
-        command_callback = partial(run_script, script, script_name, name)
+        tool_name = script.replace("ui", "tool").replace("_", " ").title()
+        print(f"---ADDING {script.upper()} TO MAYA TOOL MENU")
+        command_callback = partial(run_script, script, tool_name)
         print(command_callback)
         cmds.menuItem(
-            label=name,
+            label=tool_name,
             command=command_callback,
             parent="customToolsMenu"
         )
 
 
-def _menu_debug_print():
-    ui_directory = Path(__file__).parent
-    joint_ui = ui_directory / "components/joint/joint_ui.py"
-    util_ui = ui_directory / "components/utils/utilities_ui.py"
-    control_ui = ui_directory / "components/control/control_ui.py"
-    print(f"UI Directory: {ui_directory}", f"EXISTS: {ui_directory.exists()}")
-    print(f"Joint UI: {joint_ui}", f"EXISTS: {joint_ui.exists()}")
-    print(f"Util UI: {util_ui}", f"EXISTS: {util_ui.exists()}")
-    print(f"Control UI: {control_ui}", f"EXISTS: {control_ui.exists()}")
-    scripts = [str(item) for item in [joint_ui, util_ui, control_ui]]
-    print("Scripts:", scripts)
-    for script in scripts:
-        name = script.rsplit("\\", 1)[1].replace("_ui.py", "").title()
-        script_name = name + " Tool"
-        print("Script name:", script_name)
-
-
 if __name__ == "__main__":
     __file__ = Path().home() / "Documents" / "GitRepos" / "MayaPythonToolbox" / "maya_scripts" / "ui" / "_main_ui_.py"
     create_tools_menu()
-    # _menu_debug_print()
 
