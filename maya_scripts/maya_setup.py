@@ -8,14 +8,15 @@ from pathlib import Path
 def set_maya_command_port():
     """Set Maya command line to Pycharm listener"""
     try:
+        print("[INFO] Setting Maya command port to 4434")
         if not cmds.commandPort(":4434", query=True):
             cmds.commandPort(name=":4434")
         if cmds.commandPort(":4434", query=True):
-            print("Maya command port set to 4434")
+            print("[INFO] SUCCESS | Maya command port set to 4434")
         else:
-            print("Maya command port not set")
+            print("[WARNING] FAILURE | Maya command port not set")
     except Exception as e:
-        print("Error during Maya startup:", str(e))
+        print("[ERROR] UNEXPECTED EXCEPTION | Error occured during Maya startup - Set Maya Command Port:", str(e))
 
 
 def push_scripts_to_sys():
@@ -24,11 +25,11 @@ def push_scripts_to_sys():
         scripts_folder = str(Path(__file__).parent.parent)
         if scripts_folder not in sys.path:
             sys.path.append(scripts_folder)
-            print("Custom scripts folder added to sys.path")
+            print("[INFO] SUCCESS | Custom scripts folder added to sys.path")
         else:
-            print("Custom scripts folder already in sys.path")
+            print("[INFO] SKIPPING | Custom scripts folder already in sys.path")
     except Exception as e:
-        print("Error during Maya startup:", str(e))
+        print("[ERROR] UNEXPECTED EXCEPTION | Error occured during Maya startup - Push Scripts To Sys:", str(e))
 
 
 def set_tool_tab_on_start():
@@ -36,16 +37,16 @@ def set_tool_tab_on_start():
     try:
         cmds.scriptJob(event=("SceneOpened", refresh_tools))
         cmds.scriptJob(event=("NewSceneOpened", refresh_tools))
-        print("Custom Tools event added to Maya sceneOpened event")
+        print("[INFO] Custom Tools event added to Maya sceneOpened event")
         check = cmds.file(query=True, exists=True)
         open_scene = cmds.file(query=True, sceneName=True)
-        print("Checking if scene is currently open...")
+        print("[INFO] Checking if scene is currently open...")
         if check and open_scene:
-            print("CONFIRMED SCENE IS OPEN, running refresh_tools()")
-            print("SCENE:", open_scene)
+            print("[INFO] CONFIRMED SCENE IS OPEN, running refresh_tools()")
+            print("[INFO] SCENE:", open_scene)
             refresh_tools()
     except Exception as e:
-        print("Error during Maya startup:", str(e))
+        print("[ERROR] UNEXPECTED EXCEPTION | Error occured during Maya startup - Set Tool Tab on Start:", str(e))
 
 
 def refresh_tools():
@@ -53,7 +54,7 @@ def refresh_tools():
     try:
         _main_ui_.create_tools_menu()
     except Exception as e:
-        print("Error during Maya startup:", str(e))
+        print("[ERROR] UNEXPECTED EXCEPTION | Error occured during Maya startup - Refresh Tools:", str(e))
 
 
 def get_substance_plugin_working():
@@ -62,7 +63,7 @@ def get_substance_plugin_working():
     Reordering the path fixes the issue, performing this fix below
     """
     try:
-        print('reordering substance path')
+        print('[INFO] reordering substance path')
         import os
         path = os.getenv('PATH')
         path_items = path.split(';')
@@ -86,9 +87,41 @@ def get_substance_plugin_working():
 
         path_reorder = ';'.join(path_items)
         os.environ["PATH"] = path_reorder
-        print('substance path reordered')
+        print('[INFO] SUCCESS | substance path reordered.')
     except Exception as e:
-        print("Error during Maya startup:", str(e))
+        print("[ERROR] UNEXPECTED EXCEPTION | Error occured during Maya startup - Get Substance Plugin Working:", str(e))
+
+
+def create_user_setup(year: str = None, _open: bool = False):
+    user_setup = str(Path(cmds.internalVar(userScriptDir=True) / "userSetup.py")) if \
+        cmds.internalVar(userScriptDir=True) else \
+        str(Path(Path.home() / f"documents/maya/{year}/scripts/userSetup.py")) if year else None
+    try:
+        if not Path(user_setup).parent.exists():
+            raise FileNotFoundError(f"[ERROR] FILE NOT FOUND EXCEPTION | Could not find userSetup.py at {user_setup}.")
+    except TypeError:
+        raise TypeError("Could not find userSetup.py")
+    print(f"[INFO] SUCCESS | Provided Path Validated.")
+    print(f"[INFO] Attempting to create userSetup.py at: '{user_setup}'...")
+    with open(user_setup, "w") as file:
+        file.write(
+            """import maya.cmds as cmds
+from config.maya_setup import set_maya_on_start
+
+try:
+    print('[INFO] Running ZP Tools setup...')
+    cmds.evalDeferred('set_maya_on_start()', lowestPriority=True)
+except Exception as e:
+    print('[ERROR] UNEXPECTED EXCEPTION | Error setting up ZP Tools during Maya startup:', str(e))
+""")
+
+    if Path(user_setup).exists():
+        print(f"[INFO] SUCCESS | created userSetup.py at {user_setup}.")
+        if _open:
+            if sys.platform == "win32":
+                os.startfile(user_setup)
+    else:
+        print(f"[WARNING] FAILURE | failed to create userSetup.py at {user_setup}.")
 
 
 def set_maya_on_start():
@@ -98,37 +131,8 @@ def set_maya_on_start():
     set_tool_tab_on_start()
 
 
-def create_user_setup(year: str = None, _open: bool = False):
-    user_setup = str(Path(cmds.internalVar(userScriptDir=True) / "userSetup.py")) if \
-        cmds.internalVar(userScriptDir=True) else \
-        str(Path(Path.home() / f"documents/maya/{year}/scripts/userSetup.py")) if year else None
-    try:
-        if not Path(user_setup).parent.exists():
-            raise FileNotFoundError(f"Could not find userSetup.py at {user_setup}")
-    except TypeError:
-        raise TypeError("Could not find userSetup.py")
-    print(f"Provided Path Validated...\n---ATTEMPT--- Creating userSetup.py at: '{user_setup}'...")
-    with open(user_setup, "w") as file:
-        file.write(
-            """import maya.cmds as cmds
-from config.maya_setup import set_maya_on_start
-
-try:
-    cmds.evalDeferred('set_maya_on_start()', lowestPriority=True)
-except Exception as e:
-    print('Error setting up ZP Tools during Maya startup:', str(e))
-""")
-
-    if Path(user_setup).exists():
-        print(f"---SUCCESS--- created userSetup.py at {user_setup}")
-        if _open:
-            if sys.platform == "win32":
-                os.startfile(user_setup)
-    else:
-        print(f"---FAIL--- to create userSetup.py at {user_setup}")
-
-
 if __name__ == "__main__":
     # set_maya_on_start()
     # refresh_tools()
     create_user_setup("2024", _open=True)
+    print("test")

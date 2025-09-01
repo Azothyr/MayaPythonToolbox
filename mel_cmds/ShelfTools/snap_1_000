@@ -1,0 +1,2 @@
+manipMoveSetSnapMode 2;
+manipMoveContext -e -snapValue 1 $currManipMovePropertiesCtx;
