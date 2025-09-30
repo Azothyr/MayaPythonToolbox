@@ -105,7 +105,7 @@ class Menu:
 # Example Usage
 if __name__ == "__main__":
     """ 
-    # TEST 1
+    # TEST 1 - Basic Usage
     def sample_callback(name, option):
         print(f"Callback for {name} with option {option}")
     mapping = {

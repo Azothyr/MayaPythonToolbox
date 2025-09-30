@@ -4,6 +4,12 @@ class Parser:
     """
 
     def __init__(self, options: list, default_value: str | None = None, **kwargs):
+        """
+        Initializes the Parser class with a list of expected variant parameter names and a default value.
+
+        :param options: A list of expected variant parameter names.
+        :param default_value: The default value to return if no variant parameter names are found.
+        """
         if not isinstance(options, list):
             raise ValueError("Options must be a list.")
         self.options = options

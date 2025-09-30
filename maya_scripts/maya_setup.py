@@ -92,17 +92,26 @@ def get_substance_plugin_working():
         print("[ERROR] UNEXPECTED EXCEPTION | Error occured during Maya startup - Get Substance Plugin Working:", str(e))
 
 
-def create_user_setup(year: str = None, _open: bool = False):
-    user_setup = str(Path(cmds.internalVar(userScriptDir=True) / "userSetup.py")) if \
-        cmds.internalVar(userScriptDir=True) else \
-        str(Path(Path.home() / f"documents/maya/{year}/scripts/userSetup.py")) if year else None
+def set_maya_on_start():
+    get_substance_plugin_working()
+    set_maya_command_port()
+    push_scripts_to_sys()
+    set_tool_tab_on_start()
+
+
+def create_user_setup(year: str = None, maya_is_open: bool = False):
+    maya_app_dir = os.environ.get("MAYA_APP_DIR") or Path.home() / "Documents" / "maya"
+    script_dir = Path(maya_app_dir) / f"{year}" / "scripts" if year else None
+    user_setup = str(Path(script_dir) / "userSetup.py")
+
     try:
-        if not Path(user_setup).parent.exists():
-            raise FileNotFoundError(f"[ERROR] FILE NOT FOUND EXCEPTION | Could not find userSetup.py at {user_setup}.")
+        if not Path(script_dir).exists():
+            raise FileNotFoundError(f"---ERROR--- Could not find {script_dir}")
     except TypeError:
-        raise TypeError("Could not find userSetup.py")
-    print(f"[INFO] SUCCESS | Provided Path Validated.")
-    print(f"[INFO] Attempting to create userSetup.py at: '{user_setup}'...")
+        raise TypeError(f"---ERROR--- Could not find {user_setup}")
+
+    print(f"Provided Path Validated...\n---ATTEMPT--- Creating userSetup.py at: '{user_setup}'...")
+
     with open(user_setup, "w") as file:
         file.write(
             """import maya.cmds as cmds
@@ -116,12 +125,12 @@ except Exception as e:
 """)
 
     if Path(user_setup).exists():
-        print(f"[INFO] SUCCESS | created userSetup.py at {user_setup}.")
-        if _open:
+        print(f"---SUCCESS--- created userSetup.py at {user_setup}")
+        if maya_is_open:
             if sys.platform == "win32":
                 os.startfile(user_setup)
     else:
-        print(f"[WARNING] FAILURE | failed to create userSetup.py at {user_setup}.")
+        print(f"---FAIL--- failed to create userSetup.py at {user_setup}")
 
 
 def set_maya_on_start():
@@ -134,5 +143,5 @@ def set_maya_on_start():
 if __name__ == "__main__":
     # set_maya_on_start()
     # refresh_tools()
-    create_user_setup("2024", _open=True)
-    print("test")
+    # create_user_setup("2026", maya_is_open=True)
+    create_user_setup("2026")

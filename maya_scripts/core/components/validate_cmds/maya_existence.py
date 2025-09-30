@@ -21,7 +21,8 @@ class Exists:
         self.options = OptMenu({
             "object": (["o", "obj"], self.obj),
             "attribute": (["a", "at", "attr"], lambda name, **kw: self.attr(
-                name, Parse(["attribute", "attr", "at", "a"], "MISSING", **kw)())),
+                name, Parse(["attribute", "attr", "at", "a"], "MISSING", **kw)())
+                          ),
             "mesh": (["m", "msh"], self.mesh),
             "node": (["n"], self.node),
             "constraint": (["cst", "cons"], self.constraint),
